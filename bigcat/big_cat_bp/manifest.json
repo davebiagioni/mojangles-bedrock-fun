@@ -1,0 +1,36 @@
+{
+  "format_version": 2,
+  "header": {
+    "description": "Big Cat behavior",
+    "name": "Big Cat BP",
+    "uuid": "ea5cc9bb-c7c1-4381-a0a5-99c9c6a07265",
+    "version": [1, 0, 1],
+    "min_engine_version": [1, 26, 60]
+  },
+  "modules": [
+    {
+      "description": "Big Cat behavior",
+      "type": "data",
+      "uuid": "e53fde84-875b-4f1c-8d88-70c0ab76011d",
+      "version": [1, 0, 1]
+    },
+    {
+      "description": "Big Cat laser pointer script",
+      "type": "script",
+      "language": "javascript",
+      "uuid": "adbc8eaf-b664-4934-825e-1296670e7e00",
+      "entry": "scripts/main.js",
+      "version": [1, 0, 1]
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.11.0"
+    },
+    {
+      "uuid": "e2603b67-ac51-478e-9a37-ed48b3e48e5e",
+      "version": [1, 0, 1]
+    }
+  ]
+}

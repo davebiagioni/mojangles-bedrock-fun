@@ -1,0 +1,18 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mymod:laser_dot",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/laser_dot"
+      },
+      "geometry": {
+        "default": "geometry.mymod.laser_dot"
+      },
+      "render_controllers": ["controller.render.default"]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+# --- Mojang content: never committed (Minecraft EULA) ---------------------------
+# Mojang's bedrock-samples checkout (clone it locally, see README)
+bedrock-samples/
+# Vanilla files each build copies out of bedrock-samples (tools/fetch_vanilla.py)
+*/vanilla/
+# Generated textures derived from vanilla textures (rebuilt by tools/build.py)
+bigcat/big_cat_rp/textures/entity/coats/
+gear/gear_rp/textures/gear/
+gear/gear_bp/pack_icon.png
+gear/gear_rp/pack_icon.png
+
+# --- build output -----------------------------------------------------------
+build/
+dist/
+*.mcaddon
+__pycache__/
+
+# --- local backup of bigcat's pre-monorepo git history (contains vanilla files) -
+_old_bigcat_git/

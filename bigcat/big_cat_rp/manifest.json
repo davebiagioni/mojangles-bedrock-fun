@@ -1,0 +1,18 @@
+{
+  "format_version": 2,
+  "header": {
+    "description": "Big Cat resources",
+    "name": "Big Cat RP",
+    "uuid": "e2603b67-ac51-478e-9a37-ed48b3e48e5e",
+    "version": [1, 0, 1],
+    "min_engine_version": [1, 26, 60]
+  },
+  "modules": [
+    {
+      "description": "Big Cat resources",
+      "type": "resources",
+      "uuid": "1a9129e3-e5a3-468a-9436-88e56f55fd05",
+      "version": [1, 0, 1]
+    }
+  ]
+}

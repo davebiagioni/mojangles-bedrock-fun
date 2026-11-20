@@ -1,0 +1,122 @@
+{
+  "coat_count": 200,
+  "seed": 20261113,
+
+  "entity": {
+    "identifier": "mymod:big_cat",
+    "coat_property": "mymod:coat",
+    "geometry": "geometry.cat",
+    "render_controller": "controller.render.big_cat",
+    "addon_name": "big_cat"
+  },
+
+  "paths": {
+    "geometry": "vanilla/cat.geo.json",
+    "base_texture": "vanilla/cat_base.png",
+    "tame_reference": "vanilla/cat_tame.tga",
+    "protect_mask": "art/protect_mask.png",
+    "coat_layers": "art/coat_layers",
+    "behavior_pack": "big_cat_bp",
+    "resource_pack": "big_cat_rp",
+    "behavior_template": "tools/templates/big_cat.behavior.json",
+    "client_entity_template": "tools/templates/big_cat.client_entity.json",
+    "coat_texture_dir": "textures/entity/coats",
+    "build_dir": "build",
+    "dist_dir": "dist"
+  },
+
+  "colors": {
+    "white":      "#f2eee6",
+    "cream":      "#ecd9b8",
+    "fawn":       "#c8a47c",
+    "golden":     "#d6a24e",
+    "ginger":     "#d27f37",
+    "red":        "#a9541f",
+    "brown":      "#7c5636",
+    "chocolate":  "#4f3424",
+    "cinnamon":   "#9a5a35",
+    "black":      "#232020",
+    "charcoal":   "#3d3a38",
+    "gray":       "#77736f",
+    "blue":       "#7f8893",
+    "dark_blue":  "#4c535d",
+    "silver":     "#c9cbcd",
+    "lilac":      "#b7a8ad",
+    "dark_lilac": "#857479",
+    "seal":       "#3a2a22",
+    "smoke":      "#5e5d63"
+  },
+  "white": "white",
+
+  "palettes": [
+    { "name": "brown",     "base": "brown",     "dark": "chocolate",  "light": "fawn",   "weight": 3 },
+    { "name": "ginger",    "base": "ginger",    "dark": "red",        "light": "cream",  "weight": 3 },
+    { "name": "golden",    "base": "golden",    "dark": "cinnamon",   "light": "cream",  "weight": 1.5 },
+    { "name": "gray",      "base": "gray",      "dark": "charcoal",   "light": "silver", "weight": 2.5 },
+    { "name": "blue",      "base": "blue",      "dark": "dark_blue",  "light": "silver", "weight": 1.5 },
+    { "name": "black",     "base": "charcoal",  "dark": "black",      "light": "gray",   "weight": 2 },
+    { "name": "silver",    "base": "silver",    "dark": "smoke",      "light": "white",  "weight": 1.5 },
+    { "name": "cream",     "base": "cream",     "dark": "fawn",       "light": "white",  "weight": 1.5 },
+    { "name": "lilac",     "base": "lilac",     "dark": "dark_lilac", "light": "white",  "weight": 1 },
+    { "name": "seal",      "base": "fawn",      "dark": "seal",       "light": "cream",  "weight": 2, "patterns": ["calico", "tortie"] },
+    { "name": "tri_black", "base": "ginger",    "dark": "black",      "light": "cream",  "weight": 3, "patterns": ["calico", "tortie", "tuxedo"] },
+    { "name": "tri_blue",  "base": "golden",    "dark": "dark_blue",  "light": "cream",  "weight": 2, "patterns": ["calico", "tortie"] }
+  ],
+
+  "jitter": { "hue": 0.015, "sat": 0.08, "val": 0.07 },
+
+  "pattern_weights": {
+    "solid": 1,
+    "tabby": 3,
+    "spots": 1.5,
+    "calico": 1.5,
+    "tortie": 1,
+    "tuxedo": 1.5,
+    "colorpoint": 1,
+    "gradient": 1
+  },
+
+  "pattern_settings": {
+    "tabby":      { "period": [2.2, 3.6], "duty": [0.3, 0.5], "wobble": [0.2, 0.7], "broken_chance": 0.2 },
+    "spots":      { "cell": [2.0, 3.2], "radius": [0.36, 0.5], "density": [0.6, 0.95], "rosette_chance": 0.25 },
+    "calico":     { "white_amount": [-0.1, 0.15], "patch_freq": [0.25, 0.45] },
+    "tortie":     { "freq": [0.5, 0.9], "fleck_amount": [0.0, 0.12] },
+    "tuxedo":     { "edge_noise": [0.2, 0.6], "white_amount": [-0.05, 0.15] },
+    "colorpoint": { "mask_size": [2.5, 4.5] },
+    "gradient":   { "modes": ["dorsal", "length", "radial"] }
+  },
+
+  "modifiers": {
+    "light_belly": 0.35,
+    "white_paws": 0.12,
+    "white_blaze": 0.08,
+    "white_tail_tip": 0.06
+  },
+
+  "shading": { "strength": 0.18, "min": 0.8, "max": 1.15 },
+
+  "coat_layers": { "chance": 0.3 },
+
+  "tame": {
+    "fur_alpha": 4,
+    "collar_alpha": 255
+  },
+
+  "anatomy": {
+    "body_bone": "body",
+    "head_bone": "head",
+    "leg_bones": ["frontLegL", "frontLegR", "backLegL", "backLegR"],
+    "tail_bones": ["tail1", "tail2"],
+    "ear_cubes": [["head", 2], ["head", 3]],
+    "muzzle_cubes": [["head", 1]],
+    "belly_height": 0.35,
+    "paw_height": 1.6,
+    "rest_pose": {
+      "body":  { "rotation": [-90, 0, 0] },
+      "tail1": { "rotation": [-50, 0, 0] },
+      "tail2": { "rotation": [-75, 0, 0], "pivot": [0, 9, 16], "offset": [0, -5.1, -1.9] }
+    }
+  },
+
+  "test_grid": { "columns": 5, "rows": 4, "spacing": 6, "page_size": 20 }
+}

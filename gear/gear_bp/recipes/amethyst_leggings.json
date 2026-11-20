@@ -1,0 +1,26 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "gear:amethyst_leggings"
+    },
+    "tags": ["crafting_table"],
+    "pattern": ["SIS", "S S", "S S"],
+    "key": {
+      "S": {
+        "item": "minecraft:amethyst_shard"
+      },
+      "I": {
+        "item": "minecraft:iron_ingot"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:amethyst_shard"
+      }
+    ],
+    "result": {
+      "item": "gear:amethyst_leggings"
+    }
+  }
+}

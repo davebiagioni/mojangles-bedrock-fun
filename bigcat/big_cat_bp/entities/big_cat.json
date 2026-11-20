@@ -1,0 +1,1593 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "mymod:big_cat",
+      "spawn_category": "creature",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "properties": {
+        "mymod:sound_variant": {
+          "type": "enum",
+          "values": ["default", "royal"],
+          "default": "default",
+          "client_sync": true
+        },
+        "mymod:coat": {
+          "type": "int",
+          "range": [0, 199],
+          "default": "math.random_integer(0, 199)",
+          "client_sync": true
+        }
+      }
+    },
+    "component_groups": {
+      "minecraft:cat_baby": {
+        "minecraft:is_baby": {},
+        "minecraft:scale": {
+          "value": 1.5
+        },
+        "minecraft:ageable": {
+          "duration": 1200,
+          "feed_items": ["fish", "salmon"],
+          "pause_growth_items": ["golden_dandelion"],
+          "reset_growth_items": ["golden_dandelion"],
+          "grow_up": {
+            "event": "minecraft:ageable_grow_up",
+            "target": "self"
+          }
+        }
+      },
+      "minecraft:cat_adult": {
+        "minecraft:experience_reward": {
+          "on_bred": "Math.Random(1,7)",
+          "on_death": "query.last_hit_by_player ? Math.Random(1,3) : 0"
+        },
+        "minecraft:loot": {
+          "table": "loot_tables/entities/cat.json"
+        },
+        "minecraft:scale": {
+          "value": 3.0
+        },
+        "minecraft:leashable_to": {
+          "unleash_on_removal": false
+        },
+        "minecraft:breedable": {
+          "require_tame": true,
+          "require_full_health": true,
+          "allow_sitting": true,
+          "breeds_with": {
+            "mymod:big_cat": {}
+          },
+          "breed_items": ["fish", "salmon"]
+        },
+        "minecraft:behavior.breed": {
+          "priority": 3,
+          "speed_multiplier": 1.0
+        }
+      },
+      "minecraft:cat_wild": {
+        "minecraft:health": {
+          "value": 10,
+          "max": 10
+        },
+        "minecraft:tameable": {
+          "probability": 0.33,
+          "tame_items": ["fish", "salmon"],
+          "tame_event": {
+            "event": "minecraft:on_tame",
+            "target": "self"
+          }
+        },
+        "minecraft:rideable": {
+          "seat_count": 1,
+          "family_types": ["baby_undead"],
+          "seats": {
+            "position": [0.0, 0.35, 0.0]
+          }
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 1,
+          "reselect_targets": true,
+          "within_radius": 16.0,
+          "entity_types": [
+            {
+              "filters": {
+                "test": "is_family",
+                "subject": "other",
+                "value": "rabbit"
+              },
+              "max_dist": 8
+            },
+            {
+              "filters": {
+                "all_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "baby_turtle"
+                  },
+                  {
+                    "test": "in_water",
+                    "subject": "other",
+                    "operator": "!=",
+                    "value": true
+                  }
+                ]
+              },
+              "max_dist": 8
+            }
+          ]
+        },
+        "minecraft:behavior.tempt": {
+          "priority": 5,
+          "speed_multiplier": 0.5,
+          "within_radius": 16,
+          "can_get_scared": true,
+          "tempt_sound": "tempt",
+          "sound_interval": [0, 100],
+          "items": ["fish", "salmon"]
+        },
+        "minecraft:behavior.avoid_mob_type": {
+          "priority": 6,
+          "entity_types": [
+            {
+              "filters": {
+                "test": "is_family",
+                "subject": "other",
+                "value": "player"
+              },
+              "max_dist": 10,
+              "walk_speed_multiplier": 0.8,
+              "sprint_speed_multiplier": 1.33
+            }
+          ]
+        },
+        "minecraft:behavior.move_towards_dwelling_restriction": {
+          "priority": 7
+        }
+      },
+      "minecraft:cat_tame": {
+        "minecraft:is_tamed": {},
+        "minecraft:rideable": {
+          "seat_count": 1,
+          "crouching_skip_interact": true,
+          "family_types": ["player"],
+          "interact_text": "action.interact.ride.horse",
+          "seats": [
+            {
+              "position": [0.0, 0.5, -0.05]
+            }
+          ]
+        },
+        "minecraft:input_ground_controlled": {},
+        "minecraft:behavior.player_ride_tamed": {},
+        "minecraft:is_saddled": {},
+        "minecraft:dash_action": {
+          "cooldown_time": 1.0,
+          "horizontal_momentum": 20.0,
+          "vertical_momentum": 1.5
+        },
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:color": {
+          "value": 14
+        },
+        "minecraft:sittable": {},
+        "minecraft:is_dyeable": {
+          "interact_text": "action.interact.dye"
+        },
+        "minecraft:on_wake_with_owner": {
+          "event": "minecraft:pet_slept_with_owner",
+          "target": "self"
+        },
+        "minecraft:behavior.teleport_to_owner": {
+          "priority": 0,
+          "filters": {
+            "all_of": [
+              {
+                "test": "owner_distance",
+                "operator": ">",
+                "value": 12
+              },
+              {
+                "test": "is_panicking"
+              }
+            ]
+          }
+        },
+        "minecraft:behavior.pet_sleep_with_owner": {
+          "priority": 2,
+          "speed_multiplier": 1.2,
+          "search_height": 10,
+          "goal_radius": 1.0
+        },
+        "minecraft:behavior.stay_while_sitting": {
+          "priority": 3
+        },
+        "minecraft:behavior.follow_owner": {
+          "priority": 4,
+          "speed_multiplier": 1.0,
+          "start_distance": 10,
+          "stop_distance": 2,
+          "post_teleport_distance": -1,
+          "ignore_vibration": true
+        },
+        "minecraft:behavior.tempt": {
+          "priority": 5,
+          "speed_multiplier": 0.5,
+          "within_radius": 16,
+          "items": ["fish", "salmon"]
+        },
+        "minecraft:behavior.ocelot_sit_on_block": {
+          "priority": 7,
+          "speed_multiplier": 1.0
+        }
+      },
+      "minecraft:cat_gift_for_owner": {
+        "minecraft:behavior.drop_item_for": {
+          "priority": 1,
+          "seconds_before_pickup": 0.0,
+          "cooldown": 0.25,
+          "drop_item_chance": 0.7,
+          "offering_distance": 5.0,
+          "minimum_teleport_distance": 2.0,
+          "max_head_look_at_height": 10.0,
+          "target_range": [5.0, 5.0, 5.0],
+          "teleport_offset": [0.0, 1.0, 0.0],
+          "time_of_day_range": {
+            "min": 0.74999,
+            "max": 0.8
+          },
+          "search_range": 5,
+          "search_height": 2,
+          "goal_radius": 1.0,
+          "entity_types": [
+            {
+              "filters": {
+                "test": "is_family",
+                "subject": "other",
+                "value": "player"
+              },
+              "max_dist": 6
+            }
+          ],
+          "loot_table": "loot_tables/entities/cat_gift.json",
+          "on_drop_attempt": {
+            "event": "minecraft:cat_gifted_owner",
+            "target": "self"
+          }
+        }
+      }
+    },
+    "components": {
+      "minecraft:ambient_sound_interval": {
+        "event_name": "ambient",
+        "event_names": [
+          {
+            "condition": "query.is_baby",
+            "event_name": "ambient.baby"
+          }
+        ],
+        "range": 16.0,
+        "value": 6.0
+      },
+      "minecraft:offspring": {
+        "offspring_pairs": {
+          "mymod:big_cat": "mymod:big_cat"
+        },
+        "combine_parent_colors": true
+      },
+      "minecraft:spawn_egg_interaction": {},
+      "minecraft:leashable": {
+        "unleash_on_removal": false
+      },
+      "minecraft:balloonable": {
+        "mass": 0.6
+      },
+      "minecraft:is_hidden_when_invisible": {},
+      "minecraft:attack_damage": {
+        "value": 4
+      },
+      "minecraft:nameable": {},
+      "minecraft:type_family": {
+        "family": ["cat", "mob"]
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0
+      },
+      "minecraft:collision_box": {
+        "width": 1.2,
+        "height": 1.4
+      },
+      "minecraft:healable": {
+        "items": [
+          {
+            "item": "fish",
+            "heal_amount": 2
+          },
+          {
+            "item": "salmon",
+            "heal_amount": 2
+          }
+        ]
+      },
+      "minecraft:hurt_on_condition": {
+        "damage_conditions": [
+          {
+            "filters": {
+              "test": "in_lava",
+              "subject": "self",
+              "operator": "==",
+              "value": true
+            },
+            "cause": "lava",
+            "damage_per_tick": 4
+          }
+        ]
+      },
+      "minecraft:movement": {
+        "value": 0.3
+      },
+      "minecraft:navigation.walk": {
+        "can_float": true,
+        "avoid_water": true,
+        "avoid_damage_blocks": true,
+        "using_door_annotation": true
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:jump.static": {},
+      "minecraft:can_climb": {},
+      "minecraft:damage_sensor": {
+        "triggers": {
+          "cause": "fall",
+          "deals_damage": "no"
+        }
+      },
+      "minecraft:dweller": {
+        "dwelling_type": "village",
+        "dweller_role": "passive",
+        "update_interval_base": 60,
+        "update_interval_variant": 40,
+        "can_find_poi": false,
+        "can_migrate": true,
+        "first_founding_reward": 0
+      },
+      "minecraft:despawn": {
+        "despawn_from_distance": {}
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable_by_entity": {},
+      "minecraft:pushable_by_block": {},
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:behavior.float": {
+        "priority": 0
+      },
+      "minecraft:behavior.panic": {
+        "priority": 1,
+        "speed_multiplier": 1.25
+      },
+      "minecraft:behavior.mount_pathing": {
+        "priority": 1,
+        "speed_multiplier": 1.25,
+        "target_dist": 0,
+        "track_target": true
+      },
+      "minecraft:behavior.nearest_prioritized_attackable_target": {
+        "priority": 0,
+        "reselect_targets": true,
+        "must_see": false,
+        "must_reach": false,
+        "persist_time": 0,
+        "scan_interval": 5,
+        "within_radius": 24.0,
+        "entity_types": [
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "bigcat_laser_dot"
+                },
+                {
+                  "test": "has_tag",
+                  "subject": "self",
+                  "operator": "!=",
+                  "value": "bigcat_bored"
+                }
+              ]
+            },
+            "max_dist": 24,
+            "priority": 0
+          }
+        ]
+      },
+      "minecraft:behavior.move_towards_target": {
+        "priority": 5,
+        "speed_multiplier": 1.25,
+        "within_radius": 2.0
+      },
+      "minecraft:behavior.leap_at_target": {
+        "priority": 3
+      },
+      "minecraft:behavior.ocelotattack": {
+        "priority": 4,
+        "cooldown_time": 1.0,
+        "x_max_rotation": 30.0,
+        "y_max_head_rotation": 30.0,
+        "max_distance": 15.0,
+        "max_sneak_range": 15.0,
+        "max_sprint_range": 4.0,
+        "reach_multiplier": 2.0,
+        "sneak_speed_multiplier": 0.6,
+        "sprint_speed_multiplier": 1.33,
+        "walk_speed_multiplier": 0.8
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 8,
+        "speed_multiplier": 0.8
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 9
+      },
+      "minecraft:uses_legacy_friction": {}
+    },
+    "events": {
+      "minecraft:entity_spawned": {
+        "sequence": [
+          {
+            "randomize": [
+              {
+                "weight": 3,
+                "remove": {},
+                "add": {
+                  "component_groups": ["minecraft:cat_adult", "minecraft:cat_wild"]
+                }
+              },
+              {
+                "weight": 1,
+                "remove": {},
+                "add": {
+                  "component_groups": ["minecraft:cat_baby", "minecraft:cat_wild"]
+                }
+              }
+            ]
+          },
+          {
+            "trigger": "minecraft:randomize_sound_variant"
+          }
+        ]
+      },
+      "minecraft:spawn_from_village": {
+        "sequence": [
+          {
+            "randomize": [
+              {
+                "weight": 3,
+                "trigger": "minecraft:spawn_wild_adult"
+              },
+              {
+                "weight": 1,
+                "trigger": "minecraft:spawn_wild_baby"
+              }
+            ]
+          }
+        ]
+      },
+      "minecraft:spawn_midnight_cat": {
+        "sequence": [
+          {
+            "trigger": "minecraft:spawn_wild_adult"
+          }
+        ]
+      },
+      "minecraft:entity_born": {
+        "sequence": [
+          {
+            "filters": {
+              "test": "is_tamed"
+            },
+            "trigger": "minecraft:spawn_tame_baby"
+          },
+          {
+            "filters": {
+              "test": "is_tamed",
+              "value": false
+            },
+            "trigger": "minecraft:spawn_wild_baby"
+          }
+        ]
+      },
+      "minecraft:spawn_wild_baby": {
+        "add": {
+          "component_groups": ["minecraft:cat_baby", "minecraft:cat_wild"]
+        }
+      },
+      "minecraft:spawn_wild_adult": {
+        "add": {
+          "component_groups": ["minecraft:cat_adult", "minecraft:cat_wild"]
+        },
+        "trigger": "minecraft:randomize_sound_variant"
+      },
+      "minecraft:spawn_tame_baby": {
+        "add": {
+          "component_groups": ["minecraft:cat_baby", "minecraft:cat_tame"]
+        }
+      },
+      "minecraft:spawn_tame_adult": {
+        "add": {
+          "component_groups": ["minecraft:cat_adult", "minecraft:cat_tame"]
+        },
+        "trigger": "minecraft:randomize_sound_variant"
+      },
+      "minecraft:ageable_grow_up": {
+        "remove": {
+          "component_groups": ["minecraft:cat_baby"]
+        },
+        "add": {
+          "component_groups": ["minecraft:cat_adult"]
+        },
+        "trigger": "minecraft:randomize_sound_variant"
+      },
+      "minecraft:on_tame": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": ["minecraft:cat_wild"]
+            }
+          },
+          {
+            "add": {
+              "component_groups": ["minecraft:cat_tame"]
+            }
+          }
+        ]
+      },
+      "minecraft:pet_slept_with_owner": {
+        "add": {
+          "component_groups": ["minecraft:cat_gift_for_owner"]
+        }
+      },
+      "minecraft:cat_gifted_owner": {
+        "remove": {
+          "component_groups": ["minecraft:cat_gift_for_owner"]
+        }
+      },
+      "minecraft:randomize_sound_variant": {
+        "randomize": [
+          {
+            "weight": 1,
+            "set_property": {
+              "mymod:sound_variant": "default"
+            }
+          },
+          {
+            "weight": 1,
+            "set_property": {
+              "mymod:sound_variant": "royal"
+            }
+          }
+        ]
+      },
+      "mymod:randomize_coat": {
+        "set_property": {
+          "mymod:coat": "math.random_integer(0, 199)"
+        }
+      },
+      "mymod:next_coat": {
+        "set_property": {
+          "mymod:coat": "math.mod(query.property('mymod:coat') + 1, 200)"
+        }
+      },
+      "mymod:prev_coat": {
+        "set_property": {
+          "mymod:coat": "math.mod(query.property('mymod:coat') + 199, 200)"
+        }
+      },
+      "mymod:set_coat_0": {
+        "set_property": {
+          "mymod:coat": 0
+        }
+      },
+      "mymod:set_coat_1": {
+        "set_property": {
+          "mymod:coat": 1
+        }
+      },
+      "mymod:set_coat_2": {
+        "set_property": {
+          "mymod:coat": 2
+        }
+      },
+      "mymod:set_coat_3": {
+        "set_property": {
+          "mymod:coat": 3
+        }
+      },
+      "mymod:set_coat_4": {
+        "set_property": {
+          "mymod:coat": 4
+        }
+      },
+      "mymod:set_coat_5": {
+        "set_property": {
+          "mymod:coat": 5
+        }
+      },
+      "mymod:set_coat_6": {
+        "set_property": {
+          "mymod:coat": 6
+        }
+      },
+      "mymod:set_coat_7": {
+        "set_property": {
+          "mymod:coat": 7
+        }
+      },
+      "mymod:set_coat_8": {
+        "set_property": {
+          "mymod:coat": 8
+        }
+      },
+      "mymod:set_coat_9": {
+        "set_property": {
+          "mymod:coat": 9
+        }
+      },
+      "mymod:set_coat_10": {
+        "set_property": {
+          "mymod:coat": 10
+        }
+      },
+      "mymod:set_coat_11": {
+        "set_property": {
+          "mymod:coat": 11
+        }
+      },
+      "mymod:set_coat_12": {
+        "set_property": {
+          "mymod:coat": 12
+        }
+      },
+      "mymod:set_coat_13": {
+        "set_property": {
+          "mymod:coat": 13
+        }
+      },
+      "mymod:set_coat_14": {
+        "set_property": {
+          "mymod:coat": 14
+        }
+      },
+      "mymod:set_coat_15": {
+        "set_property": {
+          "mymod:coat": 15
+        }
+      },
+      "mymod:set_coat_16": {
+        "set_property": {
+          "mymod:coat": 16
+        }
+      },
+      "mymod:set_coat_17": {
+        "set_property": {
+          "mymod:coat": 17
+        }
+      },
+      "mymod:set_coat_18": {
+        "set_property": {
+          "mymod:coat": 18
+        }
+      },
+      "mymod:set_coat_19": {
+        "set_property": {
+          "mymod:coat": 19
+        }
+      },
+      "mymod:set_coat_20": {
+        "set_property": {
+          "mymod:coat": 20
+        }
+      },
+      "mymod:set_coat_21": {
+        "set_property": {
+          "mymod:coat": 21
+        }
+      },
+      "mymod:set_coat_22": {
+        "set_property": {
+          "mymod:coat": 22
+        }
+      },
+      "mymod:set_coat_23": {
+        "set_property": {
+          "mymod:coat": 23
+        }
+      },
+      "mymod:set_coat_24": {
+        "set_property": {
+          "mymod:coat": 24
+        }
+      },
+      "mymod:set_coat_25": {
+        "set_property": {
+          "mymod:coat": 25
+        }
+      },
+      "mymod:set_coat_26": {
+        "set_property": {
+          "mymod:coat": 26
+        }
+      },
+      "mymod:set_coat_27": {
+        "set_property": {
+          "mymod:coat": 27
+        }
+      },
+      "mymod:set_coat_28": {
+        "set_property": {
+          "mymod:coat": 28
+        }
+      },
+      "mymod:set_coat_29": {
+        "set_property": {
+          "mymod:coat": 29
+        }
+      },
+      "mymod:set_coat_30": {
+        "set_property": {
+          "mymod:coat": 30
+        }
+      },
+      "mymod:set_coat_31": {
+        "set_property": {
+          "mymod:coat": 31
+        }
+      },
+      "mymod:set_coat_32": {
+        "set_property": {
+          "mymod:coat": 32
+        }
+      },
+      "mymod:set_coat_33": {
+        "set_property": {
+          "mymod:coat": 33
+        }
+      },
+      "mymod:set_coat_34": {
+        "set_property": {
+          "mymod:coat": 34
+        }
+      },
+      "mymod:set_coat_35": {
+        "set_property": {
+          "mymod:coat": 35
+        }
+      },
+      "mymod:set_coat_36": {
+        "set_property": {
+          "mymod:coat": 36
+        }
+      },
+      "mymod:set_coat_37": {
+        "set_property": {
+          "mymod:coat": 37
+        }
+      },
+      "mymod:set_coat_38": {
+        "set_property": {
+          "mymod:coat": 38
+        }
+      },
+      "mymod:set_coat_39": {
+        "set_property": {
+          "mymod:coat": 39
+        }
+      },
+      "mymod:set_coat_40": {
+        "set_property": {
+          "mymod:coat": 40
+        }
+      },
+      "mymod:set_coat_41": {
+        "set_property": {
+          "mymod:coat": 41
+        }
+      },
+      "mymod:set_coat_42": {
+        "set_property": {
+          "mymod:coat": 42
+        }
+      },
+      "mymod:set_coat_43": {
+        "set_property": {
+          "mymod:coat": 43
+        }
+      },
+      "mymod:set_coat_44": {
+        "set_property": {
+          "mymod:coat": 44
+        }
+      },
+      "mymod:set_coat_45": {
+        "set_property": {
+          "mymod:coat": 45
+        }
+      },
+      "mymod:set_coat_46": {
+        "set_property": {
+          "mymod:coat": 46
+        }
+      },
+      "mymod:set_coat_47": {
+        "set_property": {
+          "mymod:coat": 47
+        }
+      },
+      "mymod:set_coat_48": {
+        "set_property": {
+          "mymod:coat": 48
+        }
+      },
+      "mymod:set_coat_49": {
+        "set_property": {
+          "mymod:coat": 49
+        }
+      },
+      "mymod:set_coat_50": {
+        "set_property": {
+          "mymod:coat": 50
+        }
+      },
+      "mymod:set_coat_51": {
+        "set_property": {
+          "mymod:coat": 51
+        }
+      },
+      "mymod:set_coat_52": {
+        "set_property": {
+          "mymod:coat": 52
+        }
+      },
+      "mymod:set_coat_53": {
+        "set_property": {
+          "mymod:coat": 53
+        }
+      },
+      "mymod:set_coat_54": {
+        "set_property": {
+          "mymod:coat": 54
+        }
+      },
+      "mymod:set_coat_55": {
+        "set_property": {
+          "mymod:coat": 55
+        }
+      },
+      "mymod:set_coat_56": {
+        "set_property": {
+          "mymod:coat": 56
+        }
+      },
+      "mymod:set_coat_57": {
+        "set_property": {
+          "mymod:coat": 57
+        }
+      },
+      "mymod:set_coat_58": {
+        "set_property": {
+          "mymod:coat": 58
+        }
+      },
+      "mymod:set_coat_59": {
+        "set_property": {
+          "mymod:coat": 59
+        }
+      },
+      "mymod:set_coat_60": {
+        "set_property": {
+          "mymod:coat": 60
+        }
+      },
+      "mymod:set_coat_61": {
+        "set_property": {
+          "mymod:coat": 61
+        }
+      },
+      "mymod:set_coat_62": {
+        "set_property": {
+          "mymod:coat": 62
+        }
+      },
+      "mymod:set_coat_63": {
+        "set_property": {
+          "mymod:coat": 63
+        }
+      },
+      "mymod:set_coat_64": {
+        "set_property": {
+          "mymod:coat": 64
+        }
+      },
+      "mymod:set_coat_65": {
+        "set_property": {
+          "mymod:coat": 65
+        }
+      },
+      "mymod:set_coat_66": {
+        "set_property": {
+          "mymod:coat": 66
+        }
+      },
+      "mymod:set_coat_67": {
+        "set_property": {
+          "mymod:coat": 67
+        }
+      },
+      "mymod:set_coat_68": {
+        "set_property": {
+          "mymod:coat": 68
+        }
+      },
+      "mymod:set_coat_69": {
+        "set_property": {
+          "mymod:coat": 69
+        }
+      },
+      "mymod:set_coat_70": {
+        "set_property": {
+          "mymod:coat": 70
+        }
+      },
+      "mymod:set_coat_71": {
+        "set_property": {
+          "mymod:coat": 71
+        }
+      },
+      "mymod:set_coat_72": {
+        "set_property": {
+          "mymod:coat": 72
+        }
+      },
+      "mymod:set_coat_73": {
+        "set_property": {
+          "mymod:coat": 73
+        }
+      },
+      "mymod:set_coat_74": {
+        "set_property": {
+          "mymod:coat": 74
+        }
+      },
+      "mymod:set_coat_75": {
+        "set_property": {
+          "mymod:coat": 75
+        }
+      },
+      "mymod:set_coat_76": {
+        "set_property": {
+          "mymod:coat": 76
+        }
+      },
+      "mymod:set_coat_77": {
+        "set_property": {
+          "mymod:coat": 77
+        }
+      },
+      "mymod:set_coat_78": {
+        "set_property": {
+          "mymod:coat": 78
+        }
+      },
+      "mymod:set_coat_79": {
+        "set_property": {
+          "mymod:coat": 79
+        }
+      },
+      "mymod:set_coat_80": {
+        "set_property": {
+          "mymod:coat": 80
+        }
+      },
+      "mymod:set_coat_81": {
+        "set_property": {
+          "mymod:coat": 81
+        }
+      },
+      "mymod:set_coat_82": {
+        "set_property": {
+          "mymod:coat": 82
+        }
+      },
+      "mymod:set_coat_83": {
+        "set_property": {
+          "mymod:coat": 83
+        }
+      },
+      "mymod:set_coat_84": {
+        "set_property": {
+          "mymod:coat": 84
+        }
+      },
+      "mymod:set_coat_85": {
+        "set_property": {
+          "mymod:coat": 85
+        }
+      },
+      "mymod:set_coat_86": {
+        "set_property": {
+          "mymod:coat": 86
+        }
+      },
+      "mymod:set_coat_87": {
+        "set_property": {
+          "mymod:coat": 87
+        }
+      },
+      "mymod:set_coat_88": {
+        "set_property": {
+          "mymod:coat": 88
+        }
+      },
+      "mymod:set_coat_89": {
+        "set_property": {
+          "mymod:coat": 89
+        }
+      },
+      "mymod:set_coat_90": {
+        "set_property": {
+          "mymod:coat": 90
+        }
+      },
+      "mymod:set_coat_91": {
+        "set_property": {
+          "mymod:coat": 91
+        }
+      },
+      "mymod:set_coat_92": {
+        "set_property": {
+          "mymod:coat": 92
+        }
+      },
+      "mymod:set_coat_93": {
+        "set_property": {
+          "mymod:coat": 93
+        }
+      },
+      "mymod:set_coat_94": {
+        "set_property": {
+          "mymod:coat": 94
+        }
+      },
+      "mymod:set_coat_95": {
+        "set_property": {
+          "mymod:coat": 95
+        }
+      },
+      "mymod:set_coat_96": {
+        "set_property": {
+          "mymod:coat": 96
+        }
+      },
+      "mymod:set_coat_97": {
+        "set_property": {
+          "mymod:coat": 97
+        }
+      },
+      "mymod:set_coat_98": {
+        "set_property": {
+          "mymod:coat": 98
+        }
+      },
+      "mymod:set_coat_99": {
+        "set_property": {
+          "mymod:coat": 99
+        }
+      },
+      "mymod:set_coat_100": {
+        "set_property": {
+          "mymod:coat": 100
+        }
+      },
+      "mymod:set_coat_101": {
+        "set_property": {
+          "mymod:coat": 101
+        }
+      },
+      "mymod:set_coat_102": {
+        "set_property": {
+          "mymod:coat": 102
+        }
+      },
+      "mymod:set_coat_103": {
+        "set_property": {
+          "mymod:coat": 103
+        }
+      },
+      "mymod:set_coat_104": {
+        "set_property": {
+          "mymod:coat": 104
+        }
+      },
+      "mymod:set_coat_105": {
+        "set_property": {
+          "mymod:coat": 105
+        }
+      },
+      "mymod:set_coat_106": {
+        "set_property": {
+          "mymod:coat": 106
+        }
+      },
+      "mymod:set_coat_107": {
+        "set_property": {
+          "mymod:coat": 107
+        }
+      },
+      "mymod:set_coat_108": {
+        "set_property": {
+          "mymod:coat": 108
+        }
+      },
+      "mymod:set_coat_109": {
+        "set_property": {
+          "mymod:coat": 109
+        }
+      },
+      "mymod:set_coat_110": {
+        "set_property": {
+          "mymod:coat": 110
+        }
+      },
+      "mymod:set_coat_111": {
+        "set_property": {
+          "mymod:coat": 111
+        }
+      },
+      "mymod:set_coat_112": {
+        "set_property": {
+          "mymod:coat": 112
+        }
+      },
+      "mymod:set_coat_113": {
+        "set_property": {
+          "mymod:coat": 113
+        }
+      },
+      "mymod:set_coat_114": {
+        "set_property": {
+          "mymod:coat": 114
+        }
+      },
+      "mymod:set_coat_115": {
+        "set_property": {
+          "mymod:coat": 115
+        }
+      },
+      "mymod:set_coat_116": {
+        "set_property": {
+          "mymod:coat": 116
+        }
+      },
+      "mymod:set_coat_117": {
+        "set_property": {
+          "mymod:coat": 117
+        }
+      },
+      "mymod:set_coat_118": {
+        "set_property": {
+          "mymod:coat": 118
+        }
+      },
+      "mymod:set_coat_119": {
+        "set_property": {
+          "mymod:coat": 119
+        }
+      },
+      "mymod:set_coat_120": {
+        "set_property": {
+          "mymod:coat": 120
+        }
+      },
+      "mymod:set_coat_121": {
+        "set_property": {
+          "mymod:coat": 121
+        }
+      },
+      "mymod:set_coat_122": {
+        "set_property": {
+          "mymod:coat": 122
+        }
+      },
+      "mymod:set_coat_123": {
+        "set_property": {
+          "mymod:coat": 123
+        }
+      },
+      "mymod:set_coat_124": {
+        "set_property": {
+          "mymod:coat": 124
+        }
+      },
+      "mymod:set_coat_125": {
+        "set_property": {
+          "mymod:coat": 125
+        }
+      },
+      "mymod:set_coat_126": {
+        "set_property": {
+          "mymod:coat": 126
+        }
+      },
+      "mymod:set_coat_127": {
+        "set_property": {
+          "mymod:coat": 127
+        }
+      },
+      "mymod:set_coat_128": {
+        "set_property": {
+          "mymod:coat": 128
+        }
+      },
+      "mymod:set_coat_129": {
+        "set_property": {
+          "mymod:coat": 129
+        }
+      },
+      "mymod:set_coat_130": {
+        "set_property": {
+          "mymod:coat": 130
+        }
+      },
+      "mymod:set_coat_131": {
+        "set_property": {
+          "mymod:coat": 131
+        }
+      },
+      "mymod:set_coat_132": {
+        "set_property": {
+          "mymod:coat": 132
+        }
+      },
+      "mymod:set_coat_133": {
+        "set_property": {
+          "mymod:coat": 133
+        }
+      },
+      "mymod:set_coat_134": {
+        "set_property": {
+          "mymod:coat": 134
+        }
+      },
+      "mymod:set_coat_135": {
+        "set_property": {
+          "mymod:coat": 135
+        }
+      },
+      "mymod:set_coat_136": {
+        "set_property": {
+          "mymod:coat": 136
+        }
+      },
+      "mymod:set_coat_137": {
+        "set_property": {
+          "mymod:coat": 137
+        }
+      },
+      "mymod:set_coat_138": {
+        "set_property": {
+          "mymod:coat": 138
+        }
+      },
+      "mymod:set_coat_139": {
+        "set_property": {
+          "mymod:coat": 139
+        }
+      },
+      "mymod:set_coat_140": {
+        "set_property": {
+          "mymod:coat": 140
+        }
+      },
+      "mymod:set_coat_141": {
+        "set_property": {
+          "mymod:coat": 141
+        }
+      },
+      "mymod:set_coat_142": {
+        "set_property": {
+          "mymod:coat": 142
+        }
+      },
+      "mymod:set_coat_143": {
+        "set_property": {
+          "mymod:coat": 143
+        }
+      },
+      "mymod:set_coat_144": {
+        "set_property": {
+          "mymod:coat": 144
+        }
+      },
+      "mymod:set_coat_145": {
+        "set_property": {
+          "mymod:coat": 145
+        }
+      },
+      "mymod:set_coat_146": {
+        "set_property": {
+          "mymod:coat": 146
+        }
+      },
+      "mymod:set_coat_147": {
+        "set_property": {
+          "mymod:coat": 147
+        }
+      },
+      "mymod:set_coat_148": {
+        "set_property": {
+          "mymod:coat": 148
+        }
+      },
+      "mymod:set_coat_149": {
+        "set_property": {
+          "mymod:coat": 149
+        }
+      },
+      "mymod:set_coat_150": {
+        "set_property": {
+          "mymod:coat": 150
+        }
+      },
+      "mymod:set_coat_151": {
+        "set_property": {
+          "mymod:coat": 151
+        }
+      },
+      "mymod:set_coat_152": {
+        "set_property": {
+          "mymod:coat": 152
+        }
+      },
+      "mymod:set_coat_153": {
+        "set_property": {
+          "mymod:coat": 153
+        }
+      },
+      "mymod:set_coat_154": {
+        "set_property": {
+          "mymod:coat": 154
+        }
+      },
+      "mymod:set_coat_155": {
+        "set_property": {
+          "mymod:coat": 155
+        }
+      },
+      "mymod:set_coat_156": {
+        "set_property": {
+          "mymod:coat": 156
+        }
+      },
+      "mymod:set_coat_157": {
+        "set_property": {
+          "mymod:coat": 157
+        }
+      },
+      "mymod:set_coat_158": {
+        "set_property": {
+          "mymod:coat": 158
+        }
+      },
+      "mymod:set_coat_159": {
+        "set_property": {
+          "mymod:coat": 159
+        }
+      },
+      "mymod:set_coat_160": {
+        "set_property": {
+          "mymod:coat": 160
+        }
+      },
+      "mymod:set_coat_161": {
+        "set_property": {
+          "mymod:coat": 161
+        }
+      },
+      "mymod:set_coat_162": {
+        "set_property": {
+          "mymod:coat": 162
+        }
+      },
+      "mymod:set_coat_163": {
+        "set_property": {
+          "mymod:coat": 163
+        }
+      },
+      "mymod:set_coat_164": {
+        "set_property": {
+          "mymod:coat": 164
+        }
+      },
+      "mymod:set_coat_165": {
+        "set_property": {
+          "mymod:coat": 165
+        }
+      },
+      "mymod:set_coat_166": {
+        "set_property": {
+          "mymod:coat": 166
+        }
+      },
+      "mymod:set_coat_167": {
+        "set_property": {
+          "mymod:coat": 167
+        }
+      },
+      "mymod:set_coat_168": {
+        "set_property": {
+          "mymod:coat": 168
+        }
+      },
+      "mymod:set_coat_169": {
+        "set_property": {
+          "mymod:coat": 169
+        }
+      },
+      "mymod:set_coat_170": {
+        "set_property": {
+          "mymod:coat": 170
+        }
+      },
+      "mymod:set_coat_171": {
+        "set_property": {
+          "mymod:coat": 171
+        }
+      },
+      "mymod:set_coat_172": {
+        "set_property": {
+          "mymod:coat": 172
+        }
+      },
+      "mymod:set_coat_173": {
+        "set_property": {
+          "mymod:coat": 173
+        }
+      },
+      "mymod:set_coat_174": {
+        "set_property": {
+          "mymod:coat": 174
+        }
+      },
+      "mymod:set_coat_175": {
+        "set_property": {
+          "mymod:coat": 175
+        }
+      },
+      "mymod:set_coat_176": {
+        "set_property": {
+          "mymod:coat": 176
+        }
+      },
+      "mymod:set_coat_177": {
+        "set_property": {
+          "mymod:coat": 177
+        }
+      },
+      "mymod:set_coat_178": {
+        "set_property": {
+          "mymod:coat": 178
+        }
+      },
+      "mymod:set_coat_179": {
+        "set_property": {
+          "mymod:coat": 179
+        }
+      },
+      "mymod:set_coat_180": {
+        "set_property": {
+          "mymod:coat": 180
+        }
+      },
+      "mymod:set_coat_181": {
+        "set_property": {
+          "mymod:coat": 181
+        }
+      },
+      "mymod:set_coat_182": {
+        "set_property": {
+          "mymod:coat": 182
+        }
+      },
+      "mymod:set_coat_183": {
+        "set_property": {
+          "mymod:coat": 183
+        }
+      },
+      "mymod:set_coat_184": {
+        "set_property": {
+          "mymod:coat": 184
+        }
+      },
+      "mymod:set_coat_185": {
+        "set_property": {
+          "mymod:coat": 185
+        }
+      },
+      "mymod:set_coat_186": {
+        "set_property": {
+          "mymod:coat": 186
+        }
+      },
+      "mymod:set_coat_187": {
+        "set_property": {
+          "mymod:coat": 187
+        }
+      },
+      "mymod:set_coat_188": {
+        "set_property": {
+          "mymod:coat": 188
+        }
+      },
+      "mymod:set_coat_189": {
+        "set_property": {
+          "mymod:coat": 189
+        }
+      },
+      "mymod:set_coat_190": {
+        "set_property": {
+          "mymod:coat": 190
+        }
+      },
+      "mymod:set_coat_191": {
+        "set_property": {
+          "mymod:coat": 191
+        }
+      },
+      "mymod:set_coat_192": {
+        "set_property": {
+          "mymod:coat": 192
+        }
+      },
+      "mymod:set_coat_193": {
+        "set_property": {
+          "mymod:coat": 193
+        }
+      },
+      "mymod:set_coat_194": {
+        "set_property": {
+          "mymod:coat": 194
+        }
+      },
+      "mymod:set_coat_195": {
+        "set_property": {
+          "mymod:coat": 195
+        }
+      },
+      "mymod:set_coat_196": {
+        "set_property": {
+          "mymod:coat": 196
+        }
+      },
+      "mymod:set_coat_197": {
+        "set_property": {
+          "mymod:coat": 197
+        }
+      },
+      "mymod:set_coat_198": {
+        "set_property": {
+          "mymod:coat": 198
+        }
+      },
+      "mymod:set_coat_199": {
+        "set_property": {
+          "mymod:coat": 199
+        }
+      }
+    }
+  }
+}

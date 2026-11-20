@@ -1,0 +1,92 @@
+{
+  "namespace": "gear",
+  "addon_name": "gear",
+  "paths": {
+    "behavior_pack": "gear_bp",
+    "resource_pack": "gear_rp",
+    "vanilla_art": "vanilla",
+    "build_dir": "build",
+    "dist_dir": "dist",
+    "item_texture_dir": "textures/gear/items",
+    "armor_texture_dir": "textures/gear/armor",
+    "bedrock_samples_default": "../bedrock-samples"
+  },
+  "item_format_version": "1.26.50",
+  "recipe_format_version": "1.20.10",
+  "attachable_format_version": "1.10.0",
+  "material": {
+    "enchantability": 15,
+    "repair_item": "minecraft:amethyst_shard",
+    "repair_fraction": 0.25,
+    "tags": ["minecraft:is_armor"]
+  },
+  "palette": {
+    "comment": "luminance gradient (dark -> light) used to recolor the diamond textures; the last stop is the crystalline highlight",
+    "stops": [
+      [0.00, [30, 16, 52]],
+      [0.15, [58, 36, 98]],
+      [0.40, [96, 66, 156]],
+      [0.58, [128, 94, 192]],
+      [0.74, [164, 128, 232]],
+      [0.88, [204, 164, 248]],
+      [1.00, [255, 222, 244]]
+    ],
+    "armor_range": [0.32, 1.0],
+    "icon_range": [0.0, 1.0],
+    "sparkle_every": 11,
+    "sparkle_strength": 0.35
+  },
+  "layers": {
+    "amethyst_1": {"source": "diamond_1.png"},
+    "amethyst_2": {"source": "diamond_2.png"},
+    "geode_goggles": {"source": "diamond_1.png", "goggles": true}
+  },
+  "pieces": [
+    {
+      "id": "amethyst_helmet", "name": "Amethyst Helmet", "set_piece": true,
+      "slot": "slot.armor.head", "script_slot": "Head", "enchant_slot": "armor_head",
+      "protection": 2, "durability": 264,
+      "kind": "helmet", "layer": "amethyst_1", "icon_source": "diamond_helmet.png",
+      "group": "minecraft:itemGroup.name.helmet",
+      "recipe": {"pattern": ["SIS", "S S"], "key": {"S": "minecraft:amethyst_shard", "I": "minecraft:iron_ingot"}}
+    },
+    {
+      "id": "amethyst_chestplate", "name": "Amethyst Chestplate", "set_piece": true,
+      "slot": "slot.armor.chest", "script_slot": "Chest", "enchant_slot": "armor_torso",
+      "protection": 7, "durability": 384,
+      "kind": "chestplate", "layer": "amethyst_1", "icon_source": "diamond_chestplate.png",
+      "group": "minecraft:itemGroup.name.chestplate",
+      "recipe": {"pattern": ["S S", "SIS", "SSS"], "key": {"S": "minecraft:amethyst_shard", "I": "minecraft:iron_ingot"}}
+    },
+    {
+      "id": "amethyst_leggings", "name": "Amethyst Leggings", "set_piece": true,
+      "slot": "slot.armor.legs", "script_slot": "Legs", "enchant_slot": "armor_legs",
+      "protection": 5, "durability": 360,
+      "kind": "leggings", "layer": "amethyst_2", "icon_source": "diamond_leggings.png",
+      "group": "minecraft:itemGroup.name.leggings",
+      "recipe": {"pattern": ["SIS", "S S", "S S"], "key": {"S": "minecraft:amethyst_shard", "I": "minecraft:iron_ingot"}}
+    },
+    {
+      "id": "amethyst_boots", "name": "Amethyst Boots", "set_piece": true,
+      "slot": "slot.armor.feet", "script_slot": "Feet", "enchant_slot": "armor_feet",
+      "protection": 2, "durability": 312,
+      "kind": "boots", "layer": "amethyst_1", "icon_source": "diamond_boots.png",
+      "group": "minecraft:itemGroup.name.boots",
+      "recipe": {"pattern": ["I I", "S S"], "key": {"S": "minecraft:amethyst_shard", "I": "minecraft:iron_ingot"}}
+    },
+    {
+      "id": "geode_goggles", "name": "Geode Goggles", "set_piece": false,
+      "slot": "slot.armor.head", "script_slot": "Head", "enchant_slot": "armor_head",
+      "protection": 2, "durability": 264,
+      "kind": "helmet", "layer": "geode_goggles", "icon_source": "diamond_helmet.png", "icon_goggles": true,
+      "group": "minecraft:itemGroup.name.helmet",
+      "recipe": {"pattern": ["SIS", "T T"], "key": {"S": "minecraft:amethyst_shard", "I": "minecraft:iron_ingot", "T": "minecraft:tinted_glass"}}
+    }
+  ],
+  "kinds": {
+    "helmet":     {"parent_setup": "variable.helmet_layer_visible = 0.0;", "animation": "animation.armor.helmet.offset"},
+    "chestplate": {"parent_setup": "variable.chest_layer_visible = 0.0;",  "animation": "animation.armor.chestplate.offset"},
+    "leggings":   {"parent_setup": "variable.leg_layer_visible = 0.0;",    "animation": "animation.armor.leggings.offset"},
+    "boots":      {"parent_setup": "variable.boot_layer_visible = 0.0;",   "animation": "animation.armor.boots.offset"}
+  }
+}
