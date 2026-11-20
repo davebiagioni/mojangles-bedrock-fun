@@ -18,8 +18,10 @@ Then rebuild.
 
 For comparison, iron is 15 armor points in total, amethyst is 16 and diamond is 20 (plus toughness). Durability sits between iron (x15) and diamond (x33) at x24. Enchantability is 15. All pieces repair at an anvil with amethyst shards (25% per shard) or with a second copy of the same piece.
 
-- **Set bonus** (all four amethyst pieces): Resistance I, refreshed every second. When the set completes you get a chime, sparkles and the actionbar message *"Amethyst set bonus: Resistance I"*. When you take a piece off you get a lower chime and *"Amethyst set bonus lost"*, and the Resistance is removed.
-- **Geode Goggles**: Night Vision while worn, with the actionbar message *"Geode Goggles: Night Vision"*. The Night Vision is removed when you take them off. The goggles take the helmet slot, so they can't be combined with the set bonus.
+- **Stats**: protection 5 / 10 / 8 / 5 (28 total; vanilla netherite is 20), durability 4000 / 6000 / 5500 / 4500, enchantability 30. Geode Goggles: protection 5, durability 4000.
+- **Set bonus** (all four amethyst pieces, "OVERPOWERED"): Resistance III, Strength II, Speed II, Haste II, Regeneration II, Jump Boost I, Fire Resistance and Water Breathing, refreshed every second. When the set completes you get a chime, sparkles and the actionbar message *"Amethyst set bonus: OVERPOWERED"*. When you take a piece off you get a lower chime and *"Amethyst set bonus lost"*, and the effects are removed.
+- **Purple flames**: while the full set is worn, small purple flames flicker up around your legs, body and feet (about 30 a second). They stop when the set bonus ends. The particle is `gear_rp/particles/amethyst_flame.particle.json`, which tints vanilla's white flame sprite from pale pink to deep purple.
+- **Geode Goggles**: Night Vision and Water Breathing while worn, with the actionbar message *"Geode Goggles: Night Vision + Water Breathing"*. The effects are removed when you take them off. The goggles take the helmet slot, so they can't be combined with the set bonus.
 
 ## One-time setup (Windows)
 
@@ -29,7 +31,7 @@ For comparison, iron is 15 armor points in total, amethyst is 16 and diamond is 
 4. Create a test world:
    - **Creative**, **Cheats on**, **Flat**.
    - No experiments are needed. `@minecraft/server` 2.11.0 is stable.
-5. In the world settings, activate **Gear BP** under **Behavior Packs**. **Gear RP** attaches automatically as a dependency.
+5. In the world settings, activate **OP Gear** under **Behavior Packs**. **OP Gear Resources** attaches automatically as a dependency.
 
 ## Every iteration
 
@@ -76,10 +78,10 @@ The items are also in the creative inventory under **Equipment**, in the helmet,
    - Two damaged pieces combine.
 6. **Crafting:** the recipes in the table above work in a crafting table. In survival, they unlock in the recipe book once you pick up an amethyst shard.
 7. **Set bonus:**
-   - Put on all four pieces. Within about 1 second you should get the actionbar message, a chime, green sparkles and a small totem burst, and Resistance I in the inventory effects list (shown without particles).
-   - Remove one piece. You should get *"Amethyst set bonus lost"* and a lower chime, and Resistance should disappear.
+   - Put on all four pieces. Within about 1 second you should get the actionbar message, a chime, green sparkles and a small totem burst, and all eight effects in the inventory effects list (shown without particles).
+   - Remove one piece. You should get *"Amethyst set bonus lost"* and a lower chime, and the effects should disappear within a second or two.
    - Re-equip the piece: the message appears again, once, not every second.
-   - Drink a Resistance potion with Resistance II (`/effect @s resistance 60 1`) while wearing the set. It shouldn't be downgraded or removed.
+   - Give yourself a stronger effect (`/effect @s resistance 60 3`, Resistance IV) while wearing the set. It shouldn't be downgraded or removed.
 8. **Goggles:**
    - Wear the goggles at night or in a cave. Night Vision should start within 1 second and show no flicker over a few minutes.
    - Take them off: Night Vision ends, with the message *"Geode Goggles removed"*.

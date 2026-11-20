@@ -124,9 +124,9 @@ def generate_json() -> None:
     lang += [
         "",
         "## used by scripts/main.js via rawtext translate",
-        "gear.set_bonus.on=§dAmethyst set bonus: §fResistance I",
+        "gear.set_bonus.on=§dAmethyst set bonus: §fOVERPOWERED",
         "gear.set_bonus.off=§7Amethyst set bonus lost",
-        "gear.goggles.on=§dGeode Goggles: §fNight Vision",
+        "gear.goggles.on=§dGeode Goggles: §fNight Vision + Water Breathing",
         "gear.goggles.off=§7Geode Goggles removed",
     ]
     write_text(rp / "texts" / "en_US.lang", "\n".join(lang) + "\n")

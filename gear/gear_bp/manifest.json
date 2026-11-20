@@ -2,7 +2,7 @@
   "format_version": 2,
   "header": {
     "description": "Amethyst armor set with a set bonus, plus Geode Goggles (night vision)",
-    "name": "Gear BP",
+    "name": "OP Gear",
     "uuid": "611531e8-7168-4d97-9ed1-2fb86dc7ca3a",
     "version": [1, 0, 0],
     "min_engine_version": [1, 26, 60]

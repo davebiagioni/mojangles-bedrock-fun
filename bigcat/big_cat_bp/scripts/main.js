@@ -93,15 +93,18 @@ function pointLaser(player) {
 
   const n = NORMALS[hit.face] ?? NORMALS.Up;
   const p = hitPoint(hit);
-  // The dot model is a 2px cube standing on the entity origin: sit on floors, hang under
-  // ceilings, and stick out of walls centred on the hit point.
-  const out = n.y === 0 ? 0.08 : 0.01;
+  // The dot model is a 4px (0.25 block) cube standing on the entity origin: sit on floors,
+  // hang under ceilings, and sit against walls centred on the hit point.
+  const DOT_SIZE = 0.25;
+  const out = n.y === 0 ? DOT_SIZE / 2 + 0.01 : 0.01;
   const dotLoc = {
     x: p.x + n.x * out,
-    y: p.y + n.y * out - (n.y < 0 ? 0.14 : n.y === 0 ? 0.0625 : 0),
+    y: p.y + n.y * out - (n.y < 0 ? DOT_SIZE : n.y === 0 ? DOT_SIZE / 2 : 0),
     z: p.z + n.z * out,
   };
-  const glowAt = { x: p.x + n.x * 0.06, y: p.y + n.y * 0.06, z: p.z + n.z * 0.06 };
+  // Glow halo centred on the cube, so it shows around the dot instead of inside it.
+  const c = DOT_SIZE / 2 + 0.01;
+  const glowAt = { x: p.x + n.x * c, y: p.y + n.y * c, z: p.z + n.z * c };
   const dim = player.dimension;
 
   let laser = lasers.get(player.id);

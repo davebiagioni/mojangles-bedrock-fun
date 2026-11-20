@@ -12,7 +12,9 @@
       "geometry": {
         "default": "geometry.mymod.laser_dot"
       },
-      "render_controllers": ["controller.render.default"]
+      "render_controllers": [
+        "controller.render.mymod_laser_dot"
+      ]
     }
   }
 }

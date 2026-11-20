@@ -148,7 +148,7 @@ def validate(verbose: bool = True) -> None:
         render_controllers |= set(load_json(f, allow_comments=True).get("render_controllers", {}))
     sound_defs = set(load_json(vrp / "sounds" / "sound_definitions.json", allow_comments=True)["sound_definitions"])
     particles = set()
-    for f in (vrp / "particles").glob("*.json"):
+    for f in [*(vrp / "particles").glob("*.json"), *(rp / "particles").glob("*.json")]:
         pe = load_json(f, allow_comments=True).get("particle_effect", {})
         particles.add(pe.get("description", {}).get("identifier"))
 
@@ -388,7 +388,7 @@ def _check_script(js, samples, pieces, cfg, lang, vanilla_effects, sound_defs, p
     # content referenced by the script
     strings = set(re.findall(r'"([^"]*)"', re.sub(r"//[^\n]*", "", js)))
     for s in strings:
-        if s.startswith(f"{cfg['namespace']}:") and s not in pieces:
+        if s.startswith(f"{cfg['namespace']}:") and s not in pieces and s not in particles:
             err(f"{rel_js}: references unknown item {s}")
     for ident, piece in pieces.items():
         if piece.get("set_piece") and ident not in strings:
@@ -399,7 +399,7 @@ def _check_script(js, samples, pieces, cfg, lang, vanilla_effects, sound_defs, p
     for call in re.findall(r'(?:addTag|removeTag|hasTag|setDynamicProperty|getDynamicProperty)\(\s*"([^"]+)"', js):
         if not call.startswith(f"{cfg['namespace']}_"):
             err(f"{rel_js}: tag/property {call!r} must be prefixed {cfg['namespace']}_")
-    for eff in re.findall(r'=\s*"(minecraft:[a-z_]+)";', js):
+    for eff in re.findall(r'(?:=|id:)\s*"(minecraft:[a-z_]+)"', js):
         if eff not in vanilla_effects:
             err(f"{rel_js}: effect {eff} not in vanilla effect list")
     for snd in re.findall(r'playSound\(\s*"([^"]+)"', js):
@@ -407,7 +407,7 @@ def _check_script(js, samples, pieces, cfg, lang, vanilla_effects, sound_defs, p
             err(f"{rel_js}: sound {snd} not in vanilla sound_definitions.json")
     for part in re.findall(r'spawnParticle\(\s*"([^"]+)"', js):
         if part not in particles:
-            err(f"{rel_js}: particle {part} not in vanilla particles")
+            err(f"{rel_js}: particle {part} not in vanilla particles or gear_rp/particles")
     for key in re.findall(r'translate:\s*"([^"]+)"', js):
         if key not in lang:
             err(f"{rel_js}: translation key {key} missing from en_US.lang")

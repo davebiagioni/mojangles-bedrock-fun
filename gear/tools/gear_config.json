@@ -15,7 +15,7 @@
   "recipe_format_version": "1.20.10",
   "attachable_format_version": "1.10.0",
   "material": {
-    "enchantability": 15,
+    "enchantability": 30,
     "repair_item": "minecraft:amethyst_shard",
     "repair_fraction": 0.25,
     "tags": ["minecraft:is_armor"]
@@ -45,7 +45,7 @@
     {
       "id": "amethyst_helmet", "name": "Amethyst Helmet", "set_piece": true,
       "slot": "slot.armor.head", "script_slot": "Head", "enchant_slot": "armor_head",
-      "protection": 2, "durability": 264,
+      "protection": 5, "durability": 4000,
       "kind": "helmet", "layer": "amethyst_1", "icon_source": "diamond_helmet.png",
       "group": "minecraft:itemGroup.name.helmet",
       "recipe": {"pattern": ["SIS", "S S"], "key": {"S": "minecraft:amethyst_shard", "I": "minecraft:iron_ingot"}}
@@ -53,7 +53,7 @@
     {
       "id": "amethyst_chestplate", "name": "Amethyst Chestplate", "set_piece": true,
       "slot": "slot.armor.chest", "script_slot": "Chest", "enchant_slot": "armor_torso",
-      "protection": 7, "durability": 384,
+      "protection": 10, "durability": 6000,
       "kind": "chestplate", "layer": "amethyst_1", "icon_source": "diamond_chestplate.png",
       "group": "minecraft:itemGroup.name.chestplate",
       "recipe": {"pattern": ["S S", "SIS", "SSS"], "key": {"S": "minecraft:amethyst_shard", "I": "minecraft:iron_ingot"}}
@@ -61,7 +61,7 @@
     {
       "id": "amethyst_leggings", "name": "Amethyst Leggings", "set_piece": true,
       "slot": "slot.armor.legs", "script_slot": "Legs", "enchant_slot": "armor_legs",
-      "protection": 5, "durability": 360,
+      "protection": 8, "durability": 5500,
       "kind": "leggings", "layer": "amethyst_2", "icon_source": "diamond_leggings.png",
       "group": "minecraft:itemGroup.name.leggings",
       "recipe": {"pattern": ["SIS", "S S", "S S"], "key": {"S": "minecraft:amethyst_shard", "I": "minecraft:iron_ingot"}}
@@ -69,7 +69,7 @@
     {
       "id": "amethyst_boots", "name": "Amethyst Boots", "set_piece": true,
       "slot": "slot.armor.feet", "script_slot": "Feet", "enchant_slot": "armor_feet",
-      "protection": 2, "durability": 312,
+      "protection": 5, "durability": 4500,
       "kind": "boots", "layer": "amethyst_1", "icon_source": "diamond_boots.png",
       "group": "minecraft:itemGroup.name.boots",
       "recipe": {"pattern": ["I I", "S S"], "key": {"S": "minecraft:amethyst_shard", "I": "minecraft:iron_ingot"}}
@@ -77,7 +77,7 @@
     {
       "id": "geode_goggles", "name": "Geode Goggles", "set_piece": false,
       "slot": "slot.armor.head", "script_slot": "Head", "enchant_slot": "armor_head",
-      "protection": 2, "durability": 264,
+      "protection": 5, "durability": 4000,
       "kind": "helmet", "layer": "geode_goggles", "icon_source": "diamond_helmet.png", "icon_goggles": true,
       "group": "minecraft:itemGroup.name.helmet",
       "recipe": {"pattern": ["SIS", "T T"], "key": {"S": "minecraft:amethyst_shard", "I": "minecraft:iron_ingot", "T": "minecraft:tinted_glass"}}

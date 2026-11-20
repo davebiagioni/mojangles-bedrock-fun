@@ -1,7 +1,7 @@
 """Generate the laser pointer textures (tiny pixel art, drawn in code so there is no art file to lose).
 
 Outputs: <rp>/textures/items/laser_pointer.png   16x16 item icon
-         <rp>/textures/entity/laser_dot.png      8x8 texture for the dot's 2px cube
+         <rp>/textures/entity/laser_dot.png      16x16 texture for the dot's 4px cube
 
 Everything else for the laser pointer is hand-written; see GENERATED_FILES.md.
 
@@ -60,11 +60,14 @@ def _icon() -> Image.Image:
 
 
 def _dot() -> Image.Image:
-    # Box UV for a 2x2x2 cube at uv [0,0] uses the top 8x4; fill all 8x8, bright red
-    # with a lighter core so it reads as "lit" even under the lit entity material.
-    im = Image.new("RGBA", (8, 8), (225, 20, 20, 255))
-    for x, y in ((2, 0), (3, 1), (2, 2), (3, 3), (6, 2), (7, 3), (0, 2), (1, 3)):
-        im.putpixel((x, y), (255, 110, 110, 255))
+    # Box UV for a 4x4x4 cube at uv [0,0] uses the top 16x8; fill all 16x16. Bright red with
+    # a pale core on each face. The render controller ignores lighting, so this is the exact
+    # colour you see, even in shade or at night.
+    im = Image.new("RGBA", (16, 16), (235, 25, 25, 255))
+    # face rectangles of the box UV layout (x, y, w, h)
+    for fx, fy in ((4, 0), (8, 0), (0, 4), (4, 4), (8, 4), (12, 4)):
+        for dx, dy in ((1, 1), (2, 1), (1, 2), (2, 2)):
+            im.putpixel((fx + dx, fy + dy), (255, 140, 140, 255))
     return im
 
 

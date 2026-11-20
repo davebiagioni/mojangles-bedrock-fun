@@ -2,7 +2,7 @@
   "format_version": 2,
   "header": {
     "description": "Amethyst armor textures, models and names",
-    "name": "Gear RP",
+    "name": "OP Gear Resources",
     "uuid": "f7a1e4cb-44b9-4f36-a5fc-2668ee8d778a",
     "version": [1, 0, 0],
     "min_engine_version": [1, 26, 60]
