@@ -128,6 +128,8 @@ def validate(verbose: bool = True) -> None:
     vd = samples / "metadata" / "vanilladata_modules"
     vanilla_items = {d["name"] for d in load_json(vd / "mojang-items.json")["data_items"]}
     vanilla_effects = {d["name"] for d in load_json(vd / "mojang-effects.json")["data_items"]}
+    global VANILLA_ENCHANTS
+    VANILLA_ENCHANTS = vanilla_enchants = {d["name"] for d in load_json(vd / "mojang-enchantments.json")["data_items"]}
     vrp = samples / "resource_pack"
     geometries: set[str] = set()
     for f in (vrp / "models").rglob("*.json"):
@@ -399,6 +401,9 @@ def _check_script(js, samples, pieces, cfg, lang, vanilla_effects, sound_defs, p
     for call in re.findall(r'(?:addTag|removeTag|hasTag|setDynamicProperty|getDynamicProperty)\(\s*"([^"]+)"', js):
         if not call.startswith(f"{cfg['namespace']}_"):
             err(f"{rel_js}: tag/property {call!r} must be prefixed {cfg['namespace']}_")
+    for ench in re.findall(r'type:\s*"(minecraft:[a-z_]+)"', js):
+        if ench not in VANILLA_ENCHANTS:
+            err(f"{rel_js}: enchantment {ench} not in vanilla enchantment list")
     for eff in re.findall(r'(?:=|id:)\s*"(minecraft:[a-z_]+)"', js):
         if eff not in vanilla_effects:
             err(f"{rel_js}: effect {eff} not in vanilla effect list")

@@ -13,6 +13,7 @@
 // removed by the sweep below.
 
 import { world, system, EquipmentSlot } from "@minecraft/server";
+import "./cat_orb.js"; // Cat Orb: capture and release Big Cats
 
 const POINTER_ID = "mymod:laser_pointer";
 const DOT_ID = "mymod:laser_dot";

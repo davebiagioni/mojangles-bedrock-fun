@@ -178,6 +178,9 @@ def validate(verbose: bool = True) -> None:
 
     # 3b. laser pointer (hand-written files + generated textures) ----------------------
     laser_textures = validate_laser(paths, parsed, bpm, bp_ent, mev, err)
+    from gen_orb import EMPTY_TEXTURE, FULL_TEXTURE
+    laser_textures += [EMPTY_TEXTURE, FULL_TEXTURE]
+    validate_orb(paths, parsed, err)
 
     # 4. images: all referenced, right size, right alpha ---------------------------
     referenced = {(paths.rp / (t + ext)).resolve() for t in list(textures.values()) + laser_textures
@@ -280,8 +283,11 @@ def validate_laser(paths, parsed, bpm, bp_ent, mev, err) -> list[str]:
             err(f"items/laser_pointer.json: icon {icon!r} is not a key in textures/item_texture.json")
     if atlas:
         for key, entry in atlas.get("texture_data", {}).items():
-            if entry.get("textures") != ITEM_TEXTURE:
-                err(f"textures/item_texture.json: {key} -> {entry.get('textures')!r}, expected {ITEM_TEXTURE}")
+            tex = entry.get("textures")
+            if key == "mymod_laser_pointer" and tex != ITEM_TEXTURE:
+                err(f"textures/item_texture.json: {key} -> {tex!r}, expected {ITEM_TEXTURE}")
+            if not any((rp / (str(tex) + ext)).is_file() for ext in TEXTURE_EXTS):
+                err(f"textures/item_texture.json: {key} -> {tex!r}, which is not in the RP")
     if recipe and recipe["minecraft:recipe_shaped"]["result"]["item"] != LASER_ITEM:
         err(f"recipes/laser_pointer.json: result should be {LASER_ITEM}")
     if dot:
@@ -330,21 +336,72 @@ def validate_laser(paths, parsed, bpm, bp_ent, mev, err) -> list[str]:
                          (BORED_TAG, "bored tag")):
         if needle and f'"{needle}"' not in js:
             err(f"{rel(script)}: does not use the {what} id {needle!r}")
-    for other in re.findall(r'from\s*"([^"]+)"', js):
-        if other != "@minecraft/server":
-            err(f"{rel(script)}: imports {other!r}; only @minecraft/server is declared in the manifest")
     meta = (Path(os.environ.get("MC_SAMPLES") or ROOT.parent / "bedrock-samples") / "metadata/script_modules/@minecraft"
             / f"server-bindings_{SCRIPT_SERVER_VERSION}.json")
+    exported = None
     if meta.is_file():
         api = json.loads(meta.read_text(encoding="utf-8"))
         exported = {x["name"] for k in ("classes", "interfaces", "enums", "objects", "constants",
                                         "functions", "errors", "type_aliases") for x in api.get(k, [])}
-        for block in re.findall(r'import\s*\{([^}]*)\}\s*from\s*"@minecraft/server"', js):
-            for name in (n.strip().split(" as ")[0] for n in block.split(",") if n.strip()):
-                if name not in exported:
-                    err(f"{rel(script)}: imports {name!r}, which @minecraft/server "
-                        f"{SCRIPT_SERVER_VERSION} does not export")
+    # every script in the pack: imports are @minecraft/server or another script file that exists
+    for f in sorted((bp / "scripts").rglob("*.js")):
+        src = f.read_text(encoding="utf-8")
+        for other in re.findall(r'(?:from\s*|import\s+)"([^"]+)"', src):
+            if other == "@minecraft/server":
+                continue
+            if other.startswith("./") or other.startswith("../"):
+                if not (f.parent / other).resolve().is_file():
+                    err(f"{rel(f)}: imports {other!r}, which does not exist")
+                continue
+            err(f"{rel(f)}: imports {other!r}; only @minecraft/server is declared in the manifest")
+        if exported is not None:
+            for block in re.findall(r'import\s*\{([^}]*)\}\s*from\s*"@minecraft/server"', src):
+                for name in (n.strip().split(" as ")[0] for n in block.split(",") if n.strip()):
+                    if name not in exported:
+                        err(f"{rel(f)}: imports {name!r}, which @minecraft/server "
+                            f"{SCRIPT_SERVER_VERSION} does not export")
     return [ITEM_TEXTURE, DOT_TEXTURE]
+
+
+def validate_orb(paths, parsed, err) -> None:
+    """Cross-checks for the Cat Orb (hand-written items/recipe/script + generated icons)."""
+    bp, rp = paths.bp, paths.rp
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    lang = (rp / "texts/en_US.lang").read_text(encoding="utf-8")
+    script = bp / "scripts/cat_orb.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if not js:
+        err(f"{rel(script)}: missing (cat orb)")
+    if 'import "./cat_orb.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./cat_orb.js")
+    for ident, fname, stack in (("mymod:cat_orb", "cat_orb", 16), ("mymod:cat_orb_full", "cat_orb_full", 1)):
+        item = parsed.get(bp / f"items/{fname}.json")
+        if not item:
+            err(f"items/{fname}.json: missing (cat orb)")
+            continue
+        d = item["minecraft:item"]
+        if d["description"]["identifier"] != ident:
+            err(f"items/{fname}.json: identifier should be {ident}")
+        comps = d.get("components", {})
+        icon = comps.get("minecraft:icon")
+        if icon not in atlas:
+            err(f"items/{fname}.json: icon {icon!r} not in item_texture.json")
+        if comps.get("minecraft:max_stack_size") != stack:
+            err(f"items/{fname}.json: max_stack_size should be {stack}")
+        if f"item.{ident}.name=" not in lang:
+            err(f"texts/en_US.lang: missing item.{ident}.name=...")
+        if f'"{ident}"' not in js:
+            err(f"{rel(script)}: does not use {ident}")
+    # dynamic properties are only allowed on non-stackable items
+    if "setDynamicProperty" in js and parsed.get(bp / "items/cat_orb_full.json", {}).get(
+            "minecraft:item", {}).get("components", {}).get("minecraft:max_stack_size") != 1:
+        err("items/cat_orb_full.json: must have max_stack_size 1 to hold dynamic properties")
+    recipe = parsed.get(bp / "recipes/cat_orb.json")
+    if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != "mymod:cat_orb":
+        err("recipes/cat_orb.json: missing or does not make mymod:cat_orb")
+    for tag in re.findall(r'(?:addTag|removeTag|hasTag|DynamicProperty)\(\s*"([^"]+)"', js):
+        if not tag.startswith("bigcat_"):
+            err(f"{rel(script)}: tag/property {tag!r} must start with bigcat_")
 
 
 def _fail(errors):

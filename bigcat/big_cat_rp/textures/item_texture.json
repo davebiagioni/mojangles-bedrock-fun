@@ -4,6 +4,12 @@
   "texture_data": {
     "mymod_laser_pointer": {
       "textures": "textures/items/laser_pointer"
+    },
+    "mymod_cat_orb": {
+      "textures": "textures/items/cat_orb"
+    },
+    "mymod_cat_orb_full": {
+      "textures": "textures/items/cat_orb_full"
     }
   }
 }

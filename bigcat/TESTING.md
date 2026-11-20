@@ -115,3 +115,33 @@ The files that make up the pointer are listed in `GENERATED_FILES.md` under "Han
 | `python tools/deploy_dev.py` | Copy the packs into Minecraft only |
 
 Set `BIGCAT_COM_MOJANG` to override the detected `com.mojang` folder.
+
+## Cat Orb
+
+Catch a Big Cat in an orb, carry it around, and let it out again later.
+
+**Get one:** `/give @s mymod:cat_orb`, or craft it: 4 glass in a plus shape around a raw cod.
+
+1. Rebuild, then exit to the menu and reopen the world.
+2. Summon a cat and give it a name with a name tag, so you can check it comes back the same.
+3. **Catch it:** hold the orb and right-click the cat, or aim at it from up to 8 blocks away and use the orb.
+   - The cat vanishes with a portal puff and a "Caught …!" message.
+   - The orb in your hand becomes a glowing amber **Cat Orb (occupied)** with the cat's name, coat number and wild/tamed status in its tooltip.
+   - If you were holding a stack of empty orbs, one turns into the occupied orb and goes into your inventory.
+4. **Let it out:** right-click a block with the occupied orb, or aim at a block up to 8 blocks away and use it.
+   - The cat appears next to the face you clicked, with hearts, a meow and "Welcome back, …!".
+   - You get the empty orb back.
+5. Check it's the **same** cat: same coat, same name, still tamed to you with the same collar colour, still an adult or still a baby.
+6. Edge cases:
+   - Someone else's tamed cat can't be caught ("That cat belongs to someone else").
+   - Save and quit while holding an occupied orb, reopen, and release it. The cat should still come back.
+   - Right-clicking a tamed cat with the orb must not make it sit.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| "The cat slipped away" every time | The cat can't be moved to the safe spot above it. Report it with the Content Log. |
+| "The orb fizzled" | Saving the cat failed. The Content Log shows `[bigcat orb] capture failed: …`. |
+| Releasing says "Its cat could not be found" | The saved cat was deleted, for example by `/structure delete`. The orb resets to empty. |
+| Nothing happens when right-clicking the cat | The click-on-cat event didn't fire. Aim at the cat and use the orb instead, and tell me. |

@@ -2,3 +2,5 @@ entity.mymod:big_cat.name=Big Cat
 item.spawn_egg.entity.mymod:big_cat.name=Big Cat Spawn Egg
 item.mymod:laser_pointer.name=Laser Pointer
 entity.mymod:laser_dot.name=Laser Dot
+item.mymod:cat_orb.name=Cat Orb
+item.mymod:cat_orb_full.name=Cat Orb (occupied)

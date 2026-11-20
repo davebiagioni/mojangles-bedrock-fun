@@ -4,9 +4,10 @@
 // Every TICK_INTERVAL ticks, for each player:
 //   * all four amethyst pieces worn  -> SET_EFFECTS (refreshed), chime + sparkle + actionbar on activation
 //   * Geode Goggles worn on the head -> GOGGLE_EFFECTS (refreshed), actionbar on equip
+//   * every gear piece in the inventory or worn -> max-level ENCHANTS added (shows the glint)
 // State lives in entity tags (prefixed gear_) so messages fire only on change, also across rejoins.
 
-import { system, world, EquipmentSlot, EntityComponentTypes } from "@minecraft/server";
+import { system, world, EquipmentSlot, EntityComponentTypes, EnchantmentTypes } from "@minecraft/server";
 
 const TICK_INTERVAL = 20;
 
@@ -20,6 +21,72 @@ const GOGGLES = "gear:geode_goggles";
 
 const SET_TAG = "gear_amethyst_set";
 const GOGGLES_TAG = "gear_goggles";
+
+// Max-level enchantments every gear piece gets automatically (vanilla maximums: the game refuses
+// anything higher). Per piece kind; ALL applies to every piece. Incompatible or unsupported ones
+// are skipped, so the list can be generous.
+const ENCHANTS = {
+  ALL: [
+    { type: "minecraft:protection", level: 4 },
+    { type: "minecraft:unbreaking", level: 3 },
+    { type: "minecraft:mending", level: 1 },
+    { type: "minecraft:thorns", level: 3 },
+  ],
+  "gear:amethyst_helmet": [
+    { type: "minecraft:respiration", level: 3 },
+    { type: "minecraft:aqua_affinity", level: 1 },
+  ],
+  "gear:geode_goggles": [
+    { type: "minecraft:respiration", level: 3 },
+    { type: "minecraft:aqua_affinity", level: 1 },
+  ],
+  "gear:amethyst_chestplate": [],
+  "gear:amethyst_leggings": [{ type: "minecraft:swift_sneak", level: 3 }],
+  "gear:amethyst_boots": [
+    { type: "minecraft:feather_falling", level: 4 },
+    { type: "minecraft:depth_strider", level: 3 },
+    { type: "minecraft:soul_speed", level: 3 },
+  ],
+};
+const ARMOR_SLOTS = [EquipmentSlot.Head, EquipmentSlot.Chest, EquipmentSlot.Legs, EquipmentSlot.Feet];
+
+/** Adds any missing ENCHANTS to a gear item. Returns true if the item changed. */
+function enchantGear(item) {
+  const extra = item && ENCHANTS[item.typeId];
+  if (!extra) return false;
+  const ench = item.getComponent("minecraft:enchantable");
+  if (!ench) return false;
+  let changed = false;
+  for (const e of [...ENCHANTS.ALL, ...extra]) {
+    const type = EnchantmentTypes.get(e.type);
+    if (!type || ench.hasEnchantment(type)) continue;
+    const want = { type, level: Math.min(e.level, type.maxLevel) };
+    try {
+      if (ench.canAddEnchantment(want)) {
+        ench.addEnchantment(want);
+        changed = true;
+      }
+    } catch {
+      // not allowed on this slot or clashes with an existing enchantment: skip it
+    }
+  }
+  return changed;
+}
+
+/** Enchants gear in the player's inventory and armor slots (writes back only what changed). */
+function enchantPlayerGear(player, equippable) {
+  const container = player.getComponent("minecraft:inventory")?.container;
+  if (container) {
+    for (let i = 0; i < container.size; i++) {
+      const item = container.getItem(i);
+      if (item && enchantGear(item)) container.setItem(i, item);
+    }
+  }
+  for (const slot of ARMOR_SLOTS) {
+    const item = equippable.getEquipment(slot);
+    if (item && enchantGear(item)) equippable.setEquipment(slot, item);
+  }
+}
 
 // Effects are short and refreshed every TICK_INTERVAL, so they drop off ~1-2 s after a piece
 // comes off (and are also removed straight away). `amp` is the level minus one (1 = II).
@@ -72,6 +139,8 @@ function sparkle(player) {
 function updatePlayer(player) {
   const equippable = player.getComponent(EntityComponentTypes.Equippable);
   if (!equippable) return;
+
+  enchantPlayerGear(player, equippable);
 
   // --- Amethyst set bonus ---------------------------------------------------
   const fullSet = SET_PIECES.every(([slot, id]) => equippedId(equippable, slot) === id);
