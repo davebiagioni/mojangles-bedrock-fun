@@ -17,6 +17,7 @@ from deploy_dev import deploy
 from gen_json import generate_json
 from gen_laser import generate_laser_textures
 from gen_orb import generate_orb_textures
+from gen_tame import generate_tame
 from package import bump_versions, make_mcaddon
 from validate import validate
 
@@ -28,7 +29,7 @@ def main() -> int:
     args = ap.parse_args()
     t0 = time.time()
     steps = [("fetch Mojang files", fetch_vanilla), ("generate coats", build_coats), ("generate JSON", generate_json),
-             ("generate laser textures", generate_laser_textures), ("generate orb textures", generate_orb_textures), ("validate", validate)]
+             ("generate laser textures", generate_laser_textures), ("generate orb textures", generate_orb_textures), ("make monsters tameable", generate_tame), ("validate", validate)]
     if args.package:
         steps += [("bump version", bump_versions), ("re-validate", validate)]
     if not args.no_deploy:

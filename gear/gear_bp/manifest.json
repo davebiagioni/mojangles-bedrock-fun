@@ -4,7 +4,7 @@
     "description": "Amethyst armor set with a set bonus, plus Geode Goggles (night vision)",
     "name": "OP Gear",
     "uuid": "611531e8-7168-4d97-9ed1-2fb86dc7ca3a",
-    "version": [1, 0, 0],
+    "version": [1, 0, 1],
     "min_engine_version": [1, 26, 60]
   },
   "modules": [
@@ -12,7 +12,7 @@
       "description": "Gear items and recipes",
       "type": "data",
       "uuid": "864aadb2-ea77-455e-a2e2-a1c9f5ac6c11",
-      "version": [1, 0, 0]
+      "version": [1, 0, 1]
     },
     {
       "description": "Gear set bonus and goggles script",
@@ -20,13 +20,13 @@
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "f1db76b9-f364-477a-8872-7a58da455f36",
-      "version": [1, 0, 0]
+      "version": [1, 0, 1]
     }
   ],
   "dependencies": [
     {
       "uuid": "f7a1e4cb-44b9-4f36-a5fc-2668ee8d778a",
-      "version": [1, 0, 0]
+      "version": [1, 0, 1]
     },
     {
       "module_name": "@minecraft/server",

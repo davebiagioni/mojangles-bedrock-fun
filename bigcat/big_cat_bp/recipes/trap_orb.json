@@ -1,0 +1,33 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:trap_orb"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " G ",
+      "GCG",
+      " G "
+    ],
+    "key": {
+      "G": {
+        "item": "minecraft:glass"
+      },
+      "C": {
+        "item": "minecraft:iron_bars"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:iron_bars"
+      }
+    ],
+    "result": {
+      "item": "mymod:trap_orb",
+      "count": 1
+    }
+  }
+}

@@ -13,7 +13,9 @@
 // removed by the sweep below.
 
 import { world, system, EquipmentSlot } from "@minecraft/server";
-import "./cat_orb.js"; // Cat Orb: capture and release Big Cats
+import "./orbs.js"; // Cat Orb + Creature Orb: capture and release mobs
+import "./trap_orb.js"; // Player Trap Orb
+import "./tame_monsters.js"; // tame zombies (cake), skeletons (milk) and creepers (hugs)
 
 const POINTER_ID = "mymod:laser_pointer";
 const DOT_ID = "mymod:laser_dot";

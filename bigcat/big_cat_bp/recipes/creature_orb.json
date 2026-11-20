@@ -1,0 +1,33 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:creature_orb"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " G ",
+      "GCG",
+      " G "
+    ],
+    "key": {
+      "G": {
+        "item": "minecraft:glass"
+      },
+      "C": {
+        "item": "minecraft:ender_pearl"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:ender_pearl"
+      }
+    ],
+    "result": {
+      "item": "mymod:creature_orb",
+      "count": 1
+    }
+  }
+}

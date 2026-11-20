@@ -141,7 +141,70 @@ Catch a Big Cat in an orb, carry it around, and let it out again later.
 
 | Symptom | Likely cause |
 |---|---|
-| "The cat slipped away" every time | The cat can't be moved to the safe spot above it. Report it with the Content Log. |
+| "Too crowded: something else is right next to …" | Another mob, a dropped item or an XP orb is in the same block. Wait for it to move, or pick up the item. This stops the orb from copying anything else. |
 | "The orb fizzled" | Saving the cat failed. The Content Log shows `[bigcat orb] capture failed: …`. |
 | Releasing says "Its cat could not be found" | The saved cat was deleted, for example by `/structure delete`. The orb resets to empty. |
 | Nothing happens when right-clicking the cat | The click-on-cat event didn't fire. Aim at the cat and use the orb instead, and tell me. |
+
+## Creature Orb
+
+Works exactly like the Cat Orb, but catches **any mob** except players, bosses (Ender Dragon, Wither, Warden,
+Elder Guardian) and objects (armor stands, boats, minecarts). Other people's tamed pets are refused too.
+
+**Get one:** `/give @s mymod:creature_orb`, or craft it: 4 glass in a plus shape around an ender pearl.
+
+1. Catch a few different mobs: a cow, a named villager (check its trades come back), a tamed wolf, a zombie, a Big Cat.
+2. Catch some **wild** animals too (goats, rabbits): they must end up in the orb, not vanish.
+3. Release each one and check it's the same: name, health, baby/adult, owner, villager trades.
+4. Try a boss (`/summon wither`) or an armor stand: you should get a refusal message and nothing happens.
+5. Cat Orbs you filled before this update still release normally.
+
+## Player Trap Orb
+
+Needs **two players** in the same world (it can't trap you, and single player has no one else to catch).
+
+**Get one:** `/give @s mymod:trap_orb`, or craft it: 4 glass in a plus shape around iron bars.
+
+1. Aim at another player within 10 blocks and use the orb, or hit them with it.
+   - They see "Trapped!", switch to spectator mode high above where they stood, and can't move. Their actionbar shows a countdown.
+   - Your orb becomes **Player Trap Orb (occupied)** with their name.
+2. Use the occupied orb on a block. They appear there in their old game mode and can move again ("You're free!").
+3. Safety checks:
+   - Wait 5 minutes without releasing: they're freed where they were caught ("The trap wore off").
+   - Trap someone, then leave the world: they're freed within a second.
+   - Have the trapped player leave and rejoin: they're still trapped (or freed, if the time ran out or you released them while they were away).
+   - Trapping yourself or someone already trapped is refused.
+
+## Taming monsters
+
+Zombies, skeletons and creepers can be tamed, the silly way. `tools/gen_tame.py` builds tameable copies of
+their vanilla definitions (gitignored), and `scripts/tame_monsters.js` handles the taming.
+
+| Mob | How to tame | What it says |
+|---|---|---|
+| Skeleton | Use a **milk bucket** on it | "The skeleton finally got its calcium!" (you keep the empty bucket) |
+| Zombie | Use a **cake** on it | "Nobody ever remembered its birthday. Until you." |
+| Creeper | **Sneak**, empty hand, and use it (a **hug**) | 35% chance it accepts. Otherwise it **sneezes**: a harmless fake explosion that launches you backwards |
+
+On touch screens (iPad), the mob shows a **Give Milk**, **Give Cake** or **Hug** button when you hold the right thing.
+
+1. Rebuild, exit to the menu and reopen the world. Easiest in Creative, where monsters ignore you.
+2. Summon each mob (`/summon skeleton`, `/summon zombie`, `/summon creeper`) and tame it as above.
+   - You should see a "Tamed!" title with a funny line, hearts, and a level-up chime.
+   - In Survival, the cake is used up and the milk bucket becomes an empty bucket.
+3. A tamed monster:
+   - follows you around and never attacks you, even if you hit it;
+   - doesn't burn in daylight (it gets hidden fire resistance);
+   - never despawns;
+   - zombies and skeletons attack other, untamed monsters, and anything that hurts you or that you attack;
+   - creepers just tag along and never explode on their own.
+4. Hugging a creeper without sneaking, or with something in your hand, gives a hint instead.
+5. Other zombies, skeletons and creepers still behave normally until you tame them.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| Nothing happens when using milk/cake/empty hand on the mob | The interaction didn't reach the script. Check the Content Log for errors in `zombie.json`, `skeleton.json` or `creeper.json`. |
+| A tamed creeper still blows up | It got a target anyway. Report which mob it was chasing. |
+| Tamed mobs disappear after a while | The despawn override didn't take. Name them with a name tag as a workaround and report it. |

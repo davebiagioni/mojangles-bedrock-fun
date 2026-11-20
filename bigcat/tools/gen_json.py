@@ -60,7 +60,7 @@ fields in pack JSON, so this list is the "generated" marker instead.
 | `{rp}/{paths.coat_texture_dir}/coat_000.png` ... `coat_{n - 1:03d}.png` | `tools/coats_config.json`, `art/` |
 | `{bp}/manifest.json`, `{rp}/manifest.json` - version only | bumped by `python tools/build.py --package` |
 | `{rp}/textures/items/laser_pointer.png`, `{rp}/textures/entity/laser_dot.png` | `tools/gen_laser.py` (pixel art in code) |
-| `{rp}/textures/items/cat_orb.png`, `{rp}/textures/items/cat_orb_full.png` | `tools/gen_orb.py` (pixel art in code) |
+| `{rp}/textures/items/{{cat,creature,trap}}_orb[_full].png` | `tools/gen_orb.py` (pixel art in code) |
 | `GENERATED_FILES.md` (this file) | `write_generated_list` in `tools/gen_json.py` |
 
 ## Hand-written - edit these directly
@@ -76,15 +76,16 @@ Laser pointer (checked by `validate_laser` in `tools/validate.py`):
 | `{bp}/entities/laser_dot.json` | the invulnerable, gravity-free `mymod:laser_dot` entity (family `bigcat_laser_dot`) |
 | `{rp}/entity/laser_dot.entity.json`, `{rp}/models/entity/laser_dot.geo.json` | the dot's tiny red cube |
 | `{rp}/particles/laser_dot.particle.json` | `mymod:laser_dot_glow`, the unlit red glow the script spawns at the dot |
-| `{rp}/textures/item_texture.json` | item icon atlas entries `mymod_laser_pointer`, `mymod_cat_orb`, `mymod_cat_orb_full` |
+| `{rp}/textures/item_texture.json` | item icon atlas entries for the laser pointer and the three orbs (empty and full) |
 
-Cat Orb (checked by `validate_orb` in `tools/validate.py`):
+Orbs (checked by `validate_orb` in `tools/validate.py`):
 
 | File | What it is |
 |---|---|
-| `{bp}/scripts/cat_orb.js` | capture/release logic, imported by `scripts/main.js` |
-| `{bp}/items/cat_orb.json`, `{bp}/items/cat_orb_full.json` | the empty orb (stacks to 16) and the occupied orb (holds one cat, not in the creative menu) |
-| `{bp}/recipes/cat_orb.json` | crafting: 4 glass around a raw cod |
+| `{bp}/scripts/orbs.js` | Cat Orb + Creature Orb capture/release, imported by `scripts/main.js` |
+| `{bp}/scripts/trap_orb.js` | Player Trap Orb (spectator-mode trap with auto-release), imported by `scripts/main.js` |
+| `{bp}/items/{{cat,creature,trap}}_orb.json`, `..._full.json` | each empty orb (stacks to 16) and its occupied version (holds one, not in the creative menu) |
+| `{bp}/recipes/{{cat,creature,trap}}_orb.json` | crafting: 4 glass in a plus around a raw cod / ender pearl / iron bars |
 | `{rp}/texts/en_US.lang` | display names |
 
 The cats' chase goals (`minecraft:behavior.nearest_prioritized_attackable_target` for the

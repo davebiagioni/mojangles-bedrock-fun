@@ -4,7 +4,7 @@
     "description": "Amethyst armor textures, models and names",
     "name": "OP Gear Resources",
     "uuid": "f7a1e4cb-44b9-4f36-a5fc-2668ee8d778a",
-    "version": [1, 0, 0],
+    "version": [1, 0, 1],
     "min_engine_version": [1, 26, 60]
   },
   "modules": [
@@ -12,7 +12,7 @@
       "description": "Gear resources",
       "type": "resources",
       "uuid": "72f5a18c-fa30-4890-b931-2c47f7f00720",
-      "version": [1, 0, 0]
+      "version": [1, 0, 1]
     }
   ]
 }

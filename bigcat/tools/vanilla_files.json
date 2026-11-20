@@ -1,5 +1,8 @@
 {
   "cat.geo.json": "resource_pack/models/entity/cat.geo.json",
   "cat_base.png": "resource_pack/textures/entity/cat/tabby.png",
-  "cat_tame.tga": "resource_pack/textures/entity/cat/tabby_tame.tga"
+  "cat_tame.tga": "resource_pack/textures/entity/cat/tabby_tame.tga",
+  "zombie.json": "behavior_pack/entities/zombie.json",
+  "creeper.json": "behavior_pack/entities/creeper.json",
+  "skeleton.json": "behavior_pack/entities/skeleton.json"
 }

@@ -10,6 +10,18 @@
     },
     "mymod_cat_orb_full": {
       "textures": "textures/items/cat_orb_full"
+    },
+    "mymod_creature_orb": {
+      "textures": "textures/items/creature_orb"
+    },
+    "mymod_creature_orb_full": {
+      "textures": "textures/items/creature_orb_full"
+    },
+    "mymod_trap_orb": {
+      "textures": "textures/items/trap_orb"
+    },
+    "mymod_trap_orb_full": {
+      "textures": "textures/items/trap_orb_full"
     }
   }
 }

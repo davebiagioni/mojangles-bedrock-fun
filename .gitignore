@@ -8,6 +8,10 @@ bigcat/big_cat_rp/textures/entity/coats/
 gear/gear_rp/textures/gear/
 gear/gear_bp/pack_icon.png
 gear/gear_rp/pack_icon.png
+# Vanilla mob definitions with taming added (tools/gen_tame.py)
+bigcat/big_cat_bp/entities/zombie.json
+bigcat/big_cat_bp/entities/creeper.json
+bigcat/big_cat_bp/entities/skeleton.json
 
 # --- build output -----------------------------------------------------------
 build/

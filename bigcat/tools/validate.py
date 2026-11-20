@@ -178,8 +178,8 @@ def validate(verbose: bool = True) -> None:
 
     # 3b. laser pointer (hand-written files + generated textures) ----------------------
     laser_textures = validate_laser(paths, parsed, bpm, bp_ent, mev, err)
-    from gen_orb import EMPTY_TEXTURE, FULL_TEXTURE
-    laser_textures += [EMPTY_TEXTURE, FULL_TEXTURE]
+    from gen_orb import ALL_TEXTURES as ORB_TEXTURES
+    laser_textures += ORB_TEXTURES
     validate_orb(paths, parsed, err)
 
     # 4. images: all referenced, right size, right alpha ---------------------------
@@ -364,44 +364,51 @@ def validate_laser(paths, parsed, bpm, bp_ent, mev, err) -> list[str]:
 
 
 def validate_orb(paths, parsed, err) -> None:
-    """Cross-checks for the Cat Orb (hand-written items/recipe/script + generated icons)."""
+    """Cross-checks for the orbs (hand-written items/recipes/scripts + generated icons)."""
     bp, rp = paths.bp, paths.rp
     atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
     lang = (rp / "texts/en_US.lang").read_text(encoding="utf-8")
-    script = bp / "scripts/cat_orb.js"
-    js = script.read_text(encoding="utf-8") if script.is_file() else ""
-    if not js:
-        err(f"{rel(script)}: missing (cat orb)")
-    if 'import "./cat_orb.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
-        err("scripts/main.js: must import ./cat_orb.js")
-    for ident, fname, stack in (("mymod:cat_orb", "cat_orb", 16), ("mymod:cat_orb_full", "cat_orb_full", 1)):
-        item = parsed.get(bp / f"items/{fname}.json")
-        if not item:
-            err(f"items/{fname}.json: missing (cat orb)")
-            continue
-        d = item["minecraft:item"]
-        if d["description"]["identifier"] != ident:
-            err(f"items/{fname}.json: identifier should be {ident}")
-        comps = d.get("components", {})
-        icon = comps.get("minecraft:icon")
-        if icon not in atlas:
-            err(f"items/{fname}.json: icon {icon!r} not in item_texture.json")
-        if comps.get("minecraft:max_stack_size") != stack:
-            err(f"items/{fname}.json: max_stack_size should be {stack}")
-        if f"item.{ident}.name=" not in lang:
-            err(f"texts/en_US.lang: missing item.{ident}.name=...")
-        if f'"{ident}"' not in js:
-            err(f"{rel(script)}: does not use {ident}")
-    # dynamic properties are only allowed on non-stackable items
-    if "setDynamicProperty" in js and parsed.get(bp / "items/cat_orb_full.json", {}).get(
-            "minecraft:item", {}).get("components", {}).get("minecraft:max_stack_size") != 1:
-        err("items/cat_orb_full.json: must have max_stack_size 1 to hold dynamic properties")
-    recipe = parsed.get(bp / "recipes/cat_orb.json")
-    if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != "mymod:cat_orb":
-        err("recipes/cat_orb.json: missing or does not make mymod:cat_orb")
-    for tag in re.findall(r'(?:addTag|removeTag|hasTag|DynamicProperty)\(\s*"([^"]+)"', js):
-        if not tag.startswith("bigcat_"):
-            err(f"{rel(script)}: tag/property {tag!r} must start with bigcat_")
+    main_js = (bp / "scripts/main.js").read_text(encoding="utf-8")
+    # orb name -> script that implements it
+    kinds = {"cat_orb": "orbs.js", "creature_orb": "orbs.js", "trap_orb": "trap_orb.js"}
+    for script_name in sorted(set(kinds.values())):
+        if f'import "./{script_name}"' not in main_js:
+            err(f"scripts/main.js: must import ./{script_name}")
+    for name, script_name in kinds.items():
+        script = bp / "scripts" / script_name
+        js = script.read_text(encoding="utf-8") if script.is_file() else ""
+        if not js:
+            err(f"{rel(script)}: missing ({name})")
+        for fname, stack in ((name, 16), (name + "_full", 1)):
+            ident = f"mymod:{fname}"
+            item = parsed.get(bp / f"items/{fname}.json")
+            if not item:
+                err(f"items/{fname}.json: missing ({name})")
+                continue
+            d = item["minecraft:item"]
+            if d["description"]["identifier"] != ident:
+                err(f"items/{fname}.json: identifier should be {ident}")
+            comps = d.get("components", {})
+            if comps.get("minecraft:icon") not in atlas:
+                err(f"items/{fname}.json: icon {comps.get('minecraft:icon')!r} not in item_texture.json")
+            # full orbs hold dynamic properties, which only work on non-stackable items
+            if comps.get("minecraft:max_stack_size") != stack:
+                err(f"items/{fname}.json: max_stack_size should be {stack}")
+            if f"item.{ident}.name=" not in lang:
+                err(f"texts/en_US.lang: missing item.{ident}.name=...")
+            if f'"{ident}"' not in js:
+                err(f"{rel(script)}: does not use {ident}")
+        recipe = parsed.get(bp / f"recipes/{name}.json")
+        if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != f"mymod:{name}":
+            err(f"recipes/{name}.json: missing or does not make mymod:{name}")
+    for script in sorted((bp / "scripts").glob("*.js")):
+        js = script.read_text(encoding="utf-8")
+        for tag in re.findall(r'(?:addTag|removeTag|hasTag|DynamicProperty)\(\s*"([^"]+)"', js):
+            if not tag.startswith("bigcat_"):
+                err(f"{rel(script)}: tag/property {tag!r} must start with bigcat_")
+        for prefix in re.findall(r'(?:PROP_[A-Z_]+|RECORD_PREFIX)\s*=\s*"([^"]+)"', js):
+            if not prefix.startswith("bigcat_"):
+                err(f"{rel(script)}: dynamic property {prefix!r} must start with bigcat_")
 
 
 def _fail(errors):
