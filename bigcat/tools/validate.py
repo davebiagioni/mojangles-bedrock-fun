@@ -66,6 +66,7 @@ def validate(verbose: bool = True) -> None:
         "block_sounds",
         "interactive_sounds",
         "minecraft:item",
+        "minecraft:block",
         "minecraft:recipe_shaped",
         "particle_effect",
         "resource_pack_name",
@@ -205,7 +206,9 @@ def validate(verbose: bool = True) -> None:
     validate_orb(paths, parsed, err)
     validate_wands(paths, parsed, err)
     laser_textures += validate_grapple(paths, parsed, mev, err)
+    laser_textures += validate_drowned_trap(paths, parsed, mev, err)
     laser_textures += validate_evolution(paths, parsed, bp_ent, ce, err)
+    laser_textures += validate_net_trap(paths, parsed, err)
 
     # 4. images: all referenced, right size, right alpha ---------------------------
     referenced = {
@@ -634,6 +637,126 @@ def validate_evolution(paths, parsed, bp_ent, ce, err) -> list[str]:
             "render_controllers/big_cat_wings.render_controllers.json: part_visibility should be "
             f'[{{"*": "{wing_condition()}"}}] so the wings only show at the last stage'
         )
+    return list(ALL_TEXTURES)
+
+
+def validate_net_trap(paths, parsed, err) -> list[str]:
+    """Cross-checks for the Net Trap block, its item and script. Returns the textures it uses."""
+    from gen_net import ALL_TEXTURES, BLOCK_TEXTURE, ICON_TEXTURE, NET_ID
+
+    bp, rp = paths.bp, paths.rp
+    lang = (rp / "texts/en_US.lang").read_text(encoding="utf-8")
+    script = bp / "scripts/net_trap.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if not js:
+        err(f"{rel(script)}: missing (net trap)")
+    elif f'"{NET_ID}"' not in js or "registerCustomComponent(NET_ID" not in js:
+        err(f"{rel(script)}: must register the custom block component {NET_ID}")
+    if 'import "./net_trap.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./net_trap.js")
+
+    block = parsed.get(bp / "blocks/net_trap.json")
+    if not block or block["minecraft:block"]["description"]["identifier"] != NET_ID:
+        err(f"blocks/net_trap.json: missing or identifier is not {NET_ID}")
+    else:
+        comps = block["minecraft:block"]["components"]
+        if NET_ID not in comps:
+            err(f"blocks/net_trap.json: needs the custom component {NET_ID} (the script's step-on trigger)")
+        box = comps.get("minecraft:collision_box")
+        if not isinstance(box, dict) or not box.get("size", [0, 0, 0])[1] > 0:
+            err("blocks/net_trap.json: needs a collision_box with some height, or onStepOn never fires")
+        gid = comps.get("minecraft:geometry")
+        geo = parsed.get(rp / "models/blocks/net_trap.geo.json", {})
+        if gid not in [g["description"]["identifier"] for g in geo.get("minecraft:geometry", [])]:
+            err(f"blocks/net_trap.json: geometry {gid} not defined in models/blocks/net_trap.geo.json")
+        terrain = parsed.get(rp / "textures/terrain_texture.json", {}).get("texture_data", {})
+        tex = comps.get("minecraft:material_instances", {}).get("*", {}).get("texture")
+        if terrain.get(tex, {}).get("textures") != BLOCK_TEXTURE:
+            err(f"blocks/net_trap.json: texture {tex!r} should map to {BLOCK_TEXTURE} in terrain_texture.json")
+
+    item = parsed.get(bp / "items/net_trap.json")
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    if not item or item["minecraft:item"]["description"]["identifier"] != NET_ID:
+        err(f"items/net_trap.json: missing or identifier is not {NET_ID}")
+    else:
+        comps = item["minecraft:item"]["components"]
+        placer = comps.get("minecraft:block_placer", {})
+        if placer.get("block") != NET_ID or placer.get("replace_block_item") is not True:
+            err(f"items/net_trap.json: block_placer must place {NET_ID} with replace_block_item")
+        if atlas.get(comps.get("minecraft:icon"), {}).get("textures") != ICON_TEXTURE:
+            err(f"items/net_trap.json: icon should map to {ICON_TEXTURE} in item_texture.json")
+    recipe = parsed.get(bp / "recipes/net_trap.json")
+    if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != NET_ID:
+        err(f"recipes/net_trap.json: missing or does not make {NET_ID}")
+    if f"item.{NET_ID}.name=" not in lang:
+        err(f"texts/en_US.lang: missing item.{NET_ID}.name=...")
+    return list(ALL_TEXTURES)
+
+
+def validate_drowned_trap(paths, parsed, mev, err) -> list[str]:
+    """Cross-checks for the Drowned Trap. Returns the RP texture paths it uses."""
+    from gen_drowned_trap import ALL_TEXTURES, LURE_TEXTURE, TARGET_GOAL, TRAP_FAMILY
+
+    bp, rp = paths.bp, paths.rp
+    item_id, lure_id = "mymod:drowned_trap", "mymod:drowned_lure"
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    lang = (rp / "texts/en_US.lang").read_text(encoding="utf-8")
+    script = bp / "scripts/drowned_trap.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if not js:
+        err(f"{rel(script)}: missing (drowned trap)")
+    if 'import "./drowned_trap.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./drowned_trap.js")
+
+    item = parsed.get(bp / "items/drowned_trap.json")
+    if not item or item["minecraft:item"]["description"]["identifier"] != item_id:
+        err(f"items/drowned_trap.json: missing or identifier is not {item_id}")
+    elif item["minecraft:item"]["components"].get("minecraft:icon") not in atlas:
+        err("items/drowned_trap.json: icon not in item_texture.json")
+    recipe = parsed.get(bp / "recipes/drowned_trap.json")
+    if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != item_id:
+        err(f"recipes/drowned_trap.json: missing or does not make {item_id}")
+
+    lure = parsed.get(bp / "entities/drowned_lure.json")
+    if not lure or lure["minecraft:entity"]["description"]["identifier"] != lure_id:
+        err(f"entities/drowned_lure.json: missing or identifier is not {lure_id}")
+    else:
+        fv = lure.get("format_version", "0")
+        if mev and tuple(int(x) for x in fv.split(".")) > tuple(mev):
+            err(f"entities/drowned_lure.json: format_version {fv} is newer than min_engine_version {mev}")
+        comps = lure["minecraft:entity"].get("components", {})
+        if TRAP_FAMILY not in comps.get("minecraft:type_family", {}).get("family", []):
+            err(f"entities/drowned_lure.json: type_family must include {TRAP_FAMILY} (drowned target it)")
+        ds = comps.get("minecraft:damage_sensor", {}).get("triggers", {})
+        if ds.get("cause") != "all" or ds.get("deals_damage") != "no":
+            err("entities/drowned_lure.json: damage_sensor must block all damage")
+
+    drowned = parsed.get(bp / "entities/drowned.json")
+    if not drowned:
+        err("entities/drowned.json: missing (tools/gen_drowned_trap.py)")
+    else:
+        goal = drowned["minecraft:entity"].get("components", {}).get(TARGET_GOAL, {})
+        if TRAP_FAMILY not in json.dumps(goal.get("entity_types", [])):
+            err(f"entities/drowned.json: {TARGET_GOAL} does not target the {TRAP_FAMILY} family")
+
+    ce = parsed.get(rp / "entity/drowned_lure.entity.json")
+    geo = parsed.get(rp / "models/entity/drowned_lure.geo.json")
+    if not ce or ce["minecraft:client_entity"]["description"]["identifier"] != lure_id:
+        err(f"entity/drowned_lure.entity.json: missing or identifier is not {lure_id}")
+    else:
+        desc = ce["minecraft:client_entity"]["description"]
+        if desc.get("textures", {}).get("default") != LURE_TEXTURE:
+            err(f"entity/drowned_lure.entity.json: default texture should be {LURE_TEXTURE}")
+        gid = desc.get("geometry", {}).get("default")
+        if not geo or gid not in [g["description"]["identifier"] for g in geo.get("minecraft:geometry", [])]:
+            err(f"entity/drowned_lure.entity.json: geometry {gid} not defined in models/entity/drowned_lure.geo.json")
+
+    for key in (f"item.{item_id}.name", f"entity.{lure_id}.name"):
+        if f"{key}=" not in lang:
+            err(f"texts/en_US.lang: missing {key}=...")
+    for needle in (item_id, lure_id):
+        if js and f'"{needle}"' not in js:
+            err(f"{rel(script)}: does not use {needle}")
     return list(ALL_TEXTURES)
 
 

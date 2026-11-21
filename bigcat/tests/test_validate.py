@@ -155,6 +155,21 @@ def drop_rope_particle(p):
     (p.rp / "particles" / "grapple_rope.particle.json").unlink()
 
 
+def drowned_ignores_trap(p):
+    def fn(d):
+        goal = d["minecraft:entity"]["components"]["minecraft:behavior.nearest_attackable_target"]
+        goal["entity_types"] = goal["entity_types"][1:]
+
+    _edit_json(p.bp / "entities" / "drowned.json", fn)
+
+
+def lure_wrong_family(p):
+    _edit_json(
+        p.bp / "entities" / "drowned_lure.json",
+        lambda d: d["minecraft:entity"]["components"]["minecraft:type_family"].update(family=["inanimate"]),
+    )
+
+
 BREAKAGES = [
     (bump_rp_only, "depends on RP version"),
     (add_bom, "UTF-8 BOM"),
@@ -177,6 +192,8 @@ BREAKAGES = [
     (remove_atlas_entry, "items/size_wand.json: icon not in item_texture.json"),
     (adult_scale_changed, "adult scale is no longer 3.0"),
     (drop_orb_recipe, "recipes/trap_orb.json: missing or does not make mymod:trap_orb"),
+    (drowned_ignores_trap, "drowned.json: minecraft:behavior.nearest_attackable_target does not target"),
+    (lure_wrong_family, "drowned_lure.json: type_family must include bigcat_drowned_trap"),
     (hook_not_a_projectile, "grapple_hook.json: needs minecraft:projectile"),
     (grapple_not_imported, "scripts/main.js: must import ./grapple.js"),
     (drop_rope_particle, "grapple_rope.particle.json: missing or does not define mymod:grapple_rope"),

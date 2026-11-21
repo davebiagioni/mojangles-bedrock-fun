@@ -15,7 +15,10 @@ fields in pack JSON, so this list is the "generated" marker instead.
 | `big_cat_rp/textures/items/{cat,creature,trap}_orb[_full].png` | `tools/gen_orb.py` (pixel art in code) |
 | `big_cat_rp/textures/items/{size,vapor}_wand.png` | `tools/gen_wand.py` (pixel art in code) |
 | `big_cat_rp/textures/items/grappling_gun.png`, `big_cat_rp/textures/entity/grapple_hook.png` | `tools/gen_grapple.py` (pixel art in code) |
+| `big_cat_rp/textures/items/drowned_trap.png`, `big_cat_rp/textures/entity/drowned_lure.png` | `tools/gen_drowned_trap.py` (pixel art in code) |
+| `big_cat_bp/entities/drowned.json` (gitignored) | `tools/gen_drowned_trap.py` (vanilla drowned + the trap as an attack target) |
 | `big_cat_rp/textures/items/evolution_stone.png`, `big_cat_rp/textures/entity/big_cat_wings.png` | `tools/gen_evolution.py` (pixel art in code) |
+| `big_cat_rp/textures/blocks/net_trap.png`, `big_cat_rp/textures/items/net_trap.png` | `tools/gen_net.py` (pixel art in code) |
 | `big_cat_bp/entities/player.json` (gitignored) | `tools/gen_player.py` (vanilla player + Size Wand sizes) |
 | `GENERATED_FILES.md` (this file) | `write_generated_list` in `tools/gen_json.py` |
 
@@ -63,6 +66,15 @@ Grappling Gun (checked by `validate_grapple` in `tools/validate.py`):
 | `big_cat_rp/entity/grapple_hook.entity.json`, `big_cat_rp/models/entity/grapple_hook.geo.json` | the hook's four-pronged steel model |
 | `big_cat_rp/particles/grapple_rope.particle.json` | `mymod:grapple_rope`, the rope dots the script draws between you and the hook |
 
+Drowned Trap (checked by `validate_drowned_trap` in `tools/validate.py`):
+
+| File | What it is |
+|---|---|
+| `big_cat_bp/scripts/drowned_trap.js` | place / pick up the trap, blow up drowned that attack it, drop one randomly enchanted weapon, imported by `scripts/main.js` |
+| `big_cat_bp/items/drowned_trap.json`, `big_cat_bp/recipes/drowned_trap.json` | the `mymod:drowned_trap` item (stacks to 16); crafting: 4 iron bars in a plus around a raw cod |
+| `big_cat_bp/entities/drowned_lure.json` | the placed trap, `mymod:drowned_lure` (family `bigcat_drowned_trap`, invulnerable, never despawns) |
+| `big_cat_rp/entity/drowned_lure.entity.json`, `big_cat_rp/models/entity/drowned_lure.geo.json` | the see-through prismarine cage with a fish inside |
+
 Evolution Stone (checked by `validate_evolution` in `tools/validate.py`; stages, stats and the
 stage property/groups/events in `big_cat_bp/entities/big_cat.json` come from `tools/gen_evolution.py`):
 
@@ -73,6 +85,16 @@ stage property/groups/events in `big_cat_bp/entities/big_cat.json` come from `to
 | `big_cat_rp/models/entity/big_cat_wings.geo.json` | the wings, a second model drawn on the cat (its `body` bone follows the cat's sit / lie-down poses) |
 | `big_cat_rp/render_controllers/big_cat_wings.render_controllers.json` | draws the wings; its `part_visibility` hides them below stage 8 |
 | `big_cat_rp/animations/big_cat_wings.animation.json`, `controller.animation.big_cat.wings` in `big_cat_rp/animation_controllers/big_cat.animation_controllers.json` | folded wings on the ground, flapping in the air |
+
+Net Trap (checked by `validate_net_trap` in `tools/validate.py`):
+
+| File | What it is |
+|---|---|
+| `big_cat_bp/scripts/net_trap.js` | the `mymod:net_trap` custom block component (step on it: caught), holding, releasing; imported by `scripts/main.js` |
+| `big_cat_bp/blocks/net_trap.json` | the flat net block (thin collision box, so stepping on it fires `onStepOn`) |
+| `big_cat_bp/items/net_trap.json`, `big_cat_bp/recipes/net_trap.json` | the item that places it (`block_placer`, replaces the block's own item); crafting: 4 string in the corners around a slime ball, makes 2 |
+| `big_cat_rp/models/blocks/net_trap.geo.json` | a 16x16 plate a quarter pixel thick |
+| `big_cat_rp/textures/terrain_texture.json` | block texture atlas entry `mymod_net_trap` |
 
 The cats' chase goals (`minecraft:behavior.nearest_prioritized_attackable_target` for the
 `bigcat_laser_dot` family and `minecraft:behavior.move_towards_target`) live in

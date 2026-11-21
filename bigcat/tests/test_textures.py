@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 from PIL import Image
 
+import gen_drowned_trap
 import gen_grapple
 import gen_laser
 import gen_orb
@@ -24,6 +25,7 @@ MAKERS = {
     "vapor_wand": lambda: gen_wand._wand(gen_wand.VAPOR_TIP),
     "grappling_gun": gen_grapple._icon,
     "grapple_hook": gen_grapple._hook,
+    "drowned_trap": gen_drowned_trap._icon,
 }
 ICONS = [k for k in MAKERS if k not in ("laser_dot", "grapple_hook")]  # item icons have transparent backgrounds
 
@@ -156,3 +158,38 @@ def test_grapple_icon_rejects_bad_grid(monkeypatch):
 
 def test_grapple_hook_texture_is_opaque():
     assert {px[3] for px in pixels(gen_grapple._hook())} == {255}
+
+
+def test_drowned_trap_icon_grid_is_well_formed():
+    grid = gen_drowned_trap.ICON
+    assert len(grid) == 16
+    assert all(len(row) == 16 for row in grid)
+    assert {ch for row in grid for ch in row} - {"."} <= set(gen_drowned_trap.COLORS)
+
+
+def test_drowned_lure_texture_is_32x32_with_see_through_cage():
+    im = gen_drowned_trap._lure()
+    assert im.size == (32, 32)
+    assert im.getpixel((11, 3))[3] == 0  # gap between bars
+    assert im.getpixel((8, 0))[3] == 255  # frame
+    assert im.getpixel((1, 17))[3] == 255  # bait fish
+
+
+def test_generate_drowned_trap_writes_textures_and_patched_drowned(project):
+    import common
+
+    gen_drowned_trap.generate_drowned_trap(verbose=False)
+    for tex in gen_drowned_trap.ALL_TEXTURES:
+        assert (project.rp / (tex + ".png")).is_file()
+    doc = common.load_json(project.bp / "entities" / "drowned.json")
+    types = doc["minecraft:entity"]["components"][gen_drowned_trap.TARGET_GOAL]["entity_types"]
+    assert types[0] == gen_drowned_trap.TRAP_TARGET
+    assert len(types) == 2  # the vanilla target is kept
+
+
+def test_patch_drowned_requires_target_goal(project):
+    from common import BuildError
+
+    (project.root / "vanilla" / "drowned.json").write_text('{"minecraft:entity": {"components": {}}}', encoding="utf-8")
+    with pytest.raises(BuildError, match=r"has no minecraft:behavior\.nearest_attackable_target"):
+        gen_drowned_trap.patch_drowned()

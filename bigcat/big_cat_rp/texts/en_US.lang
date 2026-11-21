@@ -16,3 +16,7 @@ item.mymod:vapor_wand.name=Vapor Wand
 item.mymod:grappling_gun.name=Grappling Gun
 entity.mymod:grapple_hook.name=Grapple Hook
 item.mymod:evolution_stone.name=Evolution Stone
+item.mymod:net_trap.name=Net Trap
+tile.mymod:net_trap.name=Net Trap
+item.mymod:drowned_trap.name=Drowned Trap
+entity.mymod:drowned_lure.name=Drowned Trap

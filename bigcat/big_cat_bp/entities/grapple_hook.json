@@ -46,7 +46,8 @@
           0
         ],
         "should_bounce": "no",
-        "hit_sound": "random.anvil_land"
+        "hit_sound": "random.anvil_land",
+        "isolated_physics": false
       },
       "minecraft:physics": {},
       "minecraft:pushable_by_block": {},

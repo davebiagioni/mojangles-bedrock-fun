@@ -34,6 +34,12 @@
     },
     "mymod_evolution_stone": {
       "textures": "textures/items/evolution_stone"
+    },
+    "mymod_net_trap": {
+      "textures": "textures/items/net_trap"
+    },
+    "mymod_drowned_trap": {
+      "textures": "textures/items/drowned_trap"
     }
   }
 }

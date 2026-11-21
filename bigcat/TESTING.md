@@ -317,3 +317,69 @@ Crafting (top to bottom): tripwire hook, string, iron ingot.
 | Flying feels too fast, slow or floaty | `FLY_SPEED`, `CLIMB_SPEED` and `STEERING` in `evolution.js`. |
 | Jump does nothing in the air | `player.inputInfo` isn't reporting jump; check the Content Log. |
 | Health didn't go up | Look for Content Log errors about `mymod:evolution_*`. |
+
+## Net Trap
+
+`scripts/net_trap.js` handles the net. It's a flat block you place on the ground. The first creature that walks onto it is caught: held on the net for 10 seconds, then the net is used up. Mobs, animals, Big Cats and other players are all caught. The player who placed the net can walk over it safely (`OWNER_IS_SAFE` in the script). Bosses (dragon, wither, warden, elder guardian), items, arrows and players in spectator mode are never caught. Breaking a net frees whatever is in it.
+
+- **Mobs** get Slowness 255 and are put back on the net if they get pushed off it.
+- **Players** have movement and jump turned off. They always get their controls back: when the 10 seconds end, when the net breaks, when they rejoin, and after `/reload`.
+
+Crafting: string in the four corners and a slime ball in the middle makes 2 nets.
+
+### Test steps
+
+1. Rebuild, exit to the menu and reopen the world. `/give @s mymod:net_trap 8`. Check the icon, the name **Net Trap** (Creative inventory: **Equipment**), and that it places only on top of blocks as a flat rope mesh you can see the ground through.
+2. Walk over your own net: nothing happens.
+3. Place a net in a pen and `/summon pig` next to it. Lure or push the pig onto it: a twang, a puff of particles and "Your net caught Pig!". The pig stays put with white specks around it, even if you hit it. After 10 seconds the net disappears and the pig walks off.
+4. Try a zombie at night, a Big Cat, a chicken: all caught. A dropped item or an arrow landing on the net: nothing happens.
+5. Break a net that's holding something: it's freed right away.
+6. With a second player: they walk onto your net and see "You're caught in a net! (10s)". They can look around but can't move or jump, and "You wriggled free" appears when it ends. Have them disconnect while caught and come back: they can move.
+7. `/reload` while a player is caught: they can move again right away.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| Nothing happens when walking onto it | `onStepOn` isn't firing. Check the Content Log for errors about the `mymod:net_trap` custom component, and that the block has its collision box. |
+| Net shows as a purple/black or solid block | Check `terrain_texture.json` and the block geometry in the Content Log. |
+| Net item shows as a tiny flat sliver instead of the icon | `block_placer`'s `replace_block_item` didn't take; report it. |
+| A player stays frozen after release | Run `/reload` (the script unlocks anyone it isn't holding). Report it. |
+| Mobs jitter on the net | Expected a little while they try to walk; raise `SNAP_DISTANCE` in the script to make it calmer. |
+
+## Drowned Trap
+
+`scripts/drowned_trap.js` handles the trap. `tools/gen_drowned_trap.py` builds a copy of the vanilla drowned (gitignored)
+that treats the trap as an enemy. No other mob is changed, so zombies, husks and the rest ignore it.
+
+- **Placing:** use the Drowned Trap on a block up to 8 blocks away. Aiming through water at the sea floor works. A
+  see-through cage with a fish inside appears there.
+- **Catching:** drowned within about 12 blocks that can see the trap go for it. When one hits it, throws a trident at it, or
+  gets right up against it, the drowned blows up. The explosion is just for show: nothing else is hurt and no blocks break.
+- **The drop:** no normal loot, just **one weapon with 1–3 random enchantments**. That's the drowned's own trident if it
+  was holding one, otherwise a random trident, iron or diamond sword, iron or diamond axe, bow or crossbow (tridents are the
+  most likely). Players within 32 blocks see "Drowned Trap: caught a drowned!".
+- **It keeps working**, drowned after drowned. **Hit it** to pick it back up.
+
+Crafting: 4 iron bars in a plus around a raw cod.
+
+1. Rebuild, exit to the menu and reopen the world. `/give @s mymod:drowned_trap`. Check the icon and the name **Drowned Trap**.
+2. Place it on the floor. `/summon drowned` about 6 blocks away: it walks to the trap and hits it, then boom, and a weapon
+   with enchantments (check its tooltip) drops where the drowned was.
+3. Do it a few times: weapons and enchantments should vary, with no curses and no rotten flesh.
+4. Give a drowned a trident (`/summon drowned`, then `/replaceitem entity @e[type=drowned,c=1] slot.weapon.mainhand 0 trident`)
+   and step back. It throws at the trap or hits it, and should drop an enchanted **trident**.
+5. Underwater: place the trap on the sea floor near drowned, at night or in an ocean. It should catch them there too.
+6. `/summon zombie` and `/summon husk` next to the trap: they ignore it and come for you.
+7. Hit the trap: it pops back into your inventory.
+8. Survival: drowned still attack you normally when the trap isn't around, and killing one yourself still gives normal loot.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| Drowned ignore the trap | The patched `drowned.json` didn't load. Check the Content Log, and check that no other add-on replaces the drowned. |
+| A drowned that held a trident drops a random weapon instead | This game version doesn't let scripts read a mob's hands. Report it. |
+| The trap can't be picked up by hitting it | Report it; picking up may need a different trigger. |
+| Nothing happens when placing | Check the Content Log for errors in `drowned_lure.json` or `drowned_trap.js`. |
+

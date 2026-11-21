@@ -15,10 +15,12 @@ from build_coats import build_coats
 from common import BuildError
 from deploy_dev import deploy
 from fetch_vanilla import fetch_vanilla
+from gen_drowned_trap import generate_drowned_trap
 from gen_evolution import generate_evolution_textures
 from gen_grapple import generate_grapple_textures
 from gen_json import generate_json
 from gen_laser import generate_laser_textures
+from gen_net import generate_net_textures
 from gen_orb import generate_orb_textures
 from gen_player import generate_player
 from gen_tame import generate_tame
@@ -42,7 +44,9 @@ def main() -> int:
         ("make monsters tameable", generate_tame),
         ("generate wand textures", generate_wand_textures),
         ("generate grappling gun textures", generate_grapple_textures),
+        ("drowned trap: patch drowned + textures", generate_drowned_trap),
         ("generate evolution stone textures", generate_evolution_textures),
+        ("generate net trap textures", generate_net_textures),
         ("add player sizes", generate_player),
         ("validate", validate),
     ]

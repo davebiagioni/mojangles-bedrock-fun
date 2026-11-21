@@ -12,6 +12,8 @@ gear/gear_rp/pack_icon.png
 bigcat/big_cat_bp/entities/zombie.json
 bigcat/big_cat_bp/entities/creeper.json
 bigcat/big_cat_bp/entities/skeleton.json
+# Vanilla drowned that attack the Drowned Trap (tools/gen_drowned_trap.py)
+bigcat/big_cat_bp/entities/drowned.json
 # Vanilla player definition with Size Wand sizes added (tools/gen_player.py)
 bigcat/big_cat_bp/entities/player.json
 

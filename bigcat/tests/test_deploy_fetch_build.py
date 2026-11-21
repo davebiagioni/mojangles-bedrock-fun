@@ -175,7 +175,7 @@ def test_vanilla_list_covers_configured_inputs(synth):
     cfg = synth.small_config()
     for key in ("geometry", "base_texture", "tame_reference"):
         assert cfg["paths"][key].removeprefix("vanilla/") in files
-    for mob in ("zombie", "skeleton", "creeper", "player"):
+    for mob in ("zombie", "skeleton", "creeper", "player", "drowned"):
         assert f"{mob}.json" in files
 
 
@@ -191,7 +191,9 @@ STEP_NAMES = [
     "generate_tame",
     "generate_wand_textures",
     "generate_grapple_textures",
+    "generate_drowned_trap",
     "generate_evolution_textures",
+    "generate_net_textures",
     "generate_player",
     "validate",
     "bump_versions",
@@ -209,7 +211,7 @@ def calls(monkeypatch):
     return log
 
 
-BASE_STEPS = STEP_NAMES[:11]
+BASE_STEPS = STEP_NAMES[: STEP_NAMES.index("validate") + 1]  # every step up to validate
 
 
 @pytest.mark.parametrize(

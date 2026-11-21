@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:drowned_trap"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      " B ",
+      "BCB",
+      " B "
+    ],
+    "key": {
+      "B": { "item": "minecraft:iron_bars" },
+      "C": { "item": "minecraft:cod" }
+    },
+    "unlock": [
+      { "item": "minecraft:iron_bars" }
+    ],
+    "result": {
+      "item": "mymod:drowned_trap",
+      "count": 1
+    }
+  }
+}

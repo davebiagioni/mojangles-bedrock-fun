@@ -164,6 +164,15 @@ VANILLA_MOBS = {
     "skeleton": vanilla_mob("minecraft:skeleton"),
     "creeper": vanilla_mob("minecraft:creeper", **{"minecraft:interact": {"interactions": CREEPER_INTERACT}}),
     "player": vanilla_mob("minecraft:player"),
+    "drowned": vanilla_mob(
+        "minecraft:drowned",
+        **{
+            "minecraft:behavior.nearest_attackable_target": {
+                "within_radius": 12,
+                "entity_types": [{"filters": {"test": "is_family", "subject": "other", "value": "player"}}],
+            }
+        },
+    ),
 }
 
 
@@ -179,7 +188,7 @@ def small_config(coat_count: int = COAT_COUNT) -> dict:
 
 def _ignore_generated(src, names):
     # coat textures are regenerated anyway; generated mob files come from the synthetic vanilla
-    skip = {"coats", "zombie.json", "skeleton.json", "creeper.json", "player.json", "__pycache__"}
+    skip = {"coats", "zombie.json", "skeleton.json", "creeper.json", "player.json", "drowned.json", "__pycache__"}
     return [n for n in names if n in skip]
 
 
@@ -213,7 +222,9 @@ def run_generators() -> None:
     tool("gen_tame").generate_tame(verbose=False)
     tool("gen_wand").generate_wand_textures(verbose=False)
     tool("gen_grapple").generate_grapple_textures(verbose=False)
+    tool("gen_drowned_trap").generate_drowned_trap(verbose=False)
     tool("gen_evolution").generate_evolution_textures(verbose=False)
+    tool("gen_net").generate_net_textures(verbose=False)
     tool("gen_player").generate_player(verbose=False)
 
 

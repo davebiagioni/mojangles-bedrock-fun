@@ -18,7 +18,9 @@ import "./trap_orb.js"; // Player Trap Orb
 import "./tame_monsters.js"; // tame zombies (cake), skeletons (milk) and creepers (hugs)
 import "./wands.js"; // Size Wand (mini / huge) and Vapor Wand (rainbow / stinky)
 import "./grapple.js"; // Grappling Gun
+import "./drowned_trap.js"; // Drowned Trap
 import "./evolution.js"; // Evolution Stone: ore drops, 8 cat stages, winged flight
+import "./net_trap.js"; // Net Trap: holds whatever walks onto it
 
 const POINTER_ID = "mymod:laser_pointer";
 const DOT_ID = "mymod:laser_dot";

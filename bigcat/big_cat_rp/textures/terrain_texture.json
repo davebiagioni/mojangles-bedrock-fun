@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "big_cat",
+  "texture_name": "atlas.terrain",
+  "texture_data": {
+    "mymod_net_trap": {
+      "textures": "textures/blocks/net_trap"
+    }
+  }
+}
