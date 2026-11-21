@@ -13,6 +13,7 @@ Outputs:
 
 Run standalone:  python tools/build_coats.py
 """
+
 from __future__ import annotations
 
 import colorsys
@@ -24,8 +25,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from common import (BuildError, Geometry, Texel, coat_name, load_config, load_geometry, rel, tame_name,
-                    write_json)
+from common import BuildError, Geometry, Texel, coat_name, load_config, load_geometry, rel, tame_name, write_json
 
 Color = tuple[float, float, float]
 
@@ -50,7 +50,7 @@ def hex_to_rgb(h: str) -> Color:
     h = h.lstrip("#")
     if len(h) != 6:
         raise BuildError(f"bad color '{h}' in config (use #rrggbb)")
-    return tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
+    return tuple(int(h[i : i + 2], 16) / 255 for i in (0, 2, 4))
 
 
 def luminance(rgb) -> float:
@@ -76,19 +76,19 @@ class Noise:
         ux, uy, uz = fx * fx * (3 - 2 * fx), fy * fy * (3 - 2 * fy), fz * fz * (3 - 2 * fz)
         h = self._hash
 
-        def l(a, b, t):
+        def lerp(a, b, t):
             return a + (b - a) * t
 
-        x00 = l(h(ix, iy, iz), h(ix + 1, iy, iz), ux)
-        x10 = l(h(ix, iy + 1, iz), h(ix + 1, iy + 1, iz), ux)
-        x01 = l(h(ix, iy, iz + 1), h(ix + 1, iy, iz + 1), ux)
-        x11 = l(h(ix, iy + 1, iz + 1), h(ix + 1, iy + 1, iz + 1), ux)
-        return l(l(x00, x10, uy), l(x01, x11, uy), uz)
+        x00 = lerp(h(ix, iy, iz), h(ix + 1, iy, iz), ux)
+        x10 = lerp(h(ix, iy + 1, iz), h(ix + 1, iy + 1, iz), ux)
+        x01 = lerp(h(ix, iy, iz + 1), h(ix + 1, iy, iz + 1), ux)
+        x11 = lerp(h(ix, iy + 1, iz + 1), h(ix + 1, iy + 1, iz + 1), ux)
+        return lerp(lerp(x00, x10, uy), lerp(x01, x11, uy), uz)
 
     def fbm(self, p, freq: float, octaves: int = 3) -> float:
         total, amp, norm = 0.0, 1.0, 0.0
         for o in range(octaves):
-            f = freq * (2 ** o)
+            f = freq * (2**o)
             total += amp * self.value(p[0] * f + o * 17.1, p[1] * f + o * 3.7, p[2] * f + o * 9.3)
             norm += amp
             amp *= 0.5
@@ -127,18 +127,35 @@ def compute_anatomy(geo: Geometry, cfg: dict) -> None:
 
     allP = [t.P for t in geo.surface]
     zmin, zmax = min(p[2] for p in allP), max(p[2] for p in allP)
-    (bx0, by0, bz0), (bx1, by1, bz1) = geo.cube_bounds[(body, 0)]
-    (hx0, hy0, hz0), (hx1, hy1, hz1) = geo.cube_bounds[(head, 0)]
+    (_bx0, by0, bz0), (_bx1, by1, bz1) = geo.cube_bounds[(body, 0)]
+    (hx0, hy0, hz0), (hx1, hy1, _hz1) = geo.cube_bounds[(head, 0)]
     nose = next(iter(muzzle))
-    (nx0, ny0, nz0), (nx1, ny1, nz1) = geo.cube_bounds[nose]
+    (nx0, ny0, nz0), (nx1, ny1, _nz1) = geo.cube_bounds[nose]
     nose_c = ((nx0 + nx1) / 2, (ny0 + ny1) / 2, nz0)
     head_cx = (hx0 + hx1) / 2
 
     for t in list(geo.texels.values()):
         x, y, z = t.P
-        nx, ny, nz = t.N
-        w = {k: 0.0 for k in ("ventral", "chest", "paw", "leg_low", "legs", "face", "lower_face",
-                              "muzzle", "ears", "tail", "tail_tip", "blaze", "dorsal", "nose_dist")}
+        _nx, ny, nz = t.N
+        w = dict.fromkeys(
+            (
+                "ventral",
+                "chest",
+                "paw",
+                "leg_low",
+                "legs",
+                "face",
+                "lower_face",
+                "muzzle",
+                "ears",
+                "tail",
+                "tail_tip",
+                "blaze",
+                "dorsal",
+                "nose_dist",
+            ),
+            0.0,
+        )
         w["length"] = (z - zmin) / (zmax - zmin)
         cube = (t.bone, t.cube)
         w["nose_dist"] = math.dist(t.P, nose_c)
@@ -166,14 +183,14 @@ def compute_anatomy(geo: Geometry, cfg: dict) -> None:
             if near_front:
                 w["blaze"] = smooth((0.9 - abs(x - head_cx)) / 0.4) * (1 if ny > 0.5 or ry > 0.4 else 0)
         elif t.bone in legs:
-            (lx0, ly0, lz0), (lx1, ly1, lz1) = geo.cube_bounds[cube]
+            (_lx0, ly0, _lz0), (_lx1, ly1, _lz1) = geo.cube_bounds[cube]
             above = y - ly0
             w["legs"] = 1.0
             w["leg_low"] = clamp01(1 - above / (ly1 - ly0))
             w["paw"] = 1.0 if (ny < -0.5 or above < paw_h) else 0.0
             w["dorsal"] = 0.5 * (1 - w["leg_low"])
         elif t.bone in tails:
-            (tx0, ty0, tz0), (tx1, ty1, tz1) = geo.cube_bounds[cube]
+            (_tx0, ty0, _tz0), (_tx1, ty1, _tz1) = geo.cube_bounds[cube]
             seg = tails.index(t.bone)
             along = clamp01((ty1 - y) / (ty1 - ty0)) if ny > -0.5 else 1.0
             w["tail"] = 1.0
@@ -220,6 +237,7 @@ def pat_tabby(rng, pal, s, cfg):
             on = False
         col = pal.dark if on else pal.base
         return lerp(col, belly, t.w["ventral"] * 0.85)
+
     return f
 
 
@@ -239,6 +257,7 @@ def pat_spots(rng, pal, s, cfg):
             if rosette and d < radius * 0.45:
                 col = lerp(pal.base, pal.dark, 0.35)
         return lerp(col, belly, t.w["ventral"] * 0.9)
+
     return f
 
 
@@ -255,6 +274,7 @@ def pat_calico(rng, pal, s, cfg):
         if score > 0.5:
             return pal.white
         return pal.base if n2.fbm(t.P, freq) > cut else pal.dark
+
     return f
 
 
@@ -269,6 +289,7 @@ def pat_tortie(rng, pal, s, cfg):
         if n2.value(t.P[0] * 1.3, t.P[1] * 1.3, t.P[2] * 1.3) < flecks:
             col = lerp(col, pal.light, 0.6)
         return col
+
     return f
 
 
@@ -284,6 +305,7 @@ def pat_tuxedo(rng, pal, s, cfg):
         if white + (n.fbm(t.P, 0.6) - 0.5) * jag + amount > 0.55:
             return pal.white
         return coat
+
     return f
 
 
@@ -296,6 +318,7 @@ def pat_colorpoint(rng, pal, s, cfg):
         face = w["face"] * smooth(1 - w["nose_dist"] / reach)
         pts = max(w["ears"], w["muzzle"], face, w["leg_low"] ** 1.3 * w["legs"], w["tail_tip"] ** 0.8 * w["tail"])
         return lerp(body, pal.dark, smooth(pts))
+
     return f
 
 
@@ -312,12 +335,19 @@ def pat_gradient(rng, pal, s, cfg):
             return lerp(pal.base, pal.dark, smooth(k))
         # radial: darker the further from the nose
         return lerp(pal.light, pal.dark, smooth(w["nose_dist"] / 22))
+
     return f
 
 
 PATTERNS = {
-    "solid": pat_solid, "tabby": pat_tabby, "spots": pat_spots, "calico": pat_calico,
-    "tortie": pat_tortie, "tuxedo": pat_tuxedo, "colorpoint": pat_colorpoint, "gradient": pat_gradient,
+    "solid": pat_solid,
+    "tabby": pat_tabby,
+    "spots": pat_spots,
+    "calico": pat_calico,
+    "tortie": pat_tortie,
+    "tuxedo": pat_tuxedo,
+    "colorpoint": pat_colorpoint,
+    "gradient": pat_gradient,
 }
 
 
@@ -325,8 +355,11 @@ def apply_modifiers(rng, name, pal, cfg):
     """Optional extras layered on top of the main pattern."""
     mods = []
     mc = cfg.get("modifiers", {})
-    skip = {"tuxedo": {"white_paws", "white_blaze", "light_belly"}, "calico": {"white_paws", "light_belly"},
-            "colorpoint": {"white_blaze"}}
+    skip = {
+        "tuxedo": {"white_paws", "white_blaze", "light_belly"},
+        "calico": {"white_paws", "light_belly"},
+        "colorpoint": {"white_blaze"},
+    }
     for mod in sorted(mc):
         if mod in skip.get(name, ()):
             continue
@@ -344,6 +377,7 @@ def apply_modifiers(rng, name, pal, cfg):
         if "white_tail_tip" in mods and w["tail_tip"] > 0.8:
             col = pal.white
         return col
+
     return mods, f
 
 
@@ -395,8 +429,12 @@ def load_collar(paths, geo: Geometry) -> dict[tuple[int, int], tuple]:
     ref = Image.open(paths.tame_reference).convert("RGBA")
     if ref.size != (geo.width, geo.height):
         raise BuildError(f"{rel(paths.tame_reference)} is {ref.size}, expected {(geo.width, geo.height)}")
-    collar = {(x, y): ref.getpixel((x, y))[:3] for y in range(ref.height) for x in range(ref.width)
-              if ref.getpixel((x, y))[3] == 255}
+    collar = {
+        (x, y): ref.getpixel((x, y))[:3]
+        for y in range(ref.height)
+        for x in range(ref.width)
+        if ref.getpixel((x, y))[3] == 255
+    }
     if not collar:
         raise BuildError(f"{rel(paths.tame_reference)}: no collar pixels (alpha 255) found")
     stray = [k for k in collar if k not in geo.texels]
@@ -431,8 +469,10 @@ def load_layers(paths, size) -> list[tuple[str, Image.Image]]:
         im = Image.open(p).convert("RGBA")
         sx, sy = im.width / size[0], im.height / size[1]
         if sx != sy or sx < 1 or sx != int(sx):
-            raise BuildError(f"{rel(p)} is {im.width}x{im.height}; layers must be {size[0]}x{size[1]} "
-                             f"or an exact multiple of it (e.g. {size[0]*16}x{size[1]*16})")
+            raise BuildError(
+                f"{rel(p)} is {im.width}x{im.height}; layers must be {size[0]}x{size[1]} "
+                f"or an exact multiple of it (e.g. {size[0] * 16}x{size[1] * 16})"
+            )
         if sx > 1:
             im = im.resize(size, Image.Resampling.NEAREST)
         layers.append((p.name, im))
@@ -456,8 +496,10 @@ def make_coat(i, cfg, geo, base, protect, shade, layers):
         if pc[k] not in colors:
             raise BuildError(f"palette '{pal_name}' uses unknown color '{pc[k]}'")
     j = cfg["jitter"]
-    pal = Pal(*(jitter(colors[pc[k]], rng, j) for k in ("base", "dark", "light")),
-              jitter(colors[cfg.get("white", "white")], rng, {"hue": 0, "sat": 0.03, "val": 0.03}))
+    pal = Pal(
+        *(jitter(colors[pc[k]], rng, j) for k in ("base", "dark", "light")),
+        jitter(colors[cfg.get("white", "white")], rng, {"hue": 0, "sat": 0.03, "val": 0.03}),
+    )
     fn = PATTERNS[pattern](rng, pal, cfg["pattern_settings"].get(pattern, {}), cfg)
     mods, modfn = apply_modifiers(rng, pattern, pal, cfg)
 
@@ -478,10 +520,17 @@ def make_coat(i, cfg, geo, base, protect, shade, layers):
             a = la / 255
             r, g, b = r + (lr - r) * a, g + (lg - g) * a, b + (lb - b) * a
         k = shade[key]
-        out.putpixel(key, (min(255, round(r * k)), min(255, round(g * k)), min(255, round(b * k)),
-                           base.getpixel(key)[3]))
-    meta = {"index": i, "name": coat_name(i), "pattern": pattern, "palette": pal_name, "modifiers": mods,
-            "layer": layer[0] if layer else None}
+        out.putpixel(
+            key, (min(255, round(r * k)), min(255, round(g * k)), min(255, round(b * k)), base.getpixel(key)[3])
+        )
+    meta = {
+        "index": i,
+        "name": coat_name(i),
+        "pattern": pattern,
+        "palette": pal_name,
+        "modifiers": mods,
+        "layer": layer[0] if layer else None,
+    }
     return out, meta
 
 
@@ -521,8 +570,20 @@ def render_views(img: Image.Image, geo: Geometry, scale: int) -> dict[str, Image
     z0, z1 = min(p[2] for p in P), max(p[2] for p in P)
     views = {
         # name: (visible-if, screen x, screen y, depth (draw ascending), size)
-        "side": (lambda t: t.N[0] < -0.5, lambda p: p[2] - z0, lambda p: y1 - p[1], lambda p: -p[0], (z1 - z0, y1 - y0)),
-        "front": (lambda t: t.N[2] < -0.5, lambda p: x1 - p[0], lambda p: y1 - p[1], lambda p: p[2], (x1 - x0, y1 - y0)),
+        "side": (
+            lambda t: t.N[0] < -0.5,
+            lambda p: p[2] - z0,
+            lambda p: y1 - p[1],
+            lambda p: -p[0],
+            (z1 - z0, y1 - y0),
+        ),
+        "front": (
+            lambda t: t.N[2] < -0.5,
+            lambda p: x1 - p[0],
+            lambda p: y1 - p[1],
+            lambda p: p[2],
+            (x1 - x0, y1 - y0),
+        ),
         "top": (lambda t: t.N[1] > 0.5, lambda p: p[2] - z0, lambda p: p[0] - x0, lambda p: p[1], (z1 - z0, x1 - x0)),
     }
     out = {}
@@ -554,7 +615,7 @@ def contact_sheet(coats, metas, geo, path: Path, cols: int = 10):
     d = ImageDraw.Draw(sheet)
     font = _font(11)
     d.text((6, 5), f"{len(coats)} coats  -  index / pattern / palette  (+ modifiers)", fill=(235, 235, 235), font=font)
-    for n, (img, m) in enumerate(zip(coats, metas)):
+    for n, (img, m) in enumerate(zip(coats, metas, strict=True)):
         ox, oy = (n % cols) * tile_w + pad, (n // cols) * tile_h + 24
         v = render_views(img, geo, scale)
         label = f"{m['index']:03d} {m['pattern']}/{m['palette']}" + (" +" if m["modifiers"] or m["layer"] else "")
@@ -614,13 +675,20 @@ def uv_template(geo: Geometry, base: Image.Image, path: Path, cfg: dict, scale: 
     for fk, (a, b, c, e) in sorted(rects.items()):
         t = first[fk]
         name = part(t.bone, t.cube)
-        d.rectangle([a * scale, b * scale, (c + 1) * scale - 1, (e + 1) * scale - 1], outline=(30, 30, 30, 255), width=2)
+        d.rectangle(
+            [a * scale, b * scale, (c + 1) * scale - 1, (e + 1) * scale - 1], outline=(30, 30, 30, 255), width=2
+        )
         g = groups.setdefault(name, [a, b, c, e])
         g[0], g[1], g[2], g[3] = min(g[0], a), min(g[1], b), max(g[2], c), max(g[3], e)
         if name in ("body", "head") and (c - a + 1) * scale >= 60:
-            d.multiline_text((a * scale + 3, b * scale + 2), f"{name}\n{facing(t.N, name)}",
-                             fill=(20, 20, 20, 255), font=font, spacing=0)
-    for name, (a, b, c, e) in groups.items():  # small parts: one label per part, above it
+            d.multiline_text(
+                (a * scale + 3, b * scale + 2),
+                f"{name}\n{facing(t.N, name)}",
+                fill=(20, 20, 20, 255),
+                font=font,
+                spacing=0,
+            )
+    for name, (a, b, _c, e) in groups.items():  # small parts: one label per part, above it
         if name not in ("body", "head"):
             y = b * scale - 16 if b * scale >= 16 else (e + 1) * scale + 2
             d.text((a * scale + 2, y), name, fill=(150, 20, 20, 255), font=font)
@@ -664,7 +732,7 @@ def build_coats(verbose: bool = True) -> list[dict]:
         shutil.rmtree(out_dir)  # wipe so a smaller coat_count leaves no orphans
     out_dir.mkdir(parents=True)
     collar = load_collar(paths, geo)
-    for i, (img, meta) in enumerate(zip(coats, metas)):
+    for i, (img, _meta) in enumerate(zip(coats, metas, strict=True)):
         img.save(out_dir / f"{coat_name(i)}.png", optimize=False)
         # TGA like vanilla: Bedrock reads the collar alpha mask from TGA tame textures
         make_tame(img, collar, cfg).save(out_dir / f"{tame_name(i)}.tga")
@@ -678,7 +746,8 @@ def build_coats(verbose: bool = True) -> list[dict]:
         counts: dict[str, int] = {}
         for m in metas:
             counts[m["pattern"]] = counts.get(m["pattern"], 0) + 1
-        print(f"  wrote {n} coats (+ {n} tame versions with collar mask) to {rel(out_dir)}  ({', '.join(f'{k} {v}' for k, v in sorted(counts.items()))})")
+        summary = ", ".join(f"{k} {v}" for k, v in sorted(counts.items()))
+        print(f"  wrote {n} coats (+ {n} tame versions with collar mask) to {rel(out_dir)}  ({summary})")
         print(f"  preview: {rel(paths.build / 'coat_preview.png')}")
     return metas
 

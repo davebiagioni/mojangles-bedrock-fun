@@ -7,6 +7,7 @@ Everything else for the laser pointer is hand-written; see GENERATED_FILES.md.
 
 Run standalone:  python tools/gen_laser.py
 """
+
 from __future__ import annotations
 
 import sys

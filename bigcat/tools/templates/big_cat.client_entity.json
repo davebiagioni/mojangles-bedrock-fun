@@ -4,10 +4,12 @@
     "description": {
       "identifier": "mymod:big_cat",
       "materials": {
-        "default": "cat"
+        "default": "cat",
+        "wings": "entity_alphatest"
       },
       "geometry": {
-        "default": "geometry.cat"
+        "default": "geometry.cat",
+        "wings": "geometry.mymod.big_cat_wings"
       },
       "animations": {
         "sneak": "animation.cat.sneak",
@@ -20,7 +22,8 @@
         "baby_sit": "animation.cat.sit",
         "baby_walk": "animation.cat.walk",
         "baby_sprint": "animation.cat.sprint",
-        "baby_sneak": "animation.cat.sneak"
+        "baby_sneak": "animation.cat.sneak",
+        "wings": "animation.big_cat.wings"
       },
       "scripts": {
         "pre_animation": [
@@ -33,6 +36,9 @@
         },
         {
           "move": "controller.animation.big_cat.move"
+        },
+        {
+          "wings": "controller.animation.big_cat.wings"
         }
       ],
       "render_controllers": ["controller.render.big_cat"],

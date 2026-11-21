@@ -4,5 +4,6 @@
   "cat_tame.tga": "resource_pack/textures/entity/cat/tabby_tame.tga",
   "zombie.json": "behavior_pack/entities/zombie.json",
   "creeper.json": "behavior_pack/entities/creeper.json",
-  "skeleton.json": "behavior_pack/entities/skeleton.json"
+  "skeleton.json": "behavior_pack/entities/skeleton.json",
+  "player.json": "behavior_pack/entities/player.json"
 }

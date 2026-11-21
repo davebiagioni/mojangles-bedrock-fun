@@ -12,12 +12,19 @@ gear/gear_rp/pack_icon.png
 bigcat/big_cat_bp/entities/zombie.json
 bigcat/big_cat_bp/entities/creeper.json
 bigcat/big_cat_bp/entities/skeleton.json
+# Vanilla player definition with Size Wand sizes added (tools/gen_player.py)
+bigcat/big_cat_bp/entities/player.json
 
 # --- build output -----------------------------------------------------------
 build/
 dist/
 *.mcaddon
 __pycache__/
+
+# --- Python tooling (uv / pytest / ruff) -----------------------------------------
+.venv/
+.pytest_cache/
+.ruff_cache/
 
 # --- local backup of bigcat's pre-monorepo git history (contains vanilla files) -
 _old_bigcat_git/

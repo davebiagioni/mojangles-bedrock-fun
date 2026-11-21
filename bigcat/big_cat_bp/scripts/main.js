@@ -16,6 +16,9 @@ import { world, system, EquipmentSlot } from "@minecraft/server";
 import "./orbs.js"; // Cat Orb + Creature Orb: capture and release mobs
 import "./trap_orb.js"; // Player Trap Orb
 import "./tame_monsters.js"; // tame zombies (cake), skeletons (milk) and creepers (hugs)
+import "./wands.js"; // Size Wand (mini / huge) and Vapor Wand (rainbow / stinky)
+import "./grapple.js"; // Grappling Gun
+import "./evolution.js"; // Evolution Stone: ore drops, 8 cat stages, winged flight
 
 const POINTER_ID = "mymod:laser_pointer";
 const DOT_ID = "mymod:laser_dot";

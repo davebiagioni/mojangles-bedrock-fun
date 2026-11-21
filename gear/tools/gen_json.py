@@ -2,6 +2,7 @@
 
 Run standalone:  python tools/gen_json.py
 """
+
 from __future__ import annotations
 
 import sys
@@ -116,11 +117,14 @@ def generate_json() -> None:
             write_json(rp / "attachables" / name, data)
         texture_data[texture_key(cfg, piece)] = {"textures": f"{paths.item_texture_dir}/{piece['id']}"}
         lang.append(f"item.{piece['identifier']}.name={piece['name']}")
-    write_json(rp / "textures" / "item_texture.json", {
-        "resource_pack_name": cfg["namespace"],
-        "texture_name": "atlas.items",
-        "texture_data": texture_data,
-    })
+    write_json(
+        rp / "textures" / "item_texture.json",
+        {
+            "resource_pack_name": cfg["namespace"],
+            "texture_name": "atlas.items",
+            "texture_data": texture_data,
+        },
+    )
     lang += [
         "",
         "## used by scripts/main.js via rawtext translate",

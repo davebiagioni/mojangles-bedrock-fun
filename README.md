@@ -4,14 +4,17 @@ Two Minecraft: Bedrock Edition add-ons, built with Python scripts.
 
 | Folder | What it is |
 |---|---|
-| [`bigcat/`](bigcat/) | **Big Cat**: a giant, tameable cat with 200 generated coats, plus a **laser pointer** that cats chase. |
+| [`bigcat/`](bigcat/) | **Big Cat**: a giant, tameable cat with 200 generated coats, plus a **laser pointer** that cats chase, orbs, tameable monsters, and wands that make players **mini or huge** or give them **rainbow or stinky vapor**, a **grappling gun** that pulls you to blocks or pulls mobs to you, and **Evolution Stones** (dropped by ores) that evolve cats through 8 stages until they grow wings and fly. |
 | [`gear/`](gear/) | **Amethyst armor**: a full armor set with a set bonus, plus **geode goggles** that give night vision. |
 
 Each folder has a `TESTING.md` with the full test steps.
 
 ## Setup (Windows)
 
-1. Install Python 3.12+ and Pillow: `pip install pillow`.
+1. Install Python 3.12+ and [uv](https://docs.astral.sh/uv/), then create the environment (Pillow, pytest, ruff):
+   ```
+   uv sync
+   ```
 2. Clone Mojang's samples next to the add-on folders. The build copies the few vanilla files it needs from there:
    ```
    git clone --depth 1 --branch v1.26.60.5 https://github.com/Mojang/bedrock-samples
@@ -19,10 +22,20 @@ Each folder has a `TESTING.md` with the full test steps.
    To use a checkout somewhere else, set `MC_SAMPLES` to its path.
 3. Build and deploy to Minecraft's development packs:
    ```
-   python bigcat/tools/build.py
-   python gear/tools/build.py
+   uv run python bigcat/tools/build.py
+   uv run python gear/tools/build.py
    ```
-   Add `--package` to also build an `.mcaddon` in `dist/`.
+   Add `--package` to also build an `.mcaddon` in `dist/`, or `--no-deploy` to skip copying into Minecraft.
+
+## Tests and linting
+
+```
+uv run pytest                 # tests for both projects (bigcat/tests, gear/tests)
+uv run ruff check             # lint
+uv run ruff format            # format (CI-style check: uv run ruff format --check)
+```
+
+Tests don't need Minecraft. Tests that read the real `bedrock-samples` or `vanilla/` files skip when those are missing.
 
 ## Mojang content
 

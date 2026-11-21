@@ -22,6 +22,18 @@
     },
     "mymod_trap_orb_full": {
       "textures": "textures/items/trap_orb_full"
+    },
+    "mymod_size_wand": {
+      "textures": "textures/items/size_wand"
+    },
+    "mymod_vapor_wand": {
+      "textures": "textures/items/vapor_wand"
+    },
+    "mymod_grappling_gun": {
+      "textures": "textures/items/grappling_gun"
+    },
+    "mymod_evolution_stone": {
+      "textures": "textures/items/evolution_stone"
     }
   }
 }

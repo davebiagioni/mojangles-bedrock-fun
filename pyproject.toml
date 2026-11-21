@@ -1,0 +1,72 @@
+[project]
+name = "mc-bedrock-addons"
+version = "0.1.0"
+description = "Build tools for the Big Cat and Amethyst gear Minecraft Bedrock add-ons"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pillow>=11",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.8",
+]
+
+[tool.uv]
+# The tools are standalone scripts, not an installable package.
+package = false
+
+# --------------------------------------------------------------------------- pytest
+
+[tool.pytest.ini_options]
+testpaths = ["bigcat/tests", "gear/tests"]
+# importlib mode: both projects have test files with the same names, and no __init__.py.
+addopts = ["--import-mode=importlib", "-ra", "--strict-markers"]
+xfail_strict = true
+filterwarnings = ["error"]
+
+# --------------------------------------------------------------------------- ruff
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+extend-exclude = ["bedrock-samples", "_old_bigcat_git", "*/vanilla", "*/build", "*/dist"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "SIM",  # flake8-simplify
+    "C4",   # flake8-comprehensions
+    "PTH",  # prefer pathlib
+    "RUF",  # ruff-specific
+    "PT",   # flake8-pytest-style
+]
+ignore = [
+    "SIM108",  # ternaries aren't always clearer
+    "RUF001",  # ambiguous unicode in strings: lang/display text uses it on purpose
+    "RUF002",
+    "RUF003",
+]
+
+[tool.ruff.lint.isort]
+# The tools import each other as top-level modules from their own folder.
+known-first-party = [
+    "build", "build_coats", "common", "deploy_dev", "fetch_vanilla", "gen_evolution", "gen_grapple", "gen_json", "gen_laser", "gen_orb",
+    "gen_player", "gen_tame", "gen_textures", "gen_wand", "package", "schema_check", "validate",
+]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint.per-file-ignores]
+# The per-face lambdas in load_geometry are called inside the same loop iteration that defines them.
+"bigcat/tools/common.py" = ["B023"]
+# GENERATED_FILES.md is written from a Markdown table template with long rows.
+"bigcat/tools/gen_json.py" = ["E501"]

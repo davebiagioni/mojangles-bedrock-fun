@@ -1,9 +1,10 @@
 """One command for everything:
 
-    python tools/build.py               generate textures + JSON -> validate -> deploy to Minecraft
-    python tools/build.py --package     ... and bump the version and write dist/gear.mcaddon
-    python tools/build.py --no-deploy   skip copying into Minecraft (e.g. on a machine without it)
+python tools/build.py               generate textures + JSON -> validate -> deploy to Minecraft
+python tools/build.py --package     ... and bump the version and write dist/gear.mcaddon
+python tools/build.py --no-deploy   skip copying into Minecraft (e.g. on a machine without it)
 """
+
 from __future__ import annotations
 
 import argparse
@@ -11,8 +12,8 @@ import sys
 import time
 
 from common import BuildError
-from fetch_vanilla import fetch_vanilla
 from deploy_dev import deploy
+from fetch_vanilla import fetch_vanilla
 from gen_json import generate_json
 from gen_textures import build_textures
 from package import bump_versions, make_mcaddon
@@ -25,7 +26,12 @@ def main() -> int:
     ap.add_argument("--no-deploy", action="store_true", help="skip copying the packs into Minecraft")
     args = ap.parse_args()
     t0 = time.time()
-    steps = [("fetch Mojang files", fetch_vanilla), ("generate textures", build_textures), ("generate JSON", generate_json), ("validate", validate)]
+    steps = [
+        ("fetch Mojang files", fetch_vanilla),
+        ("generate textures", build_textures),
+        ("generate JSON", generate_json),
+        ("validate", validate),
+    ]
     if args.package:
         steps += [("bump version", bump_versions), ("re-validate", validate)]
     if not args.no_deploy:

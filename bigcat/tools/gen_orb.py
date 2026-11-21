@@ -7,6 +7,7 @@ Outputs (16x16, in <rp>/textures/items/):
 
 Run standalone:  python tools/gen_orb.py
 """
+
 from __future__ import annotations
 
 import sys
@@ -84,7 +85,7 @@ FIGURE = [
 
 
 def _lerp(a, b, t):
-    return tuple(round(x + (y - x) * t) for x, y in zip(a, b))
+    return tuple(round(x + (y - x) * t) for x, y in zip(a, b, strict=True))
 
 
 def _orb(inner_dark, inner_light, alpha, band=((214, 160, 52), (255, 222, 120))) -> Image.Image:
@@ -164,15 +165,16 @@ def _trap_empty() -> Image.Image:
 
 
 def _trap_full() -> Image.Image:
-    return _overlay(_orb((120, 16, 26), (255, 120, 104), 255, RED), FIGURE,
-                    {"H": (60, 12, 16, 255), "B": (60, 12, 16, 255)})
+    return _overlay(
+        _orb((120, 16, 26), (255, 120, 104), 255, RED), FIGURE, {"H": (60, 12, 16, 255), "B": (60, 12, 16, 255)}
+    )
 
 
 def generate_orb_textures(verbose: bool = True) -> None:
     _, paths = load_config()
     out = []
     makers = (_empty, _full, _creature_empty, _creature_full, _trap_empty, _trap_full)
-    for tex, make in zip(ALL_TEXTURES, makers):
+    for tex, make in zip(ALL_TEXTURES, makers, strict=True):
         dest = paths.rp / (tex + ".png")
         dest.parent.mkdir(parents=True, exist_ok=True)
         make().save(dest)

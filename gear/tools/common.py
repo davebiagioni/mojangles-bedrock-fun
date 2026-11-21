@@ -2,6 +2,7 @@
 
 Adapted from the Big Cat project's tools/common.py (copied, not imported).
 """
+
 from __future__ import annotations
 
 import json
@@ -86,6 +87,7 @@ def write_json(path: Path, obj) -> None:
 
 # ------------------------------------------------------------------------- config
 
+
 @dataclass
 class Paths:
     bp: Path
@@ -93,9 +95,9 @@ class Paths:
     vanilla_art: Path
     build: Path
     dist: Path
-    item_texture_dir: str   # pack-relative, e.g. "textures/gear/items"
+    item_texture_dir: str  # pack-relative, e.g. "textures/gear/items"
     armor_texture_dir: str  # pack-relative, e.g. "textures/gear/armor"
-    samples: Path           # Mojang bedrock-samples checkout (read-only reference)
+    samples: Path  # Mojang bedrock-samples checkout (read-only reference)
 
 
 def load_config() -> tuple[dict, Paths]:
@@ -106,8 +108,20 @@ def load_config() -> tuple[dict, Paths]:
         raise BuildError(f"{rel(CONFIG_PATH)}: missing keys {missing}")
     ns = cfg["namespace"]
     for piece in cfg["pieces"]:
-        for key in ("id", "name", "slot", "script_slot", "enchant_slot", "protection", "durability",
-                    "kind", "layer", "icon_source", "group", "recipe"):
+        for key in (
+            "id",
+            "name",
+            "slot",
+            "script_slot",
+            "enchant_slot",
+            "protection",
+            "durability",
+            "kind",
+            "layer",
+            "icon_source",
+            "group",
+            "recipe",
+        ):
             if key not in piece:
                 raise BuildError(f"{rel(CONFIG_PATH)}: piece {piece.get('id', '?')} is missing '{key}'")
         if not re.fullmatch(r"[a-z0-9_]+", piece["id"]):
@@ -118,7 +132,9 @@ def load_config() -> tuple[dict, Paths]:
             raise BuildError(f"{rel(CONFIG_PATH)}: piece {piece['id']} has unknown layer {piece['layer']!r}")
         piece["identifier"] = f"{ns}:{piece['id']}"
     p = cfg["paths"]
-    samples = Path(os.environ.get("MC_SAMPLES") or os.environ.get("GEAR_SAMPLES") or ROOT / p["bedrock_samples_default"]).resolve()
+    samples = Path(
+        os.environ.get("MC_SAMPLES") or os.environ.get("GEAR_SAMPLES") or ROOT / p["bedrock_samples_default"]
+    ).resolve()
     paths = Paths(
         bp=ROOT / p["behavior_pack"],
         rp=ROOT / p["resource_pack"],

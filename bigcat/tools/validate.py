@@ -2,6 +2,7 @@
 
 Run standalone:  python tools/validate.py
 """
+
 from __future__ import annotations
 
 import json
@@ -47,11 +48,30 @@ def validate(verbose: bool = True) -> None:
         _fail(errors)
 
     # Minecraft rejects unknown top-level keys ("child 'x' not valid here")
-    allowed_top = {"format_version", "minecraft:entity", "minecraft:client_entity", "render_controllers",
-                   "animation_controllers", "animations", "minecraft:geometry", "header", "modules",
-                   "dependencies", "metadata", "capabilities", "entity_sounds", "individual_event_sounds",
-                   "block_sounds", "interactive_sounds", "minecraft:item", "minecraft:recipe_shaped",
-                   "particle_effect", "resource_pack_name", "texture_name", "texture_data"}
+    allowed_top = {
+        "format_version",
+        "minecraft:entity",
+        "minecraft:client_entity",
+        "render_controllers",
+        "animation_controllers",
+        "animations",
+        "minecraft:geometry",
+        "header",
+        "modules",
+        "dependencies",
+        "metadata",
+        "capabilities",
+        "entity_sounds",
+        "individual_event_sounds",
+        "block_sounds",
+        "interactive_sounds",
+        "minecraft:item",
+        "minecraft:recipe_shaped",
+        "particle_effect",
+        "resource_pack_name",
+        "texture_name",
+        "texture_data",
+    }
     for p, data in parsed.items():
         if (paths.bp in p.parents or paths.rp in p.parents) and isinstance(data, dict):
             if p.name == "languages.json":
@@ -179,12 +199,18 @@ def validate(verbose: bool = True) -> None:
     # 3b. laser pointer (hand-written files + generated textures) ----------------------
     laser_textures = validate_laser(paths, parsed, bpm, bp_ent, mev, err)
     from gen_orb import ALL_TEXTURES as ORB_TEXTURES
-    laser_textures += ORB_TEXTURES
+    from gen_wand import ALL_TEXTURES as WAND_TEXTURES
+
+    laser_textures += ORB_TEXTURES + WAND_TEXTURES
     validate_orb(paths, parsed, err)
+    validate_wands(paths, parsed, err)
+    laser_textures += validate_grapple(paths, parsed, mev, err)
+    laser_textures += validate_evolution(paths, parsed, bp_ent, ce, err)
 
     # 4. images: all referenced, right size, right alpha ---------------------------
-    referenced = {(paths.rp / (t + ext)).resolve() for t in list(textures.values()) + laser_textures
-                  for ext in TEXTURE_EXTS}
+    referenced = {
+        (paths.rp / (t + ext)).resolve() for t in list(textures.values()) + laser_textures for ext in TEXTURE_EXTS
+    }
     pngs = sorted(p for ext in TEXTURE_EXTS for p in (paths.rp / "textures").rglob("*" + ext))
     wild = sorted(paths.coat_dir_abs.glob("coat_*.png"))
     tame = sorted(paths.coat_dir_abs.glob("coat_*_tame.tga"))
@@ -209,8 +235,10 @@ def validate(verbose: bool = True) -> None:
         if p.stem.endswith("_tame"):
             bad = sorted(k for k, a in visible.items() if a != (collar_a if k in collar else fur_a))
             if bad:
-                err(f"{rel(p)}: {len(bad)} pixels have the wrong alpha (fur must be {fur_a}, only the "
-                    f"{len(collar)} collar pixels {collar_a}) - a tamed cat would be tinted the collar colour")
+                err(
+                    f"{rel(p)}: {len(bad)} pixels have the wrong alpha (fur must be {fur_a}, only the "
+                    f"{len(collar)} collar pixels {collar_a}) - a tamed cat would be tinted the collar colour"
+                )
         elif set(visible.values()) != {255}:
             err(f"{rel(p)}: wild coat must be fully opaque, has alpha {sorted(set(visible.values()))}")
     for p in pngs:
@@ -232,9 +260,11 @@ def validate(verbose: bool = True) -> None:
     if errors:
         _fail(errors)
     if verbose:
-        print(f"  OK: {len(parsed)} JSON files parse; {n} coats == {len(textures)} textures == "
-              f"{n} array entries == {events} set_coat events; {len(wild)} PNG + {len(tame)} TGA "
-              f"{geo.width}x{geo.height}; manifests OK ({groups} component groups untouched)")
+        print(
+            f"  OK: {len(parsed)} JSON files parse; {n} coats == {len(textures)} textures == "
+            f"{n} array entries == {events} set_coat events; {len(wild)} PNG + {len(tame)} TGA "
+            f"{geo.width}x{geo.height}; manifests OK ({groups} component groups untouched)"
+        )
 
 
 def validate_laser(paths, parsed, bpm, bp_ent, mev, err) -> list[str]:
@@ -315,8 +345,11 @@ def validate_laser(paths, parsed, bpm, bp_ent, mev, err) -> list[str]:
         if geo and gid not in [g["description"]["identifier"] for g in geo.get("minecraft:geometry", [])]:
             err(f"entity/laser_dot.entity.json: geometry {gid} not defined in models/entity/laser_dot.geo.json")
     if bp_ent:
-        sel = bp_ent["minecraft:entity"].get("components", {}).get(
-            "minecraft:behavior.nearest_prioritized_attackable_target", {})
+        sel = (
+            bp_ent["minecraft:entity"]
+            .get("components", {})
+            .get("minecraft:behavior.nearest_prioritized_attackable_target", {})
+        )
         if LASER_FAMILY not in json.dumps(sel) or BORED_TAG not in json.dumps(sel):
             err(f"BP entity: big cat no longer targets the {LASER_FAMILY} family / checks {BORED_TAG}")
 
@@ -332,17 +365,22 @@ def validate_laser(paths, parsed, bpm, bp_ent, mev, err) -> list[str]:
         return [ITEM_TEXTURE, DOT_TEXTURE]
     js = script.read_text(encoding="utf-8")
     pid = particle["particle_effect"]["description"]["identifier"] if particle else None
-    for needle, what in ((LASER_ITEM, "item"), (LASER_DOT, "dot entity"), (pid, "particle"),
-                         (BORED_TAG, "bored tag")):
+    for needle, what in ((LASER_ITEM, "item"), (LASER_DOT, "dot entity"), (pid, "particle"), (BORED_TAG, "bored tag")):
         if needle and f'"{needle}"' not in js:
             err(f"{rel(script)}: does not use the {what} id {needle!r}")
-    meta = (Path(os.environ.get("MC_SAMPLES") or ROOT.parent / "bedrock-samples") / "metadata/script_modules/@minecraft"
-            / f"server-bindings_{SCRIPT_SERVER_VERSION}.json")
+    meta = (
+        Path(os.environ.get("MC_SAMPLES") or ROOT.parent / "bedrock-samples")
+        / "metadata/script_modules/@minecraft"
+        / f"server-bindings_{SCRIPT_SERVER_VERSION}.json"
+    )
     exported = None
     if meta.is_file():
         api = json.loads(meta.read_text(encoding="utf-8"))
-        exported = {x["name"] for k in ("classes", "interfaces", "enums", "objects", "constants",
-                                        "functions", "errors", "type_aliases") for x in api.get(k, [])}
+        exported = {
+            x["name"]
+            for k in ("classes", "interfaces", "enums", "objects", "constants", "functions", "errors", "type_aliases")
+            for x in api.get(k, [])
+        }
     # every script in the pack: imports are @minecraft/server or another script file that exists
     for f in sorted((bp / "scripts").rglob("*.js")):
         src = f.read_text(encoding="utf-8")
@@ -358,8 +396,10 @@ def validate_laser(paths, parsed, bpm, bp_ent, mev, err) -> list[str]:
             for block in re.findall(r'import\s*\{([^}]*)\}\s*from\s*"@minecraft/server"', src):
                 for name in (n.strip().split(" as ")[0] for n in block.split(",") if n.strip()):
                     if name not in exported:
-                        err(f"{rel(f)}: imports {name!r}, which @minecraft/server "
-                            f"{SCRIPT_SERVER_VERSION} does not export")
+                        err(
+                            f"{rel(f)}: imports {name!r}, which @minecraft/server "
+                            f"{SCRIPT_SERVER_VERSION} does not export"
+                        )
     return [ITEM_TEXTURE, DOT_TEXTURE]
 
 
@@ -409,6 +449,192 @@ def validate_orb(paths, parsed, err) -> None:
         for prefix in re.findall(r'(?:PROP_[A-Z_]+|RECORD_PREFIX)\s*=\s*"([^"]+)"', js):
             if not prefix.startswith("bigcat_"):
                 err(f"{rel(script)}: dynamic property {prefix!r} must start with bigcat_")
+
+
+def validate_wands(paths, parsed, err) -> None:
+    """Cross-checks for the Size Wand and Vapor Wand (scripts/wands.js + generated player.json)."""
+    from gen_player import EVENTS, SIZES
+
+    bp, rp = paths.bp, paths.rp
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    lang = (rp / "texts/en_US.lang").read_text(encoding="utf-8")
+    script = bp / "scripts/wands.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if 'import "./wands.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./wands.js")
+    for name in ("size_wand", "vapor_wand"):
+        ident = f"mymod:{name}"
+        item = parsed.get(bp / f"items/{name}.json")
+        if not item or item["minecraft:item"]["description"]["identifier"] != ident:
+            err(f"items/{name}.json: missing or identifier is not {ident}")
+        elif item["minecraft:item"]["components"].get("minecraft:icon") not in atlas:
+            err(f"items/{name}.json: icon not in item_texture.json")
+        recipe = parsed.get(bp / f"recipes/{name}.json")
+        if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != ident:
+            err(f"recipes/{name}.json: missing or does not make {ident}")
+        if f"item.{ident}.name=" not in lang:
+            err(f"texts/en_US.lang: missing item.{ident}.name=...")
+        if f'"{ident}"' not in js:
+            err(f"{rel(script)}: does not use {ident}")
+    player = parsed.get(bp / "entities/player.json")
+    if not player:
+        err("entities/player.json: missing (tools/gen_player.py)")
+    else:
+        events = player["minecraft:entity"].get("events", {})
+        for ev in EVENTS.values():
+            if ev not in events:
+                err(f"entities/player.json: event {ev} missing")
+        for size, scale in SIZES.items():
+            if not re.search(rf"\b{size}: {re.escape(str(scale))}\b", js):
+                err(f"{rel(script)}: SCALE.{size} should be {scale} (tools/gen_player.py SIZES)")
+    for pid in re.findall(r'"(mymod:[a-z_]+)"', js):
+        if pid.endswith(("_sparkle", "_vapor")):
+            pfile = rp / "particles" / f"{pid.split(':')[1]}.particle.json"
+            pdata = parsed.get(pfile)
+            if not pdata or pdata["particle_effect"]["description"]["identifier"] != pid:
+                err(f"{rel(pfile)}: missing or does not define {pid}")
+
+
+def validate_grapple(paths, parsed, mev, err) -> list[str]:
+    """Cross-checks for the Grappling Gun. Returns the RP texture paths it uses."""
+    from gen_grapple import ALL_TEXTURES, HOOK_TEXTURE
+
+    bp, rp = paths.bp, paths.rp
+    gun, hook = "mymod:grappling_gun", "mymod:grapple_hook"
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    lang = (rp / "texts/en_US.lang").read_text(encoding="utf-8")
+    script = bp / "scripts/grapple.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if not js:
+        err(f"{rel(script)}: missing (grappling gun)")
+    if 'import "./grapple.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./grapple.js")
+
+    item = parsed.get(bp / "items/grappling_gun.json")
+    if not item or item["minecraft:item"]["description"]["identifier"] != gun:
+        err(f"items/grappling_gun.json: missing or identifier is not {gun}")
+    elif item["minecraft:item"]["components"].get("minecraft:icon") not in atlas:
+        err("items/grappling_gun.json: icon not in item_texture.json")
+    recipe = parsed.get(bp / "recipes/grappling_gun.json")
+    if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != gun:
+        err(f"recipes/grappling_gun.json: missing or does not make {gun}")
+
+    ent = parsed.get(bp / "entities/grapple_hook.json")
+    if not ent or ent["minecraft:entity"]["description"]["identifier"] != hook:
+        err(f"entities/grapple_hook.json: missing or identifier is not {hook}")
+    else:
+        fv = ent.get("format_version", "0")
+        if mev and tuple(int(x) for x in fv.split(".")) > tuple(mev):
+            err(f"entities/grapple_hook.json: format_version {fv} is newer than min_engine_version {mev}")
+        comps = ent["minecraft:entity"].get("components", {})
+        if "minecraft:projectile" not in comps:
+            err("entities/grapple_hook.json: needs minecraft:projectile (the script calls shoot())")
+        ds = comps.get("minecraft:damage_sensor", {}).get("triggers", {})
+        if ds.get("cause") != "all" or ds.get("deals_damage") != "no":
+            err("entities/grapple_hook.json: damage_sensor must block all damage")
+
+    ce = parsed.get(rp / "entity/grapple_hook.entity.json")
+    geo = parsed.get(rp / "models/entity/grapple_hook.geo.json")
+    if not ce or ce["minecraft:client_entity"]["description"]["identifier"] != hook:
+        err(f"entity/grapple_hook.entity.json: missing or identifier is not {hook}")
+    else:
+        desc = ce["minecraft:client_entity"]["description"]
+        if desc.get("textures", {}).get("default") != HOOK_TEXTURE:
+            err(f"entity/grapple_hook.entity.json: default texture should be {HOOK_TEXTURE}")
+        gid = desc.get("geometry", {}).get("default")
+        if not geo or gid not in [g["description"]["identifier"] for g in geo.get("minecraft:geometry", [])]:
+            err(f"entity/grapple_hook.entity.json: geometry {gid} not defined in models/entity/grapple_hook.geo.json")
+
+    for key in (f"item.{gun}.name", f"entity.{hook}.name"):
+        if f"{key}=" not in lang:
+            err(f"texts/en_US.lang: missing {key}=...")
+    for pid in re.findall(r'"(mymod:[a-z_]+)"', js):
+        if pid in (gun, hook):
+            continue
+        pfile = rp / "particles" / f"{pid.split(':')[1]}.particle.json"
+        pdata = parsed.get(pfile)
+        if not pdata or pdata["particle_effect"]["description"]["identifier"] != pid:
+            err(f"{rel(pfile)}: missing or does not define {pid}")
+    for needle in (gun, hook):
+        if js and f'"{needle}"' not in js:
+            err(f"{rel(script)}: does not use {needle}")
+    return list(ALL_TEXTURES)
+
+
+def validate_evolution(paths, parsed, bp_ent, ce, err) -> list[str]:
+    """Cross-checks for the Evolution Stone and the stage-8 wings. Returns the item icon textures."""
+    from gen_evolution import ALL_TEXTURES, EVENT, GROUP, MAX_STAGE, PROPERTY, STAGES, STONE_ID, WING_TEXTURE
+    from gen_json import WING_RC, wing_condition
+
+    bp, rp = paths.bp, paths.rp
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    lang = (rp / "texts/en_US.lang").read_text(encoding="utf-8")
+    script = bp / "scripts/evolution.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if not js:
+        err(f"{rel(script)}: missing (evolution stone)")
+    if 'import "./evolution.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./evolution.js")
+    if js and f'"{STONE_ID}"' not in js:
+        err(f"{rel(script)}: does not use {STONE_ID}")
+    if js and f'"{PROPERTY}"' not in js:
+        err(f"{rel(script)}: does not read {PROPERTY}")
+
+    # the script's stage list must match tools/gen_evolution.py STAGES
+    js_stages = re.findall(r'\{ name: "([^"]+)", color: "[^"]*", particle: "([^"]+)" \}', js)
+    want = [(s[0], s[1]) for s in STAGES]
+    if js and js_stages != want:
+        err(f"{rel(script)}: STAGES {js_stages} do not match tools/gen_evolution.py {want}")
+
+    item = parsed.get(bp / "items/evolution_stone.json")
+    if not item or item["minecraft:item"]["description"]["identifier"] != STONE_ID:
+        err(f"items/evolution_stone.json: missing or identifier is not {STONE_ID}")
+    elif item["minecraft:item"]["components"].get("minecraft:icon") not in atlas:
+        err("items/evolution_stone.json: icon not in item_texture.json")
+    if f"item.{STONE_ID}.name=" not in lang:
+        err(f"texts/en_US.lang: missing item.{STONE_ID}.name=...")
+
+    if bp_ent:
+        e = bp_ent["minecraft:entity"]
+        pdef = e["description"].get("properties", {}).get(PROPERTY, {})
+        if pdef.get("range") != [0, MAX_STAGE] or pdef.get("client_sync") is not True:
+            err(f"BP entity: {PROPERTY} must be an int 0..{MAX_STAGE} with client_sync (wings read it)")
+        cg, events = e.get("component_groups", {}), e.get("events", {})
+        for n in range(1, MAX_STAGE + 1):
+            if "minecraft:health" not in cg.get(GROUP.format(n=n), {}):
+                err(f"BP entity: component group {GROUP.format(n=n)} missing or has no health")
+            ev = events.get(EVENT.format(n=n), {})
+            if {PROPERTY: n} not in [step.get("set_property") for step in ev.get("sequence", [])]:
+                err(f"BP entity: {EVENT.format(n=n)} does not set {PROPERTY} to {n}")
+
+    if ce:
+        desc = ce["minecraft:client_entity"]["description"]
+        if desc.get("textures", {}).get("wings") != WING_TEXTURE:
+            err(f"client entity: texture 'wings' should be {WING_TEXTURE}")
+        rcl = desc.get("render_controllers", [])
+        if WING_RC not in rcl:
+            err(f"client entity: render controller {WING_RC} missing")
+        if mismatch := [r for r in rcl if not isinstance(r, str)]:
+            err(f"client entity: render_controllers must be plain strings in format 1.8.0, got {mismatch}")
+        geo_id = desc.get("geometry", {}).get("wings")
+        geo = parsed.get(rp / "models/entity/big_cat_wings.geo.json", {})
+        if geo_id not in [g["description"]["identifier"] for g in geo.get("minecraft:geometry", [])]:
+            err(f"client entity: geometry 'wings' ({geo_id}) not defined in models/entity/big_cat_wings.geo.json")
+        if "wings" not in desc.get("materials", {}):
+            err("client entity: material 'wings' missing")
+        anim_id = desc.get("animations", {}).get("wings")
+        anims = parsed.get(rp / "animations/big_cat_wings.animation.json", {}).get("animations", {})
+        if anim_id not in anims:
+            err(f"client entity: animation 'wings' ({anim_id}) not in animations/big_cat_wings.animation.json")
+    rcs = parsed.get(rp / "render_controllers/big_cat_wings.render_controllers.json", {})
+    if WING_RC not in rcs.get("render_controllers", {}):
+        err(f"render_controllers/big_cat_wings.render_controllers.json: {WING_RC} missing")
+    elif rcs["render_controllers"][WING_RC].get("part_visibility") != [{"*": wing_condition()}]:
+        err(
+            "render_controllers/big_cat_wings.render_controllers.json: part_visibility should be "
+            f'[{{"*": "{wing_condition()}"}}] so the wings only show at the last stage'
+        )
+    return list(ALL_TEXTURES)
 
 
 def _fail(errors):

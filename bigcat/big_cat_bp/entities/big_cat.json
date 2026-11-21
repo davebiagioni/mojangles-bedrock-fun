@@ -18,6 +18,12 @@
           "range": [0, 199],
           "default": "math.random_integer(0, 199)",
           "client_sync": true
+        },
+        "mymod:evolution": {
+          "type": "int",
+          "range": [0, 8],
+          "default": 0,
+          "client_sync": true
         }
       }
     },
@@ -260,6 +266,131 @@
             "target": "self"
           }
         }
+      },
+      "mymod:evolution_1": {
+        "minecraft:health": {
+          "value": 30,
+          "max": 30
+        },
+        "minecraft:attack_damage": {
+          "value": 6
+        },
+        "minecraft:movement": {
+          "value": 0.31
+        },
+        "minecraft:knockback_resistance": {
+          "value": 0.1
+        }
+      },
+      "mymod:evolution_2": {
+        "minecraft:health": {
+          "value": 40,
+          "max": 40
+        },
+        "minecraft:attack_damage": {
+          "value": 8
+        },
+        "minecraft:movement": {
+          "value": 0.32
+        },
+        "minecraft:knockback_resistance": {
+          "value": 0.2
+        }
+      },
+      "mymod:evolution_3": {
+        "minecraft:health": {
+          "value": 50,
+          "max": 50
+        },
+        "minecraft:attack_damage": {
+          "value": 10
+        },
+        "minecraft:movement": {
+          "value": 0.33
+        },
+        "minecraft:knockback_resistance": {
+          "value": 0.3
+        }
+      },
+      "mymod:evolution_4": {
+        "minecraft:health": {
+          "value": 60,
+          "max": 60
+        },
+        "minecraft:attack_damage": {
+          "value": 12
+        },
+        "minecraft:movement": {
+          "value": 0.34
+        },
+        "minecraft:knockback_resistance": {
+          "value": 0.4
+        },
+        "minecraft:fire_immune": {}
+      },
+      "mymod:evolution_5": {
+        "minecraft:health": {
+          "value": 70,
+          "max": 70
+        },
+        "minecraft:attack_damage": {
+          "value": 14
+        },
+        "minecraft:movement": {
+          "value": 0.35
+        },
+        "minecraft:knockback_resistance": {
+          "value": 0.5
+        },
+        "minecraft:fire_immune": {}
+      },
+      "mymod:evolution_6": {
+        "minecraft:health": {
+          "value": 80,
+          "max": 80
+        },
+        "minecraft:attack_damage": {
+          "value": 16
+        },
+        "minecraft:movement": {
+          "value": 0.36
+        },
+        "minecraft:knockback_resistance": {
+          "value": 0.6
+        },
+        "minecraft:fire_immune": {}
+      },
+      "mymod:evolution_7": {
+        "minecraft:health": {
+          "value": 90,
+          "max": 90
+        },
+        "minecraft:attack_damage": {
+          "value": 18
+        },
+        "minecraft:movement": {
+          "value": 0.38
+        },
+        "minecraft:knockback_resistance": {
+          "value": 0.7
+        },
+        "minecraft:fire_immune": {}
+      },
+      "mymod:evolution_8": {
+        "minecraft:health": {
+          "value": 100,
+          "max": 100
+        },
+        "minecraft:attack_damage": {
+          "value": 20
+        },
+        "minecraft:movement": {
+          "value": 0.4
+        },
+        "minecraft:knockback_resistance": {
+          "value": 0.8
+        },
+        "minecraft:fire_immune": {}
       }
     },
     "components": {
@@ -1587,6 +1718,235 @@
         "set_property": {
           "mymod:coat": 199
         }
+      },
+      "mymod:evolve_0": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "mymod:evolution_1",
+                "mymod:evolution_2",
+                "mymod:evolution_3",
+                "mymod:evolution_4",
+                "mymod:evolution_5",
+                "mymod:evolution_6",
+                "mymod:evolution_7",
+                "mymod:evolution_8"
+              ]
+            },
+            "set_property": {
+              "mymod:evolution": 0
+            }
+          },
+          {
+            "filters": {
+              "test": "is_tamed"
+            },
+            "add": {
+              "component_groups": ["minecraft:cat_tame"]
+            }
+          }
+        ]
+      },
+      "mymod:evolve_1": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "mymod:evolution_2",
+                "mymod:evolution_3",
+                "mymod:evolution_4",
+                "mymod:evolution_5",
+                "mymod:evolution_6",
+                "mymod:evolution_7",
+                "mymod:evolution_8"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": ["mymod:evolution_1"]
+            },
+            "set_property": {
+              "mymod:evolution": 1
+            }
+          }
+        ]
+      },
+      "mymod:evolve_2": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "mymod:evolution_1",
+                "mymod:evolution_3",
+                "mymod:evolution_4",
+                "mymod:evolution_5",
+                "mymod:evolution_6",
+                "mymod:evolution_7",
+                "mymod:evolution_8"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": ["mymod:evolution_2"]
+            },
+            "set_property": {
+              "mymod:evolution": 2
+            }
+          }
+        ]
+      },
+      "mymod:evolve_3": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "mymod:evolution_1",
+                "mymod:evolution_2",
+                "mymod:evolution_4",
+                "mymod:evolution_5",
+                "mymod:evolution_6",
+                "mymod:evolution_7",
+                "mymod:evolution_8"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": ["mymod:evolution_3"]
+            },
+            "set_property": {
+              "mymod:evolution": 3
+            }
+          }
+        ]
+      },
+      "mymod:evolve_4": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "mymod:evolution_1",
+                "mymod:evolution_2",
+                "mymod:evolution_3",
+                "mymod:evolution_5",
+                "mymod:evolution_6",
+                "mymod:evolution_7",
+                "mymod:evolution_8"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": ["mymod:evolution_4"]
+            },
+            "set_property": {
+              "mymod:evolution": 4
+            }
+          }
+        ]
+      },
+      "mymod:evolve_5": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "mymod:evolution_1",
+                "mymod:evolution_2",
+                "mymod:evolution_3",
+                "mymod:evolution_4",
+                "mymod:evolution_6",
+                "mymod:evolution_7",
+                "mymod:evolution_8"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": ["mymod:evolution_5"]
+            },
+            "set_property": {
+              "mymod:evolution": 5
+            }
+          }
+        ]
+      },
+      "mymod:evolve_6": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "mymod:evolution_1",
+                "mymod:evolution_2",
+                "mymod:evolution_3",
+                "mymod:evolution_4",
+                "mymod:evolution_5",
+                "mymod:evolution_7",
+                "mymod:evolution_8"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": ["mymod:evolution_6"]
+            },
+            "set_property": {
+              "mymod:evolution": 6
+            }
+          }
+        ]
+      },
+      "mymod:evolve_7": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "mymod:evolution_1",
+                "mymod:evolution_2",
+                "mymod:evolution_3",
+                "mymod:evolution_4",
+                "mymod:evolution_5",
+                "mymod:evolution_6",
+                "mymod:evolution_8"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": ["mymod:evolution_7"]
+            },
+            "set_property": {
+              "mymod:evolution": 7
+            }
+          }
+        ]
+      },
+      "mymod:evolve_8": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "mymod:evolution_1",
+                "mymod:evolution_2",
+                "mymod:evolution_3",
+                "mymod:evolution_4",
+                "mymod:evolution_5",
+                "mymod:evolution_6",
+                "mymod:evolution_7"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": ["mymod:evolution_8"]
+            },
+            "set_property": {
+              "mymod:evolution": 8
+            }
+          }
+        ]
       }
     }
   }

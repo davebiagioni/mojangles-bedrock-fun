@@ -11,20 +11,36 @@ How a coat is chosen: an int entity property (default "math.random_integer(0, N-
 is set the moment any cat is created (natural spawn, spawn egg, /summon, breeding)
 and for already-saved cats the first time they load with this pack version.
 """
+
 from __future__ import annotations
 
 import copy
 import shutil
 import sys
 
-from common import (GENERATED_KEY, GENERATED_NOTE, BuildError, coat_name, load_config, load_json, rel,
-                    tame_name, write_json, write_text)
+from common import (
+    GENERATED_KEY,
+    BuildError,
+    coat_name,
+    load_config,
+    load_json,
+    rel,
+    tame_name,
+    write_json,
+    write_text,
+)
+from gen_evolution import PROPERTY as EVO_PROPERTY
+from gen_evolution import WING_STAGE, WING_TEXTURE, add_evolution
 
-RC_TEXTURE_EXPR = ("query.is_tamed ? Array.tame[query.property('{prop}')] "
-                   ": Array.coats[query.property('{prop}')]")
+RC_TEXTURE_EXPR = "query.is_tamed ? Array.tame[query.property('{prop}')] : Array.coats[query.property('{prop}')]"
 BP_ENTITY = "entities/big_cat.json"
 RP_ENTITY = "entity/big_cat.entity.json"
 RP_RC = "render_controllers/big_cat.render_controllers.json"
+WING_RC = "controller.render.big_cat_wings"  # render_controllers/big_cat_wings.render_controllers.json
+
+
+def wing_condition() -> str:
+    return f"query.property('{EVO_PROPERTY}') >= {WING_STAGE}"
 
 
 def coat_events(prop: str, n: int) -> dict:
@@ -61,6 +77,10 @@ fields in pack JSON, so this list is the "generated" marker instead.
 | `{bp}/manifest.json`, `{rp}/manifest.json` - version only | bumped by `python tools/build.py --package` |
 | `{rp}/textures/items/laser_pointer.png`, `{rp}/textures/entity/laser_dot.png` | `tools/gen_laser.py` (pixel art in code) |
 | `{rp}/textures/items/{{cat,creature,trap}}_orb[_full].png` | `tools/gen_orb.py` (pixel art in code) |
+| `{rp}/textures/items/{{size,vapor}}_wand.png` | `tools/gen_wand.py` (pixel art in code) |
+| `{rp}/textures/items/grappling_gun.png`, `{rp}/textures/entity/grapple_hook.png` | `tools/gen_grapple.py` (pixel art in code) |
+| `{rp}/textures/items/evolution_stone.png`, `{rp}/textures/entity/big_cat_wings.png` | `tools/gen_evolution.py` (pixel art in code) |
+| `{bp}/entities/player.json` (gitignored) | `tools/gen_player.py` (vanilla player + Size Wand sizes) |
 | `GENERATED_FILES.md` (this file) | `write_generated_list` in `tools/gen_json.py` |
 
 ## Hand-written - edit these directly
@@ -76,7 +96,7 @@ Laser pointer (checked by `validate_laser` in `tools/validate.py`):
 | `{bp}/entities/laser_dot.json` | the invulnerable, gravity-free `mymod:laser_dot` entity (family `bigcat_laser_dot`) |
 | `{rp}/entity/laser_dot.entity.json`, `{rp}/models/entity/laser_dot.geo.json` | the dot's tiny red cube |
 | `{rp}/particles/laser_dot.particle.json` | `mymod:laser_dot_glow`, the unlit red glow the script spawns at the dot |
-| `{rp}/textures/item_texture.json` | item icon atlas entries for the laser pointer and the three orbs (empty and full) |
+| `{rp}/textures/item_texture.json` | item icon atlas entries for the laser pointer, the three orbs (empty and full), the two wands and the grappling gun |
 
 Orbs (checked by `validate_orb` in `tools/validate.py`):
 
@@ -87,6 +107,36 @@ Orbs (checked by `validate_orb` in `tools/validate.py`):
 | `{bp}/items/{{cat,creature,trap}}_orb.json`, `..._full.json` | each empty orb (stacks to 16) and its occupied version (holds one, not in the creative menu) |
 | `{bp}/recipes/{{cat,creature,trap}}_orb.json` | crafting: 4 glass in a plus around a raw cod / ender pearl / iron bars |
 | `{rp}/texts/en_US.lang` | display names |
+
+Wands (checked by `validate_wands` in `tools/validate.py`):
+
+| File | What it is |
+|---|---|
+| `{bp}/scripts/wands.js` | Size Wand (normal / mini / huge) and Vapor Wand (rainbow / stinky), imported by `scripts/main.js` |
+| `{bp}/items/{{size,vapor}}_wand.json` | the two wand items |
+| `{bp}/recipes/{{size,vapor}}_wand.json` | crafting: red mushroom / stick / brown mushroom, and glowstone dust / stick / fermented spider eye |
+| `{rp}/particles/{{rainbow_sparkle,stinky_vapor}}.particle.json` | the vapor clouds the script spawns around a player |
+
+Grappling Gun (checked by `validate_grapple` in `tools/validate.py`):
+
+| File | What it is |
+|---|---|
+| `{bp}/scripts/grapple.js` | fire the hook, reel yourself to blocks or hooked entities to you, draw the rope, imported by `scripts/main.js` |
+| `{bp}/items/grappling_gun.json`, `{bp}/recipes/grappling_gun.json` | the `mymod:grappling_gun` item; crafting: tripwire hook / string / iron ingot, stacked vertically |
+| `{bp}/entities/grapple_hook.json` | the `mymod:grapple_hook` projectile (sticks in blocks, invulnerable) |
+| `{rp}/entity/grapple_hook.entity.json`, `{rp}/models/entity/grapple_hook.geo.json` | the hook's four-pronged steel model |
+| `{rp}/particles/grapple_rope.particle.json` | `mymod:grapple_rope`, the rope dots the script draws between you and the hook |
+
+Evolution Stone (checked by `validate_evolution` in `tools/validate.py`; stages, stats and the
+stage property/groups/events in `{bp}/{BP_ENTITY}` come from `tools/gen_evolution.py`):
+
+| File | What it is |
+|---|---|
+| `{bp}/scripts/evolution.js` | stones dropping from ores, evolving a cat, stage particles, stage-8 flying while ridden; imported by `scripts/main.js` |
+| `{bp}/items/evolution_stone.json` | the `mymod:evolution_stone` item (no recipe: ores drop it) |
+| `{rp}/models/entity/big_cat_wings.geo.json` | the wings, a second model drawn on the cat (its `body` bone follows the cat's sit / lie-down poses) |
+| `{rp}/render_controllers/big_cat_wings.render_controllers.json` | draws the wings; its `part_visibility` hides them below stage 8 |
+| `{rp}/animations/big_cat_wings.animation.json`, `controller.animation.big_cat.wings` in `{rp}/animation_controllers/big_cat.animation_controllers.json` | folded wings on the ground, flapping in the air |
 
 The cats' chase goals (`minecraft:behavior.nearest_prioritized_attackable_target` for the
 `bigcat_laser_dot` family and `minecraft:behavior.move_towards_target`) live in
@@ -122,6 +172,7 @@ def generate_json(verbose: bool = True) -> None:
     if clash:
         raise BuildError(f"{rel(paths.bp_template)}: events {clash[:3]} are generated; remove them from the template")
     events.update(new_events)
+    add_evolution(e, rel(paths.bp_template))  # Evolution Stone stages (tools/gen_evolution.py)
     write_json(paths.bp / BP_ENTITY, with_note(bp))
 
     # ---- client entity
@@ -135,7 +186,14 @@ def generate_json(verbose: bool = True) -> None:
     desc["textures"] = {coat_name(i): f"{paths.coat_texture_dir}/{coat_name(i)}" for i in range(n)}
     desc["textures"].update({tame_name(i): f"{paths.coat_texture_dir}/{tame_name(i)}" for i in range(n)})
     if desc.get("render_controllers") != [rc_id]:
-        raise BuildError(f"{rel(paths.client_template)}: render_controllers must be [\"{rc_id}\"]")
+        raise BuildError(f'{rel(paths.client_template)}: render_controllers must be ["{rc_id}"]')
+    # Stage-8 wings: a second model drawn on top of the cat (geometry, material and flap animation
+    # are in the template; the geometry is models/entity/big_cat_wings.geo.json).
+    desc["textures"]["wings"] = WING_TEXTURE
+    # A 1.8.0 client entity only accepts plain strings here (a {controller: condition} entry
+    # fails to load), so the wing controller always runs and hides the wings itself with
+    # part_visibility below stage 8.
+    desc["render_controllers"].append(WING_RC)
     write_json(paths.rp / RP_ENTITY, with_note(ce))
 
     # ---- render controller
@@ -143,11 +201,13 @@ def generate_json(verbose: bool = True) -> None:
         "format_version": "1.8.0",
         "render_controllers": {
             rc_id: {
-                "arrays": {"textures": {
-                    "Array.coats": [f"Texture.{coat_name(i)}" for i in range(n)],
-                    # tame versions carry the collar alpha mask the 'cat' material tints
-                    "Array.tame": [f"Texture.{tame_name(i)}" for i in range(n)],
-                }},
+                "arrays": {
+                    "textures": {
+                        "Array.coats": [f"Texture.{coat_name(i)}" for i in range(n)],
+                        # tame versions carry the collar alpha mask the 'cat' material tints
+                        "Array.tame": [f"Texture.{tame_name(i)}" for i in range(n)],
+                    }
+                },
                 "geometry": "Geometry.default",
                 "materials": [{"*": "Material.default"}],
                 "textures": [RC_TEXTURE_EXPR.format(prop=prop)],
@@ -180,9 +240,10 @@ def write_functions(cfg, paths, ident, n):
         lines.append(f"summon {ident} ~{x} ~ ~{z}\n")
     write_text(fdir / "test_cats.mcfunction", "".join(lines))
 
-    write_text(fdir / "clear_cats.mcfunction",
-               head + "# Removes every Big Cat in the world (handy between test batches).\n"
-               f"kill @e[type={ident}]\n")
+    write_text(
+        fdir / "clear_cats.mcfunction",
+        head + f"# Removes every Big Cat in the world (handy between test batches).\nkill @e[type={ident}]\n",
+    )
 
     pages = (n + page - 1) // page
     for p in range(pages):

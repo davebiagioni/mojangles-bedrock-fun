@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mymod:grapple_hook",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/grapple_hook"
+      },
+      "geometry": {
+        "default": "geometry.mymod.grapple_hook"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

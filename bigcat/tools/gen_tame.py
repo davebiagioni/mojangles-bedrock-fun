@@ -17,6 +17,7 @@ What changes, per mob:
 
 Run standalone:  python tools/gen_tame.py
 """
+
 from __future__ import annotations
 
 import json
@@ -108,7 +109,10 @@ def _tamed_group(fights: bool) -> dict:
     g = {
         "minecraft:is_tamed": {},
         "minecraft:behavior.follow_owner": {
-            "priority": 3, "speed_multiplier": 1.15, "start_distance": 8, "stop_distance": 3,
+            "priority": 3,
+            "speed_multiplier": 1.15,
+            "start_distance": 8,
+            "stop_distance": 3,
         },
         # never despawn once tamed (the base despawn rule can't be removed, only overridden)
         "minecraft:persistent": {},
@@ -121,7 +125,9 @@ def _tamed_group(fights: bool) -> dict:
         # don't fight back against any player
         "minecraft:behavior.hurt_by_target": {
             "priority": 1,
-            "entity_types": [{"filters": {"test": "is_family", "subject": "other", "operator": "!=", "value": "player"}}],
+            "entity_types": [
+                {"filters": {"test": "is_family", "subject": "other", "operator": "!=", "value": "player"}}
+            ],
         },
     }
     if fights:
@@ -132,17 +138,27 @@ def _tamed_group(fights: bool) -> dict:
             "must_see": True,
             "reselect_targets": True,
             "within_radius": 16,
-            "entity_types": [{
-                "filters": {"all_of": [
-                    {"test": "is_family", "subject": "other", "value": "monster"},
-                    {"test": "has_component", "subject": "other", "operator": "!=", "value": "minecraft:is_tamed"},
-                ]},
-                "max_dist": 16,
-            }],
+            "entity_types": [
+                {
+                    "filters": {
+                        "all_of": [
+                            {"test": "is_family", "subject": "other", "value": "monster"},
+                            {
+                                "test": "has_component",
+                                "subject": "other",
+                                "operator": "!=",
+                                "value": "minecraft:is_tamed",
+                            },
+                        ]
+                    },
+                    "max_dist": 16,
+                }
+            ],
         }
     else:
         g["minecraft:behavior.nearest_attackable_target"] = {
-            "priority": 1, "entity_types": [{"filters": NEVER, "max_dist": 1}],
+            "priority": 1,
+            "entity_types": [{"filters": NEVER, "max_dist": 1}],
         }
     return g
 
@@ -164,7 +180,7 @@ def _patch(name: str, spec: dict) -> dict:
     else:
         existing = interact.get("interactions", [])
         existing = existing if isinstance(existing, list) else [existing]
-        interact["interactions"] = existing + [ours]
+        interact["interactions"] = [*existing, ours]
 
     groups[TAMED_GROUP] = _tamed_group(spec["fights"])
     events[TAME_EVENT] = {"add": {"component_groups": [TAMED_GROUP]}}

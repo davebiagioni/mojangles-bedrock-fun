@@ -10,6 +10,7 @@ Get it once with:
 
 Run standalone:  python tools/fetch_vanilla.py
 """
+
 from __future__ import annotations
 
 import json
@@ -27,9 +28,11 @@ DEST = ROOT / "vanilla"
 def samples_dir() -> Path:
     p = Path(os.environ["MC_SAMPLES"]) if os.environ.get("MC_SAMPLES") else ROOT.parent / "bedrock-samples"
     if not (p / "resource_pack").is_dir():
-        raise BuildError(f"Mojang bedrock-samples not found at {p}.\n  Clone it with:\n    git clone --depth 1 "
-                         f"--branch v1.26.60.5 https://github.com/Mojang/bedrock-samples \"{p}\"\n"
-                         f"  or set MC_SAMPLES to an existing checkout.")
+        raise BuildError(
+            f"Mojang bedrock-samples not found at {p}.\n  Clone it with:\n    git clone --depth 1 "
+            f'--branch v1.26.60.5 https://github.com/Mojang/bedrock-samples "{p}"\n'
+            f"  or set MC_SAMPLES to an existing checkout."
+        )
     return p
 
 

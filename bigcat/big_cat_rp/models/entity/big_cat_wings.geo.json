@@ -1,0 +1,81 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.mymod.big_cat_wings",
+        "texture_width": 32,
+        "texture_height": 32,
+        "visible_bounds_width": 4,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [0, 1, 0]
+      },
+      "bones": [
+        {
+          "name": "body",
+          "pivot": [0, 7, 1]
+        },
+        {
+          "name": "wing_l",
+          "parent": "body",
+          "pivot": [2, 10, -4],
+          "cubes": [
+            {
+              "origin": [2, 10, -5],
+              "size": [7, 0, 6],
+              "uv": {
+                "up": { "uv": [0, 0], "uv_size": [7, 6] },
+                "down": { "uv": [0, 0], "uv_size": [7, 6] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "wing_l_tip",
+          "parent": "wing_l",
+          "pivot": [9, 10, -5],
+          "cubes": [
+            {
+              "origin": [9, 10, -5],
+              "size": [7, 0, 8],
+              "uv": {
+                "up": { "uv": [0, 8], "uv_size": [7, 8] },
+                "down": { "uv": [0, 8], "uv_size": [7, 8] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "wing_r",
+          "parent": "body",
+          "pivot": [-2, 10, -4],
+          "cubes": [
+            {
+              "origin": [-9, 10, -5],
+              "size": [7, 0, 6],
+              "uv": {
+                "up": { "uv": [7, 0], "uv_size": [-7, 6] },
+                "down": { "uv": [7, 0], "uv_size": [-7, 6] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "wing_r_tip",
+          "parent": "wing_r",
+          "pivot": [-9, 10, -5],
+          "cubes": [
+            {
+              "origin": [-16, 10, -5],
+              "size": [7, 0, 8],
+              "uv": {
+                "up": { "uv": [7, 8], "uv_size": [-7, 8] },
+                "down": { "uv": [7, 8], "uv_size": [-7, 8] }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

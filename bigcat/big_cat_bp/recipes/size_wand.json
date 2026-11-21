@@ -1,0 +1,36 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:size_wand"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "R",
+      "S",
+      "B"
+    ],
+    "key": {
+      "R": {
+        "item": "minecraft:red_mushroom"
+      },
+      "S": {
+        "item": "minecraft:stick"
+      },
+      "B": {
+        "item": "minecraft:brown_mushroom"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:red_mushroom"
+      }
+    ],
+    "result": {
+      "item": "mymod:size_wand",
+      "count": 1
+    }
+  }
+}

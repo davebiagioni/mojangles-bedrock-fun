@@ -7,6 +7,7 @@ min/maxProperties, items, min/maxItems, uniqueItems, pattern (+ x-regex-flags ic
 min/maxLength, minimum/maximum/exclusive*, multipleOf, oneOf/anyOf/allOf/not, if/then/else.
 Unknown keywords (x-*, description, default, title...) are ignored.
 """
+
 from __future__ import annotations
 
 import json
@@ -41,7 +42,7 @@ class SchemaStore:
         return self.by_id[key]
 
     def resolve(self, base_id: str, ref: str) -> dict:
-        target = self._norm(urljoin("http://x" + base_id, ref)[len("http://x"):])
+        target = self._norm(urljoin("http://x" + base_id, ref)[len("http://x") :])
         if target not in self.by_id:
             raise KeyError(f"unresolved $ref {ref!r} from {base_id}")
         return self.by_id[target]
@@ -146,7 +147,7 @@ class SchemaStore:
                     errs.append(f"{path}: items must be unique")
             items = s.get("items")
             if isinstance(items, list):
-                for i, (x, sch) in enumerate(zip(inst, items)):
+                for i, (x, sch) in enumerate(zip(inst, items, strict=False)):  # prefix items: lengths may differ
                     self._v(x, sch, base, f"{path}[{i}]", errs)
             elif items is not None:
                 for i, x in enumerate(inst):
@@ -180,7 +181,7 @@ def _is_type(x, t: str) -> bool:
     if t == "boolean":
         return isinstance(x, bool)
     if t == "integer":
-        return isinstance(x, int) and not isinstance(x, bool) or (isinstance(x, float) and x.is_integer())
+        return (isinstance(x, int) and not isinstance(x, bool)) or (isinstance(x, float) and x.is_integer())
     if t == "number":
         return isinstance(x, (int, float)) and not isinstance(x, bool)
     if t == "null":

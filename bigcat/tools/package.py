@@ -7,6 +7,7 @@ new file as an update.
 Run standalone:  python tools/package.py          (bump + zip)
                  python tools/package.py --no-bump
 """
+
 from __future__ import annotations
 
 import sys
@@ -18,7 +19,7 @@ SKIP_NAMES = {"Thumbs.db", ".DS_Store", "desktop.ini"}
 
 
 def bump_versions() -> list[int]:
-    cfg, paths = load_config()
+    _cfg, paths = load_config()
     bp_path, rp_path = paths.bp / "manifest.json", paths.rp / "manifest.json"
     bp, rp = load_json(bp_path), load_json(rp_path)
     cur = max(tuple(bp["header"]["version"]), tuple(rp["header"]["version"]))

@@ -1,6 +1,18 @@
 {
   "format_version": "1.10.0",
   "animation_controllers": {
+    "controller.animation.big_cat.wings": {
+      "initial_state": "default",
+      "states": {
+        "default": {
+          "animations": [
+            {
+              "wings": "query.property('mymod:evolution') >= 8"
+            }
+          ]
+        }
+      }
+    },
     "controller.animation.big_cat.look_at_target": {
       "initial_state": "default",
       "states": {

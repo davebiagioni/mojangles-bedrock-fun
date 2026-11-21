@@ -9,8 +9,10 @@ Also writes build/armor_preview.png and both pack_icon.png files.
 
 Run standalone:  python tools/gen_textures.py
 """
+
 from __future__ import annotations
 
+import itertools
 import sys
 from pathlib import Path
 
@@ -32,10 +34,10 @@ def _lum(c) -> float:
 
 def _gradient(stops, t: float) -> tuple[int, int, int]:
     t = max(0.0, min(1.0, t))
-    for (t0, c0), (t1, c1) in zip(stops, stops[1:]):
+    for (t0, c0), (t1, c1) in itertools.pairwise(stops):
         if t <= t1:
             f = 0.0 if t1 == t0 else (t - t0) / (t1 - t0)
-            return tuple(round(a + (b - a) * f) for a, b in zip(c0, c1))
+            return tuple(round(a + (b - a) * f) for a, b in zip(c0, c1, strict=True))
     return tuple(stops[-1][1])
 
 
@@ -54,13 +56,13 @@ def recolor(src: Image.Image, palette: dict, out_range: list[float]) -> Image.Im
     every, strength = int(palette["sparkle_every"]), float(palette["sparkle_strength"])
     out = Image.new("RGBA", im.size, (0, 0, 0, 0))
     opx = out.load()
-    for (x, y), l in zip(opaque, lums):
-        t = 0.0 if hi == lo else (l - lo) / (hi - lo)
+    for (x, y), lum in zip(opaque, lums, strict=True):
+        t = 0.0 if hi == lo else (lum - lo) / (hi - lo)
         t = r0 + t * (r1 - r0)
         c = _gradient(stops, t)
         # crystalline glint: a sparse diagonal lattice of mid/bright pixels gets lifted toward the highlight
         if every > 0 and t >= 0.6 and (x * 3 + y * 5) % every == 0:
-            c = tuple(round(a + (b - a) * strength) for a, b in zip(c, highlight))
+            c = tuple(round(a + (b - a) * strength) for a, b in zip(c, highlight, strict=False))
         opx[x, y] = (*c, px[x, y][3])
     return out
 
@@ -151,8 +153,10 @@ def build_textures() -> dict[str, Path]:
         icon.save(pack / "pack_icon.png")
 
     write_preview(cfg, paths, layers, icons)
-    print(f"  {len(layers)} armor layers -> {rel(armor_dir)}, {len(icons)} icons -> {rel(item_dir)}, "
-          f"preview -> {rel(paths.build / 'armor_preview.png')}")
+    print(
+        f"  {len(layers)} armor layers -> {rel(armor_dir)}, {len(icons)} icons -> {rel(item_dir)}, "
+        f"preview -> {rel(paths.build / 'armor_preview.png')}"
+    )
     return out
 
 

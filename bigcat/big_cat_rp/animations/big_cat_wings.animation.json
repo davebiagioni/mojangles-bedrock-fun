@@ -1,0 +1,38 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.big_cat.wings": {
+      "loop": true,
+      "bones": {
+        "wing_l": {
+          "rotation": [
+            0.0,
+            "query.is_on_ground ? 30.0 : 0.0",
+            "query.is_on_ground ? 15.0 + math.sin(query.life_time * 60.0) * 3.0 : math.sin(query.life_time * 500.0) * 40.0"
+          ]
+        },
+        "wing_l_tip": {
+          "rotation": [
+            0.0,
+            "query.is_on_ground ? 70.0 : 0.0",
+            "query.is_on_ground ? -10.0 : math.sin(query.life_time * 500.0 - 50.0) * 25.0"
+          ]
+        },
+        "wing_r": {
+          "rotation": [
+            0.0,
+            "query.is_on_ground ? -30.0 : 0.0",
+            "query.is_on_ground ? -15.0 - math.sin(query.life_time * 60.0) * 3.0 : -math.sin(query.life_time * 500.0) * 40.0"
+          ]
+        },
+        "wing_r_tip": {
+          "rotation": [
+            0.0,
+            "query.is_on_ground ? -70.0 : 0.0",
+            "query.is_on_ground ? 10.0 : -math.sin(query.life_time * 500.0 - 50.0) * 25.0"
+          ]
+        }
+      }
+    }
+  }
+}

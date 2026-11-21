@@ -7,6 +7,7 @@ exist in bedrock-samples/metadata/script_modules.
 
 Run standalone:  python tools/validate.py
 """
+
 from __future__ import annotations
 
 import json
@@ -25,8 +26,12 @@ SCRIPT_VERSION = "2.11.0"
 MIN_ENGINE = [1, 26, 60]
 TEXTURE_EXTS = (".png", ".tga")
 ARMOR_MATERIALS = {"armor", "armor_enchanted", "armor_leather", "armor_leather_enchanted"}
-ENCHANT_FOR_SLOT = {"slot.armor.head": "armor_head", "slot.armor.chest": "armor_torso",
-                    "slot.armor.legs": "armor_legs", "slot.armor.feet": "armor_feet"}
+ENCHANT_FOR_SLOT = {
+    "slot.armor.head": "armor_head",
+    "slot.armor.chest": "armor_torso",
+    "slot.armor.legs": "armor_legs",
+    "slot.armor.feet": "armor_feet",
+}
 ALLOWED_TOP = {
     "manifest.json": {"format_version", "header", "modules", "dependencies", "metadata", "capabilities"},
     "items": {"format_version", "minecraft:item"},
@@ -34,9 +39,39 @@ ALLOWED_TOP = {
     "attachables": {"format_version", "minecraft:attachable"},
 }
 # JS names that are not @minecraft/server API calls
-JS_BUILTIN_CALLS = {"every", "some", "map", "filter", "forEach", "find", "includes", "push", "cos", "sin",
-                    "floor", "round", "random", "max", "min", "abs", "PI", "warn", "log", "error", "toString",
-                    "keys", "values", "entries", "has", "get", "set", "add", "delete", "join", "slice"}
+JS_BUILTIN_CALLS = {
+    "every",
+    "some",
+    "map",
+    "filter",
+    "forEach",
+    "find",
+    "includes",
+    "push",
+    "cos",
+    "sin",
+    "floor",
+    "round",
+    "random",
+    "max",
+    "min",
+    "abs",
+    "PI",
+    "warn",
+    "log",
+    "error",
+    "toString",
+    "keys",
+    "values",
+    "entries",
+    "has",
+    "get",
+    "set",
+    "add",
+    "delete",
+    "join",
+    "slice",
+}
 
 
 def validate(verbose: bool = True) -> None:
@@ -48,8 +83,10 @@ def validate(verbose: bool = True) -> None:
     pieces = {p["identifier"]: p for p in cfg["pieces"]}
 
     if not samples.is_dir():
-        raise BuildError(f"bedrock-samples not found at {samples} (set MC_SAMPLES to a checkout of "
-                         f"Mojang/bedrock-samples); it is needed for schemas and API metadata")
+        raise BuildError(
+            f"bedrock-samples not found at {samples} (set MC_SAMPLES to a checkout of "
+            f"Mojang/bedrock-samples); it is needed for schemas and API metadata"
+        )
 
     # 1. every JSON parses, no BOM, no unexpected top-level keys -----------------------
     parsed: dict[Path, object] = {}
@@ -73,7 +110,7 @@ def validate(verbose: bool = True) -> None:
     # 2. manifests -------------------------------------------------------------------
     bpm, rpm = parsed.get(bp / "manifest.json"), parsed.get(rp / "manifest.json")
     if not bpm or not rpm:
-        _fail(errors + ["gear_bp/manifest.json or gear_rp/manifest.json missing"])
+        _fail([*errors, "gear_bp/manifest.json or gear_rp/manifest.json missing"])
     seen: dict[str, str] = {}
     for label, m in (("BP", bpm), ("RP", rpm)):
         if m.get("format_version") != 2:
@@ -83,7 +120,9 @@ def validate(verbose: bool = True) -> None:
             err(f"{label} manifest: min_engine_version must be {MIN_ENGINE}, got {h.get('min_engine_version')}")
         if not h.get("name"):
             err(f"{label} manifest: header.name missing")
-        ids = [("header", h.get("uuid"))] + [(f"module {i}", mod.get("uuid")) for i, mod in enumerate(m.get("modules", []))]
+        ids = [("header", h.get("uuid"))] + [
+            (f"module {i}", mod.get("uuid")) for i, mod in enumerate(m.get("modules", []))
+        ]
         for where, u in ids:
             try:
                 uuid.UUID(str(u))
@@ -129,7 +168,7 @@ def validate(verbose: bool = True) -> None:
     vanilla_items = {d["name"] for d in load_json(vd / "mojang-items.json")["data_items"]}
     vanilla_effects = {d["name"] for d in load_json(vd / "mojang-effects.json")["data_items"]}
     global VANILLA_ENCHANTS
-    VANILLA_ENCHANTS = vanilla_enchants = {d["name"] for d in load_json(vd / "mojang-enchantments.json")["data_items"]}
+    VANILLA_ENCHANTS = {d["name"] for d in load_json(vd / "mojang-enchantments.json")["data_items"]}
     vrp = samples / "resource_pack"
     geometries: set[str] = set()
     for f in (vrp / "models").rglob("*.json"):
@@ -160,12 +199,23 @@ def validate(verbose: bool = True) -> None:
     item_texture = parsed.get(rp / "textures" / "item_texture.json", {})
     tex_data = item_texture.get("texture_data", {}) if isinstance(item_texture, dict) else {}
     found_items = set()
-    schema_dirs = sorted((d.name for d in (samples / "metadata/json_schemas/server/item").iterdir()
-                          if d.is_dir() and re.fullmatch(r"\d+\.\d+\.\d+", d.name)), key=_ver)
+    schema_dirs = sorted(
+        (
+            d.name
+            for d in (samples / "metadata/json_schemas/server/item").iterdir()
+            if d.is_dir() and re.fullmatch(r"\d+\.\d+\.\d+", d.name)
+        ),
+        key=_ver,
+    )
     for f in item_files:
         data = parsed[f]
         fv = data.get("format_version", "0")
-        usable = [d for d in schema_dirs if _ver(d) <= _ver(fv) and (samples / "metadata/json_schemas/server/item" / d / "ItemDocument.json").is_file()]
+        usable = [
+            d
+            for d in schema_dirs
+            if _ver(d) <= _ver(fv)
+            and (samples / "metadata/json_schemas/server/item" / d / "ItemDocument.json").is_file()
+        ]
         if not usable:
             err(f"{rel(f)}: no item schema for format_version {fv}")
             continue
@@ -255,7 +305,7 @@ def validate(verbose: bool = True) -> None:
     for f in sorted((rp / "attachables").glob("*.json")):
         d = parsed[f].get("minecraft:attachable", {}).get("description", {})
         aid = d.get("identifier", "")
-        base = aid[:-len(".player")] if aid.endswith(".player") else aid
+        base = aid[: -len(".player")] if aid.endswith(".player") else aid
         if base not in pieces:
             err(f"{rel(f)}: attachable {aid} does not match a gear item")
             continue
@@ -339,11 +389,13 @@ def validate(verbose: bool = True) -> None:
     if errors:
         _fail(errors)
     if verbose:
-        print(f"  OK: {len(parsed)} JSON files; {len(item_files)} items schema-valid "
-              f"(server/item/{schema_dirs[-1] if schema_dirs else '?'}); {len(signatures)} recipes; "
-              f"{sum(len(v) for v in att_for.values())} attachables use vanilla geometry; "
-              f"{len(referenced_tex)} textures; manifests OK; main.js uses {api_names} known "
-              f"{SCRIPT_MODULE} {SCRIPT_VERSION} names")
+        print(
+            f"  OK: {len(parsed)} JSON files; {len(item_files)} items schema-valid "
+            f"(server/item/{schema_dirs[-1] if schema_dirs else '?'}); {len(signatures)} recipes; "
+            f"{sum(len(v) for v in att_for.values())} attachables use vanilla geometry; "
+            f"{len(referenced_tex)} textures; manifests OK; main.js uses {api_names} known "
+            f"{SCRIPT_MODULE} {SCRIPT_VERSION} names"
+        )
 
 
 def _check_script(js, samples, pieces, cfg, lang, vanilla_effects, sound_defs, particles, err) -> int:
@@ -354,8 +406,12 @@ def _check_script(js, samples, pieces, cfg, lang, vanilla_effects, sound_defs, p
     bindings = load_json(samples / "metadata/script_modules/@minecraft" / f"server-bindings_{SCRIPT_VERSION}.json")
     classes = {c["name"]: c for c in bindings["classes"]}
     enums = {e["name"]: {k["name"] for k in e["constants"]} for e in bindings["enums"]}
-    exported = set(classes) | set(enums) | {o["name"] for o in bindings["objects"]} | \
-        {i["name"] for i in bindings["interfaces"]}
+    exported = (
+        set(classes)
+        | set(enums)
+        | {o["name"] for o in bindings["objects"]}
+        | {i["name"] for i in bindings["interfaces"]}
+    )
     functions = {f["name"] for c in bindings["classes"] for f in c.get("functions", [])}
     props = {p["name"] for c in bindings["classes"] for p in c.get("properties", [])}
 

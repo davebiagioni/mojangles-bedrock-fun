@@ -1,0 +1,21 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.big_cat_wings": {
+      "geometry": "Geometry.wings",
+      "materials": [
+        {
+          "*": "Material.wings"
+        }
+      ],
+      "textures": [
+        "Texture.wings"
+      ],
+      "part_visibility": [
+        {
+          "*": "query.property('mymod:evolution') >= 8"
+        }
+      ]
+    }
+  }
+}

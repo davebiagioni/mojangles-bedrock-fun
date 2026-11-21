@@ -1,0 +1,26 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:grappling_gun"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      "H",
+      "S",
+      "I"
+    ],
+    "key": {
+      "H": { "item": "minecraft:tripwire_hook" },
+      "S": { "item": "minecraft:string" },
+      "I": { "item": "minecraft:iron_ingot" }
+    },
+    "unlock": [
+      { "item": "minecraft:tripwire_hook" }
+    ],
+    "result": {
+      "item": "mymod:grappling_gun",
+      "count": 1
+    }
+  }
+}

@@ -7,6 +7,7 @@ Looks for com.mojang in, in order:
 
 Run standalone:  python tools/deploy_dev.py
 """
+
 from __future__ import annotations
 
 import json
@@ -23,12 +24,24 @@ def candidates() -> list[tuple[str, Path]]:
     if os.environ.get("BIGCAT_COM_MOJANG"):
         out.append(("BIGCAT_COM_MOJANG", Path(os.environ["BIGCAT_COM_MOJANG"])))
     if os.environ.get("APPDATA"):
-        out.append(("newer install (APPDATA)",
-                    Path(os.environ["APPDATA"]) / "Minecraft Bedrock" / "Users" / "Shared" / "games" / "com.mojang"))
+        out.append(
+            (
+                "newer install (APPDATA)",
+                Path(os.environ["APPDATA"]) / "Minecraft Bedrock" / "Users" / "Shared" / "games" / "com.mojang",
+            )
+        )
     if os.environ.get("LOCALAPPDATA"):
-        out.append(("older UWP install (LOCALAPPDATA)",
-                    Path(os.environ["LOCALAPPDATA"]) / "Packages" / "Microsoft.MinecraftUWP_8wekyb3d8bbwe"
-                    / "LocalState" / "games" / "com.mojang"))
+        out.append(
+            (
+                "older UWP install (LOCALAPPDATA)",
+                Path(os.environ["LOCALAPPDATA"])
+                / "Packages"
+                / "Microsoft.MinecraftUWP_8wekyb3d8bbwe"
+                / "LocalState"
+                / "games"
+                / "com.mojang",
+            )
+        )
     return out
 
 
@@ -36,8 +49,11 @@ def find_com_mojang() -> Path:
     found = [(label, p) for label, p in candidates() if p.is_dir()]
     if not found:
         tried = "\n    ".join(str(p) for _, p in candidates())
-        raise BuildError("could not find Minecraft's com.mojang folder. Tried:\n    " + tried +
-                         "\n  Launch Minecraft once, or set BIGCAT_COM_MOJANG to the folder.")
+        raise BuildError(
+            "could not find Minecraft's com.mojang folder. Tried:\n    "
+            + tried
+            + "\n  Launch Minecraft once, or set BIGCAT_COM_MOJANG to the folder."
+        )
     label, path = found[0]
     print(f"  com.mojang: {path}  [{label}]")
     for other_label, other in found[1:]:
@@ -57,12 +73,14 @@ def warn_imported_copies(com_mojang: Path, uuids: dict[str, str]) -> None:
             except (OSError, ValueError, KeyError):
                 continue
             if u in uuids:
-                print(f"  WARNING: an imported copy of {uuids[u]} is in {mf.parent}. Minecraft may load it "
-                      f"instead of the development copy. Delete it (Settings > Storage) if changes don't show.")
+                print(
+                    f"  WARNING: an imported copy of {uuids[u]} is in {mf.parent}. Minecraft may load it "
+                    f"instead of the development copy. Delete it (Settings > Storage) if changes don't show."
+                )
 
 
 def deploy() -> None:
-    cfg, paths = load_config()
+    _cfg, paths = load_config()
     com = find_com_mojang()
     uuids = {}
     for pack, dest_folder in ((paths.bp, "development_behavior_packs"), (paths.rp, "development_resource_packs")):
