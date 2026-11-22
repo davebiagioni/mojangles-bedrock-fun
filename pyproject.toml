@@ -58,7 +58,7 @@ ignore = [
 [tool.ruff.lint.isort]
 # The tools import each other as top-level modules from their own folder.
 known-first-party = [
-    "build", "build_coats", "common", "deploy_dev", "fetch_vanilla", "gen_drowned_trap", "gen_evolution", "gen_grapple", "gen_json", "gen_laser", "gen_net", "gen_orb",
+    "build", "build_coats", "common", "deploy_dev", "fetch_vanilla", "gen_drowned_trap", "gen_evolution", "gen_grapple", "gen_json", "gen_laser", "gen_morph", "gen_net", "gen_orb",
     "gen_player", "gen_tame", "gen_textures", "gen_wand", "package", "schema_check", "validate",
 ]
 

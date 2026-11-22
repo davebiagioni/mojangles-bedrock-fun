@@ -209,6 +209,7 @@ def validate(verbose: bool = True) -> None:
     laser_textures += validate_drowned_trap(paths, parsed, mev, err)
     laser_textures += validate_evolution(paths, parsed, bp_ent, ce, err)
     laser_textures += validate_net_trap(paths, parsed, err)
+    laser_textures += validate_morph(paths, parsed, err)
 
     # 4. images: all referenced, right size, right alpha ---------------------------
     referenced = {
@@ -690,6 +691,55 @@ def validate_net_trap(paths, parsed, err) -> list[str]:
         err(f"recipes/net_trap.json: missing or does not make {NET_ID}")
     if f"item.{NET_ID}.name=" not in lang:
         err(f"texts/en_US.lang: missing item.{NET_ID}.name=...")
+    return list(ALL_TEXTURES)
+
+
+def validate_morph(paths, parsed, err) -> list[str]:
+    """Cross-checks for the Morph Wand (scripts/morph.js + tools/gen_morph.py). Returns its textures."""
+    from gen_morph import ALL_TEXTURES, FORMS, ICON_TEXTURE, MORPH_ID, PROPERTY, RC, WAND_ID, forms_js
+
+    bp, rp = paths.bp, paths.rp
+    if 'import "./morph.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./morph.js")
+    script = bp / "scripts/morph.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if f'"{WAND_ID}"' not in js or '"./morph_forms.js"' not in js:
+        err(f"{rel(script)}: missing, or does not use {WAND_ID} and ./morph_forms.js")
+    for f in FORMS:
+        if not re.search(rf"^\s*{f.key}: \{{", js, re.M) or not re.search(rf'^\s*{f.key}: "', js, re.M):
+            err(f"{rel(script)}: PERKS and PERK_TEXT need an entry for {f.key} (tools/gen_morph.py FORMS)")
+    forms = bp / "scripts/morph_forms.js"
+    if not forms.is_file() or forms.read_text(encoding="utf-8") != forms_js():
+        err(f"{rel(forms)}: missing or stale; run tools/gen_morph.py")
+
+    ent = parsed.get(bp / "entities/morph.json")
+    desc = ent["minecraft:entity"]["description"] if ent else {}
+    if desc.get("identifier") != MORPH_ID:
+        err(f"entities/morph.json: missing or identifier is not {MORPH_ID}")
+    elif desc.get("properties", {}).get(PROPERTY, {}).get("range") != [0, len(FORMS)]:
+        err(f"entities/morph.json: property {PROPERTY} should have range [0, {len(FORMS)}]")
+    ce = parsed.get(rp / "entity/morph.entity.json")
+    rcs = parsed.get(rp / "render_controllers/morph.render_controllers.json", {}).get("render_controllers", {})
+    if not ce or ce["minecraft:client_entity"]["description"]["identifier"] != MORPH_ID:
+        err(f"entity/morph.entity.json: missing or identifier is not {MORPH_ID}")
+    else:
+        used = [k for e in ce["minecraft:client_entity"]["description"]["render_controllers"] for k in e]
+        for f in FORMS:
+            name = RC.format(key=f.key)
+            if name not in used or name not in rcs:
+                err(f"entity/morph.entity.json: render controller {name} missing or not defined")
+
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    item = parsed.get(bp / "items/morph_wand.json")
+    if not item or item["minecraft:item"]["description"]["identifier"] != WAND_ID:
+        err(f"items/morph_wand.json: missing or identifier is not {WAND_ID}")
+    elif atlas.get(item["minecraft:item"]["components"].get("minecraft:icon"), {}).get("textures") != ICON_TEXTURE:
+        err(f"items/morph_wand.json: icon should map to {ICON_TEXTURE} in item_texture.json")
+    recipe = parsed.get(bp / "recipes/morph_wand.json")
+    if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != WAND_ID:
+        err(f"recipes/morph_wand.json: missing or does not make {WAND_ID}")
+    if f"item.{WAND_ID}.name=" not in (rp / "texts/en_US.lang").read_text(encoding="utf-8"):
+        err(f"texts/en_US.lang: missing item.{WAND_ID}.name=...")
     return list(ALL_TEXTURES)
 
 

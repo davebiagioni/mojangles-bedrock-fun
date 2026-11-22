@@ -20,6 +20,7 @@ from gen_evolution import generate_evolution_textures
 from gen_grapple import generate_grapple_textures
 from gen_json import generate_json
 from gen_laser import generate_laser_textures
+from gen_morph import generate_morph
 from gen_net import generate_net_textures
 from gen_orb import generate_orb_textures
 from gen_player import generate_player
@@ -47,6 +48,7 @@ def main() -> int:
         ("drowned trap: patch drowned + textures", generate_drowned_trap),
         ("generate evolution stone textures", generate_evolution_textures),
         ("generate net trap textures", generate_net_textures),
+        ("generate morph wand costume", generate_morph),
         ("add player sizes", generate_player),
         ("validate", validate),
     ]

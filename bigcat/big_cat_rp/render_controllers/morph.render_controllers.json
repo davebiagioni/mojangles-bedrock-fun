@@ -1,0 +1,90 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.mymod.morph.chicken": {
+      "geometry": "Geometry.chicken",
+      "materials": [
+        {
+          "*": "Material.chicken"
+        }
+      ],
+      "textures": ["Texture.chicken"]
+    },
+    "controller.render.mymod.morph.pig": {
+      "geometry": "Geometry.pig",
+      "materials": [
+        {
+          "*": "Material.pig"
+        }
+      ],
+      "textures": ["Texture.pig"]
+    },
+    "controller.render.mymod.morph.fox": {
+      "geometry": "Geometry.fox",
+      "materials": [
+        {
+          "*": "Material.fox"
+        }
+      ],
+      "textures": ["Texture.fox"],
+      "part_visibility": [
+        {
+          "head_sleeping": false
+        }
+      ]
+    },
+    "controller.render.mymod.morph.frog": {
+      "geometry": "Geometry.frog",
+      "materials": [
+        {
+          "*": "Material.frog"
+        }
+      ],
+      "textures": ["Texture.frog"],
+      "part_visibility": [
+        {
+          "croaking_body": false
+        },
+        {
+          "tongue": false
+        }
+      ]
+    },
+    "controller.render.mymod.morph.bee": {
+      "geometry": "Geometry.bee",
+      "materials": [
+        {
+          "*": "Material.bee"
+        }
+      ],
+      "textures": ["Texture.bee"]
+    },
+    "controller.render.mymod.morph.creeper": {
+      "geometry": "Geometry.creeper",
+      "materials": [
+        {
+          "*": "Material.creeper"
+        }
+      ],
+      "textures": ["Texture.creeper"]
+    },
+    "controller.render.mymod.morph.iron_golem": {
+      "geometry": "Geometry.iron_golem",
+      "materials": [
+        {
+          "*": "Material.iron_golem"
+        }
+      ],
+      "textures": ["Texture.iron_golem"]
+    },
+    "controller.render.mymod.morph.big_cat": {
+      "geometry": "Geometry.big_cat",
+      "materials": [
+        {
+          "*": "Material.big_cat"
+        }
+      ],
+      "textures": ["Texture.big_cat"]
+    }
+  }
+}

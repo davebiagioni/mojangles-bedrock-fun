@@ -194,6 +194,7 @@ STEP_NAMES = [
     "generate_drowned_trap",
     "generate_evolution_textures",
     "generate_net_textures",
+    "generate_morph",
     "generate_player",
     "validate",
     "bump_versions",

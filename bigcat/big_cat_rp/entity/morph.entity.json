@@ -1,0 +1,157 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mymod:morph",
+      "materials": {
+        "chicken": "chicken",
+        "pig": "pig_v3",
+        "fox": "fox",
+        "frog": "frog",
+        "bee": "bee",
+        "creeper": "creeper",
+        "iron_golem": "iron_golem",
+        "big_cat": "cat"
+      },
+      "textures": {
+        "chicken": "textures/entity/chicken/chicken",
+        "pig": "textures/entity/pig/pig_v3",
+        "fox": "textures/entity/fox/fox",
+        "frog": "textures/entity/frog/temperate_frog",
+        "bee": "textures/entity/bee/bee",
+        "creeper": "textures/entity/creeper/creeper",
+        "iron_golem": "textures/entity/iron_golem",
+        "big_cat": "textures/entity/coats/coat_000"
+      },
+      "geometry": {
+        "chicken": "geometry.chicken.v1.12",
+        "pig": "geometry.pig.v3",
+        "fox": "geometry.fox",
+        "frog": "geometry.frog",
+        "bee": "geometry.bee",
+        "creeper": "geometry.creeper.v1.8",
+        "iron_golem": "geometry.irongolem",
+        "big_cat": "geometry.cat"
+      },
+      "animations": {
+        "chicken_general": "animation.chicken.general",
+        "chicken_move": "animation.chicken.move",
+        "chicken_look": "animation.common.look_at_target",
+        "pig_setup": "animation.pig.setup",
+        "pig_walk": "animation.quadruped.walk",
+        "pig_look": "animation.common.look_at_target",
+        "fox_setup": "animation.fox.setup",
+        "fox_walk": "animation.quadruped.walk",
+        "fox_look": "animation.common.look_at_target",
+        "frog_walk": "animation.frog.walk",
+        "frog_look": "animation.common.look_at_target",
+        "bee_flying": "animation.bee.flying",
+        "bee_bob": "animation.bee.fly.bobbing",
+        "creeper_legs": "animation.creeper.legs",
+        "creeper_look": "animation.common.look_at_target",
+        "iron_golem_walk": "animation.iron_golem.walk",
+        "iron_golem_arms": "animation.iron_golem.move",
+        "iron_golem_look": "animation.common.look_at_target",
+        "big_cat_walk": "animation.cat.walk",
+        "big_cat_look": "animation.common.look_at_target"
+      },
+      "scripts": {
+        "pre_animation": [
+          "variable.gliding_speed_value = 1.0;",
+          "variable.wing_flap = math.abs(math.sin(query.life_time * 1300)) * 60 * math.min(query.modified_move_speed * 3, 1);",
+          "variable.leg_rot = Math.cos(query.modified_distance_moved * 38.17326) * 80.22 * query.modified_move_speed;",
+          "variable.modified_tcos0 = Math.clamp(Math.cos(query.modified_distance_moved * 13.5) * Math.min(query.modified_move_speed, 0.6) * 25.0, -12.5, 12.5);"
+        ],
+        "animate": [
+          {
+            "chicken_general": "query.property('mymod:form') == 1"
+          },
+          {
+            "chicken_move": "query.property('mymod:form') == 1 && query.modified_move_speed"
+          },
+          {
+            "chicken_look": "query.property('mymod:form') == 1"
+          },
+          {
+            "pig_setup": "query.property('mymod:form') == 2"
+          },
+          {
+            "pig_walk": "query.property('mymod:form') == 2 && query.modified_move_speed"
+          },
+          {
+            "pig_look": "query.property('mymod:form') == 2"
+          },
+          {
+            "fox_setup": "query.property('mymod:form') == 3"
+          },
+          {
+            "fox_walk": "query.property('mymod:form') == 3 && query.modified_move_speed"
+          },
+          {
+            "fox_look": "query.property('mymod:form') == 3"
+          },
+          {
+            "frog_walk": "query.property('mymod:form') == 4 && query.modified_move_speed > 0.1"
+          },
+          {
+            "frog_look": "query.property('mymod:form') == 4"
+          },
+          {
+            "bee_flying": "query.property('mymod:form') == 5"
+          },
+          {
+            "bee_bob": "query.property('mymod:form') == 5"
+          },
+          {
+            "creeper_legs": "query.property('mymod:form') == 6"
+          },
+          {
+            "creeper_look": "query.property('mymod:form') == 6"
+          },
+          {
+            "iron_golem_walk": "query.property('mymod:form') == 7"
+          },
+          {
+            "iron_golem_arms": "query.property('mymod:form') == 7"
+          },
+          {
+            "iron_golem_look": "query.property('mymod:form') == 7"
+          },
+          {
+            "big_cat_walk": "query.property('mymod:form') == 8"
+          },
+          {
+            "big_cat_look": "query.property('mymod:form') == 8"
+          }
+        ],
+        "scale": "query.property('mymod:form') == 8 ? 2.0 : 1.0"
+      },
+      "render_controllers": [
+        {
+          "controller.render.mymod.morph.chicken": "query.property('mymod:form') == 1"
+        },
+        {
+          "controller.render.mymod.morph.pig": "query.property('mymod:form') == 2"
+        },
+        {
+          "controller.render.mymod.morph.fox": "query.property('mymod:form') == 3"
+        },
+        {
+          "controller.render.mymod.morph.frog": "query.property('mymod:form') == 4"
+        },
+        {
+          "controller.render.mymod.morph.bee": "query.property('mymod:form') == 5"
+        },
+        {
+          "controller.render.mymod.morph.creeper": "query.property('mymod:form') == 6"
+        },
+        {
+          "controller.render.mymod.morph.iron_golem": "query.property('mymod:form') == 7"
+        },
+        {
+          "controller.render.mymod.morph.big_cat": "query.property('mymod:form') == 8"
+        }
+      ]
+    }
+  }
+}

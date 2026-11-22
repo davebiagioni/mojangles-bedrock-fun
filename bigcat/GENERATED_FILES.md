@@ -19,6 +19,7 @@ fields in pack JSON, so this list is the "generated" marker instead.
 | `big_cat_bp/entities/drowned.json` (gitignored) | `tools/gen_drowned_trap.py` (vanilla drowned + the trap as an attack target) |
 | `big_cat_rp/textures/items/evolution_stone.png`, `big_cat_rp/textures/entity/big_cat_wings.png` | `tools/gen_evolution.py` (pixel art in code) |
 | `big_cat_rp/textures/blocks/net_trap.png`, `big_cat_rp/textures/items/net_trap.png` | `tools/gen_net.py` (pixel art in code) |
+| `big_cat_bp/entities/morph.json`, `big_cat_bp/scripts/morph_forms.js`, `big_cat_rp/entity/morph.entity.json`, `big_cat_rp/render_controllers/morph.render_controllers.json`, `big_cat_rp/textures/items/morph_wand.png` | `tools/gen_morph.py` (`FORMS`: the Morph Wand's creatures) |
 | `big_cat_bp/entities/player.json` (gitignored) | `tools/gen_player.py` (vanilla player + Size Wand sizes) |
 | `GENERATED_FILES.md` (this file) | `write_generated_list` in `tools/gen_json.py` |
 
@@ -95,6 +96,13 @@ Net Trap (checked by `validate_net_trap` in `tools/validate.py`):
 | `big_cat_bp/items/net_trap.json`, `big_cat_bp/recipes/net_trap.json` | the item that places it (`block_placer`, replaces the block's own item); crafting: 4 string in the corners around a slime ball, makes 2 |
 | `big_cat_rp/models/blocks/net_trap.geo.json` | a 16x16 plate a quarter pixel thick |
 | `big_cat_rp/textures/terrain_texture.json` | block texture atlas entry `mymod_net_trap` |
+
+Morph Wand (checked by `validate_morph` in `tools/validate.py`; the creatures are generated, see above):
+
+| File | What it is |
+|---|---|
+| `big_cat_bp/scripts/morph.js` | use the wand: next creature (sneak: back to yourself); the costume follows the invisible player; perks; imported by `scripts/main.js` |
+| `big_cat_bp/items/morph_wand.json`, `big_cat_bp/recipes/morph_wand.json` | the wand; crafting: feather / stick / leather |
 
 The cats' chase goals (`minecraft:behavior.nearest_prioritized_attackable_target` for the
 `bigcat_laser_dot` family and `minecraft:behavior.move_towards_target`) live in

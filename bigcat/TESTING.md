@@ -383,3 +383,47 @@ Crafting: 4 iron bars in a plus around a raw cod.
 | The trap can't be picked up by hitting it | Report it; picking up may need a different trigger. |
 | Nothing happens when placing | Check the Content Log for errors in `drowned_lure.json` or `drowned_trap.js`. |
 
+
+## Morph Wand
+
+Right-click (or tap) with the wand: you turn into the next creature. The order is Chicken, Pig, Fox, Frog, Bee, Creeper,
+Iron Golem, Big Cat, then yourself again. **Sneak + use** takes you straight back to yourself, and so does **milk**.
+Aim at another player (up to 10 blocks), or hit them with the wand, to change *them* instead.
+
+How it works: you get Invisibility, and a costume creature with no AI follows you every tick. Invisibility doesn't hide
+armour, so your armour moves into your inventory (marked "Morph Wand: worn on ...") and goes back on when you're yourself
+again. If your inventory is full, the pieces that don't fit stay on and show. The item in your hand still shows. Each
+creature has a perk:
+
+| Form | Perk |
+|---|---|
+| Chicken | Slow Falling |
+| Pig | Saturation (never hungry) |
+| Fox | Speed I + Night Vision |
+| Frog | Jump Boost III |
+| Bee | Slow Falling; **hold jump to fly up** |
+| Creeper | sneak for 1.5 s: hiss, then a harmless BOOM (no damage, no broken blocks) |
+| Iron Golem | Strength II + Resistance II, but Slowness I |
+| Big Cat | Speed II + Jump Boost I, and the costume is twice the size |
+
+Crafting: feather / stick / leather, stacked vertically.
+
+1. Rebuild, exit to the menu and reopen the world. `/give @s mymod:morph_wand`. Check the pig-face icon and the name **Morph Wand**.
+2. Press F5 to see yourself. Use the wand 9 times and check each creature appears, walks with its legs moving and
+   faces where you look. The action bar names each form and its perk.
+3. Walk, sprint and jump in each form: the costume should stay on you with no more than a slight lag.
+4. Bee: hold jump and you float up. Let go and you drift down slowly.
+5. Creeper: hold sneak and you hear a hiss, then a boom about 1.5 s later. Nothing gets hurt.
+6. Sneak + use: you're yourself, no longer invisible, and the perks are gone. Try milk too.
+   Wear armour before morphing: it moves into your inventory while you're a creature and goes back on afterwards.
+7. Pick a form, then die, respawn, leave the world and come back: you should still be that creature.
+8. With a second player: aim at them and use the wand, or hit them with it. They change, and you don't.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| You're invisible but there's no creature | Check the Content Log for `morph.entity.json` or `morph.js` errors. |
+| A creature is lying down or upside down (most likely the Fox or the Big Cat) | The vanilla "setup" animation doesn't suit this entity. Report which one. |
+| Legs don't move while walking | `query.modified_move_speed` doesn't update for teleported entities. Report it; the fix is a script-driven walk animation. |
+| A creature is left behind after `/reload` | It should vanish within 2 s (orphan sweep). If not, report it. |

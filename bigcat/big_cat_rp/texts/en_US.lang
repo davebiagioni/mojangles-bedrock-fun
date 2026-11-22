@@ -13,6 +13,7 @@ action.interact.mymod_give_milk=Give Milk
 action.interact.mymod_hug=Hug
 item.mymod:size_wand.name=Size Wand
 item.mymod:vapor_wand.name=Vapor Wand
+item.mymod:morph_wand.name=Morph Wand
 item.mymod:grappling_gun.name=Grappling Gun
 entity.mymod:grapple_hook.name=Grapple Hook
 item.mymod:evolution_stone.name=Evolution Stone

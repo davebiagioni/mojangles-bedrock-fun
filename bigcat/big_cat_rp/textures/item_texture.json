@@ -29,6 +29,9 @@
     "mymod_vapor_wand": {
       "textures": "textures/items/vapor_wand"
     },
+    "mymod_morph_wand": {
+      "textures": "textures/items/morph_wand"
+    },
     "mymod_grappling_gun": {
       "textures": "textures/items/grappling_gun"
     },

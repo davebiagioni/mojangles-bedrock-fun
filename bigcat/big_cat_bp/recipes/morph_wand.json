@@ -1,0 +1,36 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:morph_wand"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "F",
+      "S",
+      "L"
+    ],
+    "key": {
+      "F": {
+        "item": "minecraft:feather"
+      },
+      "S": {
+        "item": "minecraft:stick"
+      },
+      "L": {
+        "item": "minecraft:leather"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:feather"
+      }
+    ],
+    "result": {
+      "item": "mymod:morph_wand",
+      "count": 1
+    }
+  }
+}

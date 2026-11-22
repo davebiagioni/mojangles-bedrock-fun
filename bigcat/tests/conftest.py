@@ -225,6 +225,7 @@ def run_generators() -> None:
     tool("gen_drowned_trap").generate_drowned_trap(verbose=False)
     tool("gen_evolution").generate_evolution_textures(verbose=False)
     tool("gen_net").generate_net_textures(verbose=False)
+    tool("gen_morph").generate_morph(verbose=False)
     tool("gen_player").generate_player(verbose=False)
 
 
