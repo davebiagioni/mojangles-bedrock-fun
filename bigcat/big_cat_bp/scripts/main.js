@@ -22,6 +22,7 @@ import "./drowned_trap.js"; // Drowned Trap
 import "./evolution.js"; // Evolution Stone: ore drops, 8 cat stages, winged flight
 import "./net_trap.js"; // Net Trap: holds whatever walks onto it
 import "./morph.js"; // Morph Wand: turn into creatures
+import "./air_cannon.js"; // Air Cannon: blast players and creatures super far
 
 const POINTER_ID = "mymod:laser_pointer";
 const DOT_ID = "mymod:laser_dot";

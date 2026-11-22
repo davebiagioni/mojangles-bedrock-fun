@@ -21,3 +21,4 @@ item.mymod:net_trap.name=Net Trap
 tile.mymod:net_trap.name=Net Trap
 item.mymod:drowned_trap.name=Drowned Trap
 entity.mymod:drowned_lure.name=Drowned Trap
+item.mymod:air_cannon.name=Air Cannon

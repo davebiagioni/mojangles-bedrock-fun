@@ -210,6 +210,7 @@ def validate(verbose: bool = True) -> None:
     laser_textures += validate_evolution(paths, parsed, bp_ent, ce, err)
     laser_textures += validate_net_trap(paths, parsed, err)
     laser_textures += validate_morph(paths, parsed, err)
+    laser_textures += validate_air_cannon(paths, parsed, err)
 
     # 4. images: all referenced, right size, right alpha ---------------------------
     referenced = {
@@ -807,6 +808,32 @@ def validate_drowned_trap(paths, parsed, mev, err) -> list[str]:
     for needle in (item_id, lure_id):
         if js and f'"{needle}"' not in js:
             err(f"{rel(script)}: does not use {needle}")
+    return list(ALL_TEXTURES)
+
+
+def validate_air_cannon(paths, parsed, err) -> list[str]:
+    """Cross-checks for the Air Cannon. Returns the RP texture paths it uses."""
+    from gen_air_cannon import ALL_TEXTURES
+
+    bp, rp = paths.bp, paths.rp
+    item_id = "mymod:air_cannon"
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    script = bp / "scripts/air_cannon.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if f'"{item_id}"' not in js:
+        err(f"{rel(script)}: missing, or does not use {item_id}")
+    if 'import "./air_cannon.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./air_cannon.js")
+    item = parsed.get(bp / "items/air_cannon.json")
+    if not item or item["minecraft:item"]["description"]["identifier"] != item_id:
+        err(f"items/air_cannon.json: missing or identifier is not {item_id}")
+    elif item["minecraft:item"]["components"].get("minecraft:icon") not in atlas:
+        err("items/air_cannon.json: icon not in item_texture.json")
+    recipe = parsed.get(bp / "recipes/air_cannon.json")
+    if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != item_id:
+        err(f"recipes/air_cannon.json: missing or does not make {item_id}")
+    if f"item.{item_id}.name=" not in (rp / "texts/en_US.lang").read_text(encoding="utf-8"):
+        err(f"texts/en_US.lang: missing item.{item_id}.name=...")
     return list(ALL_TEXTURES)
 
 

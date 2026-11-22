@@ -226,6 +226,7 @@ def run_generators() -> None:
     tool("gen_evolution").generate_evolution_textures(verbose=False)
     tool("gen_net").generate_net_textures(verbose=False)
     tool("gen_morph").generate_morph(verbose=False)
+    tool("gen_air_cannon").generate_air_cannon_textures(verbose=False)
     tool("gen_player").generate_player(verbose=False)
 
 

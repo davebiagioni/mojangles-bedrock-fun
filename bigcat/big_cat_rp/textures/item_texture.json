@@ -32,6 +32,9 @@
     "mymod_morph_wand": {
       "textures": "textures/items/morph_wand"
     },
+    "mymod_air_cannon": {
+      "textures": "textures/items/air_cannon"
+    },
     "mymod_grappling_gun": {
       "textures": "textures/items/grappling_gun"
     },

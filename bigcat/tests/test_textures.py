@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 from PIL import Image
 
+import gen_air_cannon
 import gen_drowned_trap
 import gen_grapple
 import gen_laser
@@ -26,6 +27,7 @@ MAKERS = {
     "grappling_gun": gen_grapple._icon,
     "grapple_hook": gen_grapple._hook,
     "drowned_trap": gen_drowned_trap._icon,
+    "air_cannon": gen_air_cannon._icon,
 }
 ICONS = [k for k in MAKERS if k not in ("laser_dot", "grapple_hook")]  # item icons have transparent backgrounds
 
@@ -77,8 +79,9 @@ def test_laser_dot_is_fully_opaque_red():
         (gen_wand.SIZE_TIP, gen_wand.TIP_COLORS),
         (gen_wand.VAPOR_TIP, gen_wand.TIP_COLORS),
         (gen_grapple.ICON, gen_grapple.COLORS),
+        (gen_air_cannon.ICON, gen_air_cannon.COLORS),
     ],
-    ids=["laser", "cat", "paw", "figure", "size_tip", "vapor_tip", "grapple"],
+    ids=["laser", "cat", "paw", "figure", "size_tip", "vapor_tip", "grapple", "air_cannon"],
 )
 def test_pixel_grids_are_well_formed(grid, palette):
     assert all(len(row) == 16 for row in grid)
@@ -123,10 +126,11 @@ GENERATORS = [
     (gen_orb.generate_orb_textures, gen_orb.ALL_TEXTURES),
     (gen_wand.generate_wand_textures, gen_wand.ALL_TEXTURES),
     (gen_grapple.generate_grapple_textures, gen_grapple.ALL_TEXTURES),
+    (gen_air_cannon.generate_air_cannon_textures, gen_air_cannon.ALL_TEXTURES),
 ]
 
 
-@pytest.mark.parametrize(("generate", "textures"), GENERATORS, ids=["laser", "orb", "wand", "grapple"])
+@pytest.mark.parametrize(("generate", "textures"), GENERATORS, ids=["laser", "orb", "wand", "grapple", "air_cannon"])
 def test_generators_write_pngs_into_rp(bare_project, capsys, generate, textures):
     generate()
     out = capsys.readouterr().out
@@ -137,7 +141,7 @@ def test_generators_write_pngs_into_rp(bare_project, capsys, generate, textures)
         assert f"big_cat_rp/{tex}.png" in out
 
 
-@pytest.mark.parametrize(("generate", "textures"), GENERATORS, ids=["laser", "orb", "wand", "grapple"])
+@pytest.mark.parametrize(("generate", "textures"), GENERATORS, ids=["laser", "orb", "wand", "grapple", "air_cannon"])
 def test_generators_are_byte_stable(bare_project, generate, textures):
     generate(verbose=False)
     first = [(bare_project.rp / (t + ".png")).read_bytes() for t in textures]

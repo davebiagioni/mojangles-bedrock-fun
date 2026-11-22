@@ -170,6 +170,11 @@ def lure_wrong_family(p):
     )
 
 
+def air_cannon_not_imported(p):
+    f = p.bp / "scripts" / "main.js"
+    f.write_text(f.read_text(encoding="utf-8").replace('import "./air_cannon.js";', ""), encoding="utf-8")
+
+
 BREAKAGES = [
     (bump_rp_only, "depends on RP version"),
     (add_bom, "UTF-8 BOM"),
@@ -194,6 +199,7 @@ BREAKAGES = [
     (drop_orb_recipe, "recipes/trap_orb.json: missing or does not make mymod:trap_orb"),
     (drowned_ignores_trap, "drowned.json: minecraft:behavior.nearest_attackable_target does not target"),
     (lure_wrong_family, "drowned_lure.json: type_family must include bigcat_drowned_trap"),
+    (air_cannon_not_imported, "scripts/main.js: must import ./air_cannon.js"),
     (hook_not_a_projectile, "grapple_hook.json: needs minecraft:projectile"),
     (grapple_not_imported, "scripts/main.js: must import ./grapple.js"),
     (drop_rope_particle, "grapple_rope.particle.json: missing or does not define mymod:grapple_rope"),

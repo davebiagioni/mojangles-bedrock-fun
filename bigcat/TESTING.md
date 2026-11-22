@@ -427,3 +427,33 @@ Crafting: feather / stick / leather, stacked vertically.
 | A creature is lying down or upside down (most likely the Fox or the Big Cat) | The vanilla "setup" animation doesn't suit this entity. Report which one. |
 | Legs don't move while walking | `query.modified_move_speed` doesn't update for teleported entities. Report it; the fix is a script-driven walk animation. |
 | A creature is left behind after `/reload` | It should vanish within 2 s (orphan sweep). If not, report it. |
+
+## Air Cannon
+
+`scripts/air_cannon.js` handles it. Use the Air Cannon and a blast of air shoots out in a cone up to 16 blocks in front of
+you. Every player and creature in the cone, plus dropped items and arrows, is launched **super far** the way you're
+looking. The closer they are, the harder they go.
+
+- **Look up** to send them up, **straight ahead** to send them far and a bit up.
+- **Look straight down at the ground** to rocket-jump yourself into the air.
+- Launched players and Big Cats, and you after a rocket jump, get Slow Falling a moment later, so they don't die from
+  the fall. Other mobs land however they land.
+- Pets in front of you get blasted too, so aim carefully.
+
+Crafting: 3 iron ingots on top, a feather and a piston under them.
+
+1. Rebuild, exit to the menu and reopen the world. `/give @s mymod:air_cannon`. Check the teal cannon icon and the name **Air Cannon**.
+2. `/summon cow` about 5 blocks in front and fire: whoosh and white puffs, and the cow flies about 30+ blocks.
+3. Fire at a group of mobs: everything in the cone flies. Mobs right next to you go furthest.
+4. Look up at a mob close by and fire: it goes straight up.
+5. Look down at the ground and fire: you shoot up, then float down slowly.
+6. With a second player (or the kids): blast them. They fly far and float down without fall damage.
+7. Click a nearby block with it: it still fires.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| Mobs move but not far | `PUSH_NEAR` / `PUSH_FAR` in `air_cannon.js` are too low. Turn them up. |
+| Players don't move at all | `applyKnockback` failed. Check the Content Log. |
+| No whoosh or puffs | A particle or sound name changed in this game version. The push still works. |

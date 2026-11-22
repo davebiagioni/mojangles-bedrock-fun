@@ -4,7 +4,7 @@ Two Minecraft: Bedrock Edition add-ons, built with Python scripts.
 
 | Folder | What it is |
 |---|---|
-| [`bigcat/`](bigcat/) | **Big Cat**: a giant, tameable cat with 200 generated coats, plus a **laser pointer** that cats chase, orbs, tameable monsters, and wands that make players **mini or huge** or give them **rainbow or stinky vapor**, a **grappling gun** that pulls you to blocks or pulls mobs to you, **Evolution Stones** (dropped by ores) that evolve cats through 8 stages until they grow wings and fly, a **net trap** that holds whatever walks onto it, and a **Drowned Trap** that blows up drowned for enchanted weapons. |
+| [`bigcat/`](bigcat/) | **Big Cat**: a giant, tameable cat with 200 generated coats, plus a **laser pointer** that cats chase, orbs, tameable monsters, and wands that make players **mini or huge** or give them **rainbow or stinky vapor**, a **grappling gun** that pulls you to blocks or pulls mobs to you, **Evolution Stones** (dropped by ores) that evolve cats through 8 stages until they grow wings and fly, a **net trap** that holds whatever walks onto it, and a **Drowned Trap** that blows up drowned for enchanted weapons, and an **Air Cannon** that blasts players and creatures super far. |
 | [`gear/`](gear/) | **Amethyst armor**: a full armor set with a set bonus, plus **geode goggles** that give night vision. |
 
 Each folder has a `TESTING.md` with the full test steps.

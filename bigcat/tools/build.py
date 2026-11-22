@@ -15,6 +15,7 @@ from build_coats import build_coats
 from common import BuildError
 from deploy_dev import deploy
 from fetch_vanilla import fetch_vanilla
+from gen_air_cannon import generate_air_cannon_textures
 from gen_drowned_trap import generate_drowned_trap
 from gen_evolution import generate_evolution_textures
 from gen_grapple import generate_grapple_textures
@@ -49,6 +50,7 @@ def main() -> int:
         ("generate evolution stone textures", generate_evolution_textures),
         ("generate net trap textures", generate_net_textures),
         ("generate morph wand costume", generate_morph),
+        ("generate air cannon texture", generate_air_cannon_textures),
         ("add player sizes", generate_player),
         ("validate", validate),
     ]

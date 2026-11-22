@@ -79,6 +79,7 @@ fields in pack JSON, so this list is the "generated" marker instead.
 | `{rp}/textures/items/{{cat,creature,trap}}_orb[_full].png` | `tools/gen_orb.py` (pixel art in code) |
 | `{rp}/textures/items/{{size,vapor}}_wand.png` | `tools/gen_wand.py` (pixel art in code) |
 | `{rp}/textures/items/grappling_gun.png`, `{rp}/textures/entity/grapple_hook.png` | `tools/gen_grapple.py` (pixel art in code) |
+| `{rp}/textures/items/air_cannon.png` | `tools/gen_air_cannon.py` (pixel art in code) |
 | `{rp}/textures/items/drowned_trap.png`, `{rp}/textures/entity/drowned_lure.png` | `tools/gen_drowned_trap.py` (pixel art in code) |
 | `{bp}/entities/drowned.json` (gitignored) | `tools/gen_drowned_trap.py` (vanilla drowned + the trap as an attack target) |
 | `{rp}/textures/items/evolution_stone.png`, `{rp}/textures/entity/big_cat_wings.png` | `tools/gen_evolution.py` (pixel art in code) |
@@ -167,6 +168,13 @@ Morph Wand (checked by `validate_morph` in `tools/validate.py`; the creatures ar
 |---|---|
 | `{bp}/scripts/morph.js` | use the wand: next creature (sneak: back to yourself); the costume follows the invisible player; perks; imported by `scripts/main.js` |
 | `{bp}/items/morph_wand.json`, `{bp}/recipes/morph_wand.json` | the wand; crafting: feather / stick / leather |
+
+Air Cannon (checked by `validate_air_cannon` in `tools/validate.py`):
+
+| File | What it is |
+|---|---|
+| `{bp}/scripts/air_cannon.js` | blast everything in a cone in front of you super far (look down: rocket jump), imported by `scripts/main.js` |
+| `{bp}/items/air_cannon.json`, `{bp}/recipes/air_cannon.json` | the `mymod:air_cannon` item; crafting: 3 iron ingots over a feather and a piston |
 
 The cats' chase goals (`minecraft:behavior.nearest_prioritized_attackable_target` for the
 `bigcat_laser_dot` family and `minecraft:behavior.move_towards_target`) live in
