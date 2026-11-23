@@ -1,0 +1,26 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mymod:morph_big_cat",
+      "materials": {
+        "default": "cat"
+      },
+      "textures": {
+        "default": "textures/entity/coats/coat_000"
+      },
+      "geometry": {
+        "default": "geometry.cat"
+      },
+      "animations": {
+        "walk": "animation.cat.walk",
+        "look": "animation.common.look_at_target"
+      },
+      "scripts": {
+        "animate": ["walk", "look"],
+        "scale": "2.0"
+      },
+      "render_controllers": ["controller.render.mymod.morph.big_cat"]
+    }
+  }
+}

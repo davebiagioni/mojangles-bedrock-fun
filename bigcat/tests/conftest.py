@@ -227,6 +227,12 @@ def run_generators() -> None:
     tool("gen_net").generate_net_textures(verbose=False)
     tool("gen_morph").generate_morph(verbose=False)
     tool("gen_air_cannon").generate_air_cannon_textures(verbose=False)
+    tool("gen_atomic_bomb").generate_atomic_bomb_textures(verbose=False)
+    tool("gen_blaster").generate_blaster_texture(verbose=False)
+    tool("gen_mountain").generate_mountain_texture(verbose=False)
+    tool("gen_vortex").generate_vortex_texture(verbose=False)
+    tool("gen_mooshroom_drill").generate_mooshroom_drill(verbose=False)
+    tool("gen_portal").generate_portal(verbose=False)
     tool("gen_player").generate_player(verbose=False)
 
 

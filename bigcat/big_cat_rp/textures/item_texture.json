@@ -32,6 +32,30 @@
     "mymod_morph_wand": {
       "textures": "textures/items/morph_wand"
     },
+    "mymod_vortex_gun": {
+      "textures": "textures/items/vortex_gun"
+    },
+    "mymod_animal_vortex_gun": {
+      "textures": "textures/items/animal_vortex_gun"
+    },
+    "mymod_mountain_seed": {
+      "textures": "textures/items/mountain_seed"
+    },
+    "mymod_laser_blaster": {
+      "textures": "textures/items/laser_blaster"
+    },
+    "mymod_flame_blaster": {
+      "textures": "textures/items/flame_blaster"
+    },
+    "mymod_water_blaster": {
+      "textures": "textures/items/water_blaster"
+    },
+    "mymod_ice_blaster": {
+      "textures": "textures/items/ice_blaster"
+    },
+    "mymod_barf_blaster": {
+      "textures": "textures/items/barf_blaster"
+    },
     "mymod_air_cannon": {
       "textures": "textures/items/air_cannon"
     },
@@ -46,6 +70,12 @@
     },
     "mymod_drowned_trap": {
       "textures": "textures/items/drowned_trap"
+    },
+    "mymod_mooshroom_drill": {
+      "textures": "textures/items/mooshroom_drill"
+    },
+    "mymod_portal_pad": {
+      "textures": "textures/items/portal_pad"
     }
   }
 }

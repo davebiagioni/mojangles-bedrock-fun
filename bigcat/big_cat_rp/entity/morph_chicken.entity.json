@@ -1,0 +1,36 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mymod:morph_chicken",
+      "materials": {
+        "default": "chicken"
+      },
+      "textures": {
+        "default": "textures/entity/chicken/chicken"
+      },
+      "geometry": {
+        "default": "geometry.chicken.v1.12"
+      },
+      "animations": {
+        "general": "animation.chicken.general",
+        "move": "animation.chicken.move",
+        "look": "animation.common.look_at_target"
+      },
+      "scripts": {
+        "animate": [
+          "general",
+          {
+            "move": "query.modified_move_speed"
+          },
+          "look"
+        ],
+        "scale": "1.0",
+        "pre_animation": [
+          "variable.wing_flap = math.abs(math.sin(query.life_time * 1300)) * 60 * math.min(query.modified_move_speed * 3, 1);"
+        ]
+      },
+      "render_controllers": ["controller.render.mymod.morph.chicken"]
+    }
+  }
+}

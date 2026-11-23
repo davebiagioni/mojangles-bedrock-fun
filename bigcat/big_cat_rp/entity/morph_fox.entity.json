@@ -1,0 +1,33 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mymod:morph_fox",
+      "materials": {
+        "default": "fox"
+      },
+      "textures": {
+        "default": "textures/entity/fox/fox"
+      },
+      "geometry": {
+        "default": "geometry.fox"
+      },
+      "animations": {
+        "setup": "animation.fox.setup",
+        "walk": "animation.quadruped.walk",
+        "look": "animation.common.look_at_target"
+      },
+      "scripts": {
+        "animate": [
+          "setup",
+          {
+            "walk": "query.modified_move_speed"
+          },
+          "look"
+        ],
+        "scale": "1.0"
+      },
+      "render_controllers": ["controller.render.mymod.morph.fox"]
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mymod:mooshroom_drill_vehicle",
+      "materials": {
+        "default": "entity_alphatest",
+        "cow": "mooshroom"
+      },
+      "textures": {
+        "default": "textures/entity/mooshroom_drill",
+        "cow": "textures/entity/cow/mooshroom_v2"
+      },
+      "geometry": {
+        "default": "geometry.mymod.mooshroom_drill",
+        "cow": "geometry.mooshroom.v2"
+      },
+      "animations": {
+        "spin": "animation.mymod.mooshroom_drill.spin",
+        "idle": "animation.mymod.mooshroom_drill.idle"
+      },
+      "scripts": {
+        "scale": "1.5",
+        "animate": [
+          { "spin": "query.property('mymod:drilling')" },
+          { "idle": "!query.property('mymod:drilling')" }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.mymod.mooshroom_drill",
+        "controller.render.mymod.mooshroom_drill.cow"
+      ]
+    }
+  }
+}

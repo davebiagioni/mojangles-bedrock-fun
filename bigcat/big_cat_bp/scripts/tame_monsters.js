@@ -10,7 +10,7 @@
 // worked and calls tame(). Tamed monsters also get sunscreen (fire resistance), so they don't
 // burn in daylight.
 
-import { world, system, ItemStack, GameMode } from "@minecraft/server";
+import { world, system, ItemStack, GameMode, MolangVariableMap } from "@minecraft/server";
 
 const TAMED_TAG = "bigcat_tamed_monster";
 const HUG_SUCCESS_CHANCE = 0.35;
@@ -94,7 +94,10 @@ function tameZombie(player, mob, held) {
   if (held.item?.typeId !== "minecraft:cake") return false;
   consume(player, held);
   mob.dimension.playSound("random.burp", mob.location);
-  mob.dimension.spawnParticle("minecraft:note_particle", above(mob, 2.2));
+  // note_particle needs a colour, or the game logs Molang errors for every frame it is visible
+  const note = new MolangVariableMap();
+  note.setColorRGB("variable.note_color", { red: 0.2, green: 0.9, blue: 0.3 });
+  mob.dimension.spawnParticle("minecraft:note_particle", above(mob, 2.2), note);
   celebrate(
     mob,
     player,

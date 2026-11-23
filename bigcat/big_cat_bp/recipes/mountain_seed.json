@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:mountain_seed"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      " S ",
+      "SWS",
+      " S "
+    ],
+    "key": {
+      "S": { "item": "minecraft:stone" },
+      "W": { "item": "minecraft:wheat_seeds" }
+    },
+    "unlock": [
+      { "item": "minecraft:wheat_seeds" }
+    ],
+    "result": {
+      "item": "mymod:mountain_seed",
+      "count": 1
+    }
+  }
+}

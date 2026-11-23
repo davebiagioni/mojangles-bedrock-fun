@@ -1,0 +1,27 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:mooshroom_drill"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      "RPB",
+      "IMI"
+    ],
+    "key": {
+      "R": { "item": "minecraft:red_mushroom" },
+      "P": { "item": "minecraft:diamond_pickaxe" },
+      "B": { "item": "minecraft:brown_mushroom" },
+      "I": { "item": "minecraft:iron_block" },
+      "M": { "item": "minecraft:minecart" }
+    },
+    "unlock": [
+      { "item": "minecraft:diamond_pickaxe" }
+    ],
+    "result": {
+      "item": "mymod:mooshroom_drill",
+      "count": 1
+    }
+  }
+}

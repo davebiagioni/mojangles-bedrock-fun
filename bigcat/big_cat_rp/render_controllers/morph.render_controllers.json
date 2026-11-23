@@ -2,31 +2,31 @@
   "format_version": "1.8.0",
   "render_controllers": {
     "controller.render.mymod.morph.chicken": {
-      "geometry": "Geometry.chicken",
+      "geometry": "Geometry.default",
       "materials": [
         {
-          "*": "Material.chicken"
+          "*": "Material.default"
         }
       ],
-      "textures": ["Texture.chicken"]
+      "textures": ["Texture.default"]
     },
     "controller.render.mymod.morph.pig": {
-      "geometry": "Geometry.pig",
+      "geometry": "Geometry.default",
       "materials": [
         {
-          "*": "Material.pig"
+          "*": "Material.default"
         }
       ],
-      "textures": ["Texture.pig"]
+      "textures": ["Texture.default"]
     },
     "controller.render.mymod.morph.fox": {
-      "geometry": "Geometry.fox",
+      "geometry": "Geometry.default",
       "materials": [
         {
-          "*": "Material.fox"
+          "*": "Material.default"
         }
       ],
-      "textures": ["Texture.fox"],
+      "textures": ["Texture.default"],
       "part_visibility": [
         {
           "head_sleeping": false
@@ -34,13 +34,13 @@
       ]
     },
     "controller.render.mymod.morph.frog": {
-      "geometry": "Geometry.frog",
+      "geometry": "Geometry.default",
       "materials": [
         {
-          "*": "Material.frog"
+          "*": "Material.default"
         }
       ],
-      "textures": ["Texture.frog"],
+      "textures": ["Texture.default"],
       "part_visibility": [
         {
           "croaking_body": false
@@ -51,40 +51,40 @@
       ]
     },
     "controller.render.mymod.morph.bee": {
-      "geometry": "Geometry.bee",
+      "geometry": "Geometry.default",
       "materials": [
         {
-          "*": "Material.bee"
+          "*": "Material.default"
         }
       ],
-      "textures": ["Texture.bee"]
+      "textures": ["Texture.default"]
     },
     "controller.render.mymod.morph.creeper": {
-      "geometry": "Geometry.creeper",
+      "geometry": "Geometry.default",
       "materials": [
         {
-          "*": "Material.creeper"
+          "*": "Material.default"
         }
       ],
-      "textures": ["Texture.creeper"]
+      "textures": ["Texture.default"]
     },
     "controller.render.mymod.morph.iron_golem": {
-      "geometry": "Geometry.iron_golem",
+      "geometry": "Geometry.default",
       "materials": [
         {
-          "*": "Material.iron_golem"
+          "*": "Material.default"
         }
       ],
-      "textures": ["Texture.iron_golem"]
+      "textures": ["Texture.default"]
     },
     "controller.render.mymod.morph.big_cat": {
-      "geometry": "Geometry.big_cat",
+      "geometry": "Geometry.default",
       "materials": [
         {
-          "*": "Material.big_cat"
+          "*": "Material.default"
         }
       ],
-      "textures": ["Texture.big_cat"]
+      "textures": ["Texture.default"]
     }
   }
 }

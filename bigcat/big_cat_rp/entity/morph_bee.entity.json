@@ -1,0 +1,26 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mymod:morph_bee",
+      "materials": {
+        "default": "bee"
+      },
+      "textures": {
+        "default": "textures/entity/bee/bee"
+      },
+      "geometry": {
+        "default": "geometry.bee"
+      },
+      "animations": {
+        "flying": "animation.bee.flying",
+        "bob": "animation.bee.fly.bobbing"
+      },
+      "scripts": {
+        "animate": ["flying", "bob"],
+        "scale": "1.0"
+      },
+      "render_controllers": ["controller.render.mymod.morph.bee"]
+    }
+  }
+}

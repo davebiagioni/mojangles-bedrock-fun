@@ -16,16 +16,22 @@ from common import BuildError
 from deploy_dev import deploy
 from fetch_vanilla import fetch_vanilla
 from gen_air_cannon import generate_air_cannon_textures
+from gen_atomic_bomb import generate_atomic_bomb_textures
+from gen_blaster import generate_blaster_texture
 from gen_drowned_trap import generate_drowned_trap
 from gen_evolution import generate_evolution_textures
 from gen_grapple import generate_grapple_textures
 from gen_json import generate_json
 from gen_laser import generate_laser_textures
+from gen_mooshroom_drill import generate_mooshroom_drill
 from gen_morph import generate_morph
+from gen_mountain import generate_mountain_texture
 from gen_net import generate_net_textures
 from gen_orb import generate_orb_textures
 from gen_player import generate_player
+from gen_portal import generate_portal
 from gen_tame import generate_tame
+from gen_vortex import generate_vortex_texture
 from gen_wand import generate_wand_textures
 from package import bump_versions, make_mcaddon
 from validate import validate
@@ -51,6 +57,12 @@ def main() -> int:
         ("generate net trap textures", generate_net_textures),
         ("generate morph wand costume", generate_morph),
         ("generate air cannon texture", generate_air_cannon_textures),
+        ("generate atomic bomb textures", generate_atomic_bomb_textures),
+        ("generate laser blaster texture", generate_blaster_texture),
+        ("generate mountain seed texture", generate_mountain_texture),
+        ("generate vortex gun texture", generate_vortex_texture),
+        ("generate mooshroom drill model + textures", generate_mooshroom_drill),
+        ("generate portal pad block + textures", generate_portal),
         ("add player sizes", generate_player),
         ("validate", validate),
     ]

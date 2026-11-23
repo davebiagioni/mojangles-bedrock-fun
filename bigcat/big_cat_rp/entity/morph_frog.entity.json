@@ -1,0 +1,31 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mymod:morph_frog",
+      "materials": {
+        "default": "frog"
+      },
+      "textures": {
+        "default": "textures/entity/frog/temperate_frog"
+      },
+      "geometry": {
+        "default": "geometry.frog"
+      },
+      "animations": {
+        "walk": "animation.frog.walk",
+        "look": "animation.common.look_at_target"
+      },
+      "scripts": {
+        "animate": [
+          {
+            "walk": "query.modified_move_speed > 0.1"
+          },
+          "look"
+        ],
+        "scale": "1.0"
+      },
+      "render_controllers": ["controller.render.mymod.morph.frog"]
+    }
+  }
+}

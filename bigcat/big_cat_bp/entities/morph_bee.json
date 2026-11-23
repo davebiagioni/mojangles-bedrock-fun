@@ -2,17 +2,9 @@
   "format_version": "1.26.50",
   "minecraft:entity": {
     "description": {
-      "identifier": "mymod:morph",
+      "identifier": "mymod:morph_bee",
       "is_spawnable": false,
-      "is_summonable": true,
-      "properties": {
-        "mymod:form": {
-          "type": "int",
-          "range": [0, 8],
-          "default": 0,
-          "client_sync": true
-        }
-      }
+      "is_summonable": true
     },
     "components": {
       "minecraft:type_family": {

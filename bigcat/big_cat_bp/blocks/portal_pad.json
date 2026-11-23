@@ -1,0 +1,243 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:block": {
+    "description": {
+      "identifier": "mymod:portal_pad",
+      "menu_category": {
+        "category": "equipment"
+      },
+      "states": {
+        "mymod:color": {
+          "values": {
+            "min": 0,
+            "max": 15
+          }
+        }
+      }
+    },
+    "components": {
+      "minecraft:geometry": "geometry.mymod.portal_pad",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "mymod_portal_pad_purple",
+          "render_method": "alpha_test"
+        }
+      },
+      "minecraft:collision_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 1, 16]
+      },
+      "minecraft:selection_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 1, 16]
+      },
+      "minecraft:placement_filter": {
+        "conditions": [
+          {
+            "allowed_faces": ["up"]
+          }
+        ]
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0.5
+      },
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:light_emission": 10,
+      "minecraft:light_dampening": 0
+    },
+    "permutations": [
+      {
+        "condition": "q.block_state('mymod:color') == 0",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_purple",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#963cdc"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 1",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_white",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#ececec"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 2",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_orange",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#f9801d"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 3",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_magenta",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#d250c8"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 4",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_light_blue",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#46beeb"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 5",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_yellow",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#fed83d"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 6",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_lime",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#80d21f"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 7",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_pink",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#f38baa"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 8",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_gray",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#646c70"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 9",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_light_gray",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#aaaaa4"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 10",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_cyan",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#16aaaa"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 11",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_blue",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#3c50dc"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 12",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_brown",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#8c5a34"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 13",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_green",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#508c1e"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 14",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_red",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#d23228"
+        }
+      },
+      {
+        "condition": "q.block_state('mymod:color') == 15",
+        "components": {
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "mymod_portal_pad_black",
+              "render_method": "alpha_test"
+            }
+          },
+          "minecraft:map_color": "#282430"
+        }
+      }
+    ]
+  }
+}

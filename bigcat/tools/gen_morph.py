@@ -4,13 +4,16 @@ FORMS below is the single source of truth for the creatures a player can turn in
 "yourself" (no costume). Everything else is drawn with Minecraft's own models, textures and
 animations, so there is no art to keep in sync.
 
-How it works: the player is made invisible and a mymod:morph entity (no AI, can't be hurt, no
-collision) is teleported onto them every tick. Its int property mymod:form picks the creature.
+How it works: the player is made invisible and a costume entity (no AI, can't be hurt, no
+collision) is teleported onto them every tick. Each creature is its own entity type,
+mymod:morph_<key>, all in the family bigcat_morph. One type per creature (not one type with all
+the models) because vanilla models share locator names, and one client entity holding several of
+them logs "model already has a locator ..." errors every time the world loads.
 
 Outputs:
-  <bp>/entities/morph.json                         the costume entity
-  <bp>/scripts/morph_forms.js                      FORMS for the script (names, sounds)
-  <rp>/entity/morph.entity.json                    one geometry / texture / material per form
+  <bp>/entities/morph_<key>.json                   one costume entity per form
+  <bp>/scripts/morph_forms.js                      FORMS for the script (entity ids, names, sounds)
+  <rp>/entity/morph_<key>.entity.json              one client entity per form (one model each)
   <rp>/render_controllers/morph.render_controllers.json   one render controller per form
   <rp>/textures/items/morph_wand.png               the wand icon
 
@@ -27,9 +30,8 @@ from common import BuildError, load_config, rel, write_json, write_text
 from gen_wand import _wand
 
 WAND_ID = "mymod:morph_wand"
-MORPH_ID = "mymod:morph"
+MORPH_PREFIX = "mymod:morph_"
 FAMILY = "bigcat_morph"
-PROPERTY = "mymod:form"
 ICON_TEXTURE = "textures/items/morph_wand"
 ALL_TEXTURES = [ICON_TEXTURE]
 RC = "controller.render.mymod.morph.{key}"
@@ -157,20 +159,15 @@ FORMS = [
 ]
 
 
-def form_condition(n: int) -> str:
-    return f"query.property('{PROPERTY}') == {n}"
+def entity_id(f: Form) -> str:
+    return MORPH_PREFIX + f.key
 
 
-def behavior_entity() -> dict:
+def behavior_entity(f: Form) -> dict:
     return {
         "format_version": "1.26.50",
         "minecraft:entity": {
-            "description": {
-                "identifier": MORPH_ID,
-                "is_spawnable": False,
-                "is_summonable": True,
-                "properties": {PROPERTY: {"type": "int", "range": [0, len(FORMS)], "default": 0, "client_sync": True}},
-            },
+            "description": {"identifier": entity_id(f), "is_spawnable": False, "is_summonable": True},
             "components": {
                 "minecraft:type_family": {"family": [FAMILY, "inanimate"]},
                 "minecraft:health": {"value": 1, "max": 1},
@@ -186,31 +183,23 @@ def behavior_entity() -> dict:
     }
 
 
-def client_entity() -> dict:
-    animations, animate = {}, []
-    pre = ["variable.gliding_speed_value = 1.0;"]
-    for n, f in enumerate(FORMS, start=1):
-        for short, (anim, cond) in f.animations.items():
-            name = f"{f.key}_{short}"
-            animations[name] = anim
-            animate.append({name: form_condition(n) + (f" && {cond}" if cond else "")})
-        pre += [p for p in f.pre_animation if p not in pre]
-    scale = " : ".join(f"{form_condition(n)} ? {f.scale}" for n, f in enumerate(FORMS, start=1) if f.scale != 1.0)
+def client_entity(f: Form) -> dict:
+    animations = {short: anim for short, (anim, _) in f.animations.items()}
+    animate = [{short: cond} if cond else short for short, (_, cond) in f.animations.items()]
+    scripts = {"animate": animate, "scale": str(f.scale)}
+    if f.pre_animation:
+        scripts["pre_animation"] = list(f.pre_animation)
     return {
         "format_version": "1.10.0",
         "minecraft:client_entity": {
             "description": {
-                "identifier": MORPH_ID,
-                "materials": {f.key: f.material for f in FORMS},
-                "textures": {f.key: f.texture for f in FORMS},
-                "geometry": {f.key: f.geometry for f in FORMS},
+                "identifier": entity_id(f),
+                "materials": {"default": f.material},
+                "textures": {"default": f.texture},
+                "geometry": {"default": f.geometry},
                 "animations": animations,
-                "scripts": {
-                    "pre_animation": pre,
-                    "animate": animate,
-                    "scale": f"{scale} : 1.0" if scale else "1.0",
-                },
-                "render_controllers": [{RC.format(key=f.key): form_condition(n)} for n, f in enumerate(FORMS, start=1)],
+                "scripts": scripts,
+                "render_controllers": [RC.format(key=f.key)],
             },
         },
     }
@@ -219,11 +208,7 @@ def client_entity() -> dict:
 def render_controllers() -> dict:
     rcs = {}
     for f in FORMS:
-        rc = {
-            "geometry": f"Geometry.{f.key}",
-            "materials": [{"*": f"Material.{f.key}"}],
-            "textures": [f"Texture.{f.key}"],
-        }
+        rc = {"geometry": "Geometry.default", "materials": [{"*": "Material.default"}], "textures": ["Texture.default"]}
         if f.hidden_bones:
             rc["part_visibility"] = [{bone: False} for bone in f.hidden_bones]
         rcs[RC.format(key=f.key)] = rc
@@ -231,13 +216,12 @@ def render_controllers() -> dict:
 
 
 def forms_js() -> str:
-    rows = [{"key": "human", "name": "yourself again", "sound": "random.pop", "pitch": 1.0}]
-    rows += [{"key": f.key, "name": f.name, "sound": f.sound, "pitch": f.pitch} for f in FORMS]
+    rows = [{"key": "human", "entity": None, "name": "yourself again", "sound": "random.pop", "pitch": 1.0}]
+    rows += [{"key": f.key, "entity": entity_id(f), "name": f.name, "sound": f.sound, "pitch": f.pitch} for f in FORMS]
     body = ",\n".join(f"  {json.dumps(r)}" for r in rows)
     return (
-        "// GENERATED by tools/gen_morph.py - do not edit. Index = the mymod:form property.\n"
-        f'export const MORPH_ID = "{MORPH_ID}";\n'
-        f'export const FORM_PROPERTY = "{PROPERTY}";\n'
+        "// GENERATED by tools/gen_morph.py - do not edit. Index 0 = yourself.\n"
+        f'export const MORPH_FAMILY = "{FAMILY}";\n'
         f"export const FORMS = [\n{body},\n];\n"
     )
 
@@ -272,11 +256,13 @@ def icon():
 
 def generate_morph(verbose: bool = True) -> None:
     _, paths = load_config()
-    out = {
-        paths.bp / "entities/morph.json": behavior_entity(),
-        paths.rp / "entity/morph.entity.json": client_entity(),
-        paths.rp / "render_controllers/morph.render_controllers.json": render_controllers(),
-    }
+    out = {paths.rp / "render_controllers/morph.render_controllers.json": render_controllers()}
+    for f in FORMS:
+        out[paths.bp / f"entities/morph_{f.key}.json"] = behavior_entity(f)
+        out[paths.rp / f"entity/morph_{f.key}.entity.json"] = client_entity(f)
+    # the old single costume entity (before one type per form)
+    for old in (paths.bp / "entities/morph.json", paths.rp / "entity/morph.entity.json"):
+        old.unlink(missing_ok=True)
     for dest, doc in out.items():
         write_json(dest, doc)
     js = paths.bp / "scripts/morph_forms.js"

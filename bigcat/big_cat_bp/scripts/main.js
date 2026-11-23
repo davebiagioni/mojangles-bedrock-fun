@@ -23,6 +23,12 @@ import "./evolution.js"; // Evolution Stone: ore drops, 8 cat stages, winged fli
 import "./net_trap.js"; // Net Trap: holds whatever walks onto it
 import "./morph.js"; // Morph Wand: turn into creatures
 import "./air_cannon.js"; // Air Cannon: blast players and creatures super far
+import "./atomic_bomb.js"; // Atomic Bomb: huge crater, mushroom cloud
+import "./blaster.js"; // Laser Blaster: hold to fire a block-burning beam
+import "./mountain.js"; // Mountain Seed: grows a fractal mountain
+import "./vortex.js"; // Vortex Gun: pulls every creature within 256 blocks to you
+import "./drill.js"; // Mooshroom Drill: a vehicle with a spinning mooshroom drill bit
+import "./portal.js"; // Portal Pads: step on one, come out on the other one of the same colour
 
 const POINTER_ID = "mymod:laser_pointer";
 const DOT_ID = "mymod:laser_dot";

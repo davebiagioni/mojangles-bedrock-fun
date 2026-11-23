@@ -34,7 +34,6 @@ const IMMUNE = new Set([
   "mymod:laser_dot",
   "mymod:grapple_hook",
   "mymod:drowned_lure",
-  "mymod:morph", // the Morph Wand costume rides along with its player
 ]);
 
 /** playerId -> tick of last accepted use */
@@ -77,7 +76,7 @@ function safeLanding(entity) {
 }
 
 function canPush(entity, shooter) {
-  if (!entity?.isValid || entity.id === shooter.id || IMMUNE.has(entity.typeId)) return false;
+  if (!entity?.isValid || entity.id === shooter.id || IMMUNE.has(entity.typeId) || entity.typeId.startsWith("mymod:morph_")) return false;
   if (entity.typeId === "minecraft:player") {
     return safe(() => entity.getGameMode()) !== GameMode.Spectator; // e.g. inside a Player Trap Orb
   }

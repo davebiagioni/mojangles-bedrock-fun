@@ -1,0 +1,39 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.mymod.mooshroom_drill.spin": {
+      "loop": true,
+      "bones": {
+        "body": {
+          "rotation": [0.0, 0.0, "query.anim_time * 1080.0"]
+        },
+        "head": {
+          "rotation": [0.0, 0.0, "query.anim_time * 1080.0"]
+        },
+        "leg0": {
+          "rotation": [-20.0, 0.0, 0.0]
+        },
+        "leg1": {
+          "rotation": [-20.0, 0.0, 0.0]
+        },
+        "leg2": {
+          "rotation": [20.0, 0.0, 0.0]
+        },
+        "leg3": {
+          "rotation": [20.0, 0.0, 0.0]
+        }
+      }
+    },
+    "animation.mymod.mooshroom_drill.idle": {
+      "loop": true,
+      "bones": {
+        "body": {
+          "rotation": [0.0, 0.0, "math.sin(query.life_time * 90.0) * 4.0"]
+        },
+        "head": {
+          "rotation": [0.0, 0.0, "math.sin(query.life_time * 90.0) * 4.0"]
+        }
+      }
+    }
+  }
+}

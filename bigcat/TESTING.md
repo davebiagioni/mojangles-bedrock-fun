@@ -423,7 +423,7 @@ Crafting: feather / stick / leather, stacked vertically.
 
 | Symptom | Likely cause |
 |---|---|
-| You're invisible but there's no creature | Check the Content Log for `morph.entity.json` or `morph.js` errors. |
+| You're invisible but there's no creature | Check the Content Log for `morph_<form>.entity.json` or `morph.js` errors. |
 | A creature is lying down or upside down (most likely the Fox or the Big Cat) | The vanilla "setup" animation doesn't suit this entity. Report which one. |
 | Legs don't move while walking | `query.modified_move_speed` doesn't update for teleported entities. Report it; the fix is a script-driven walk animation. |
 | A creature is left behind after `/reload` | It should vanish within 2 s (orphan sweep). If not, report it. |
@@ -457,3 +457,322 @@ Crafting: 3 iron ingots on top, a feather and a piston under them.
 | Mobs move but not far | `PUSH_NEAR` / `PUSH_FAR` in `air_cannon.js` are too low. Turn them up. |
 | Players don't move at all | `applyKnockback` failed. Check the Content Log. |
 | No whoosh or puffs | A particle or sound name changed in this game version. The push still works. |
+
+## Atomic Bomb
+
+`scripts/atomic_bomb.js` handles it. The Atomic Bomb is a block. **It really destroys your world**: the crater is about
+110 blocks across. Make a backup or test in a copy of the world first.
+
+- **Light it:** use flint and steel or a fire charge on it, power it with redstone, or blow it up with TNT or a creeper.
+  Another explosion gives a 2-second fuse.
+- **Countdown:** 10 seconds of beeps that speed up, smoke, and "ATOMIC BOMB in 10..." for everyone within 240 blocks.
+  **Break the bomb to defuse it.**
+- **Boom:** a white flash and screen shake, a huge ragged crater with fire and blackstone on the floor, and a mushroom cloud.
+  Bedrock is never removed.
+- **Mobs** within 90 blocks die. **Players aren't hurt:** everyone within 160 blocks is flung away and gets 20 s of full
+  Resistance, Fire Resistance and Slow Falling. **Tamed pets** (Big Cats, dogs) and **name-tagged mobs** are treated like players.
+
+Crafting: 8 TNT around a glowstone block.
+
+1. Rebuild, exit to the menu and reopen the world (**a copy!**). `/give @s mymod:atomic_bomb`. The block should be yellow
+   with the radiation symbol and a steel top with a red fuse. The name is **Atomic Bomb**.
+2. Place it, light it with flint and steel, and run. Watch for beeps, smoke and the countdown on the action bar.
+3. Light another one and break it before it goes off: "Atomic Bomb defused!".
+4. Let one go off with you about 20 blocks away: flash, shake and boom. You fly, float down, and take no damage.
+   A crater with a mushroom cloud above it.
+5. Put cows and zombies near it: they're gone. Put a tamed Big Cat near it: it's flung but alive.
+6. A lever or redstone torch next to the bomb should light it. If not, see below.
+7. TNT next to the bomb: the bomb goes off 2 s after the TNT.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| Redstone doesn't light it | `getRedstonePower()` returns nothing for this block. Use flint and steel; report it. |
+| Flint and steel lights a fire on top instead | The before-event didn't catch the click. Report it. |
+| The crater is only partly dug | Part of it was outside the loaded chunks. Stand closer (but not too close!). |
+| The game stutters for a second | Expected while the crater is dug. Lower `CRATER_RADIUS` in `atomic_bomb.js` if it's bad on the iPads. |
+| No flash | The `camera` command isn't allowed (cheats off). Everything else still works. |
+
+
+## Laser Blaster
+
+**Hold** use (right-click, or hold on touch) and a bright cyan beam fires continuously until you let go. A quick click
+gives a short burst. Every 2 ticks the beam reaches up to 64 blocks and burns through up to 4 blocks (no drops), so
+about 40 blocks a second. It hurts and sets fire to creatures and players in the beam, but never you, your own tamed pets
+or Morph Wand costumes.
+
+The beam **stops at** (never destroys) unbreakable blocks (bedrock, portals, command blocks, barriers, reinforced
+deepslate...) and anything that holds items (chests, barrels, furnaces, hoppers, shulker boxes...), so nobody's stuff
+gets deleted. It goes straight through water and lava.
+
+Crafting: diamond on top, redstone block / laser pointer / redstone block, glowstone at the bottom.
+
+1. Rebuild, exit to the menu and reopen the world. `/give @s mymod:laser_blaster`. Check the icon, glint and the name **Laser Blaster**.
+2. Hold use at a hillside: a beam appears from the gun, and a tunnel forms 4 blocks deeper every pulse. Let go: it stops at once.
+3. Click once: a short burst only.
+4. Aim at a chest behind some dirt: the dirt burns, the chest stays with its items, and the beam ends on it.
+5. `/summon zombie` 20 blocks away and hold the beam on it: it catches fire and dies within a few seconds.
+6. Hold the beam on your own tamed Big Cat: nothing happens to it.
+7. Switch to another item while firing: the beam stops.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| Only one short burst while holding | This game version doesn't send itemStartUse for this item. Report it; the item may need a use animation. |
+| The beam keeps firing after you let go | itemStopUse didn't arrive. Switching items stops it; report it. |
+| Lag while firing with several players | Lower `PIERCE` or raise `PARTICLE_STEP` at the top of `scripts/blaster.js`. |
+
+## Mountain Seed
+
+`scripts/mountain.js` handles it. Plant the seed and, after a few seconds of rumbling, a mountain rises out of that spot
+one layer at a time. Every mountain is different.
+
+- **The shape is a fractal** made with the *diamond-square* algorithm: big bumps, smaller bumps on those, and even
+  smaller bumps on those. The outline is a wiggly fractal coastline too. The spot you planted is the highest peak.
+- **Blocks:**
+  - Outside, from the bottom up: grass and flowers, then moss and coarse dirt, then rock and gravel, then snow and ice
+    on top. Steep cliffs are always bare rock.
+  - Halfway up, just under the surface: stripes of coloured terracotta like a badlands mesa.
+  - Inside: stone, andesite, diorite, granite, tuff and deepslate, with ores (coal, copper, iron, redstone, lapis,
+    gold, emerald, and rare diamonds).
+- **Size:** up to 65 blocks across and about 30–50 tall, roughly 15–20 thousand blocks. It takes about 15 seconds to grow.
+- **It never breaks anything:** it only fills air, water, lava and plants, so houses stay put (they just end up inside
+  the mountain). Creatures caught as it rises are lifted on top of it.
+
+Crafting: 4 stone in a plus around wheat seeds.
+
+1. Rebuild, exit to the menu and reopen the world. `/give @s mymod:mountain_seed`. Check the seed-with-a-mountain icon and the name **Mountain Seed**.
+2. On flat open ground, step back about 40 blocks, aim at the ground (up to 8 blocks away, so walk up, plant, then run)
+   and use it. Watch for rumbling, puffs and a little screen shake, then the mountain rising.
+3. When it's done: "A mountain has grown!". Fly around it and check for snow on top, terracotta stripes on the sides
+   and a fractal-looking outline.
+4. Dig into it: you should find stone variants and some ores.
+5. Plant two more: each should look different.
+6. Plant one next to a small hut: the hut must not be broken.
+7. Stand where it will grow: you get lifted up and don't suffocate.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| Part of the mountain is missing (cut off flat) | That part was outside the loaded chunks. Stand closer. |
+| It grows too slowly or too fast | Change `TICKS_PER_LAYER` in `mountain.js`. |
+| Too big or too small | Change `PEAK` (height) or `GRID_POWER` (6 = 65 wide, 5 = 33 wide). |
+| The game stutters while it grows | Increase `TICKS_PER_LAYER`, or set `GRID_POWER` to 5. |
+
+## Vortex Guns
+
+`scripts/vortex.js` handles both guns. They use the same vortex but pull different creatures:
+
+- **Monster Vortex** (red swirl icon): only **hostile mobs**, like zombies, skeletons, creepers, spiders, slimes,
+  phantoms and drowned. Tamed monsters count as pets and are left alone.
+- **Animal Vortex** (green swirl icon): **everything else alive**: animals, villagers, pets and tamed monsters.
+- **Players are never pulled.**
+
+Use one and, for 5 seconds, every matching creature within 256 blocks is sucked towards you. Far-away creatures fly in
+fast, near ones slower. Each one gets its own spot on a spiral around you, so they don't pile up. Use it again (or sneak +
+use) to let go early.
+
+- Only creatures in **loaded chunks** can be pulled. In practice that's your simulation distance (Settings > Simulation
+  Distance), which on iPads is usually much less than 256 blocks.
+- At most 100 creatures per shot, nearest first.
+
+Crafting: iron, ender pearl, iron on top; iron, redstone block, iron below (Monster Vortex). Use wheat instead of the
+ender pearl for the Animal Vortex.
+
+1. Rebuild, exit to the menu and reopen the world. `/give @s mymod:vortex_gun` and `/give @s mymod:animal_vortex_gun`.
+   Check the red and green swirl icons and the names **Monster Vortex** and **Animal Vortex**.
+2. `/summon zombie ~30 ~ ~` and `/summon cow ~30 ~ ~5`. Monster Vortex: only the zombie comes. Animal Vortex: only the cow.
+3. Near a field of animals, use the Animal Vortex: they spread out around you instead of piling up. No lag.
+4. A tamed zombie (fed cake) is pulled by the Animal Vortex, not the Monster Vortex.
+5. With a second player nearby: they are NOT pulled by either gun.
+6. Use it, then again straight away: "Vortex off" and everything stops.
+7. Content Log: no Molang errors about `portal_directional` or `portal_reverse`.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| Creatures far away don't come | Their chunks aren't loaded. Raise Simulation Distance, or get closer. |
+| Creatures get stuck behind walls | They're pulled in a straight line, with a little lift to hop fences. Tall walls stop them. |
+| A hostile mob is pulled by the Animal Vortex | It isn't in the `monster` family. Report which mob. |
+| The game lags | Lower `MAX_CREATURES` in `vortex.js`, and check the Content Log for errors repeating every frame. |
+
+## Laser Blaster: beacon beam, and the Flame Blaster
+
+`scripts/blaster.js` handles both blasters.
+
+- **Laser Blaster:** the beam now looks like a beacon beam: a bright core inside a wide soft cyan glow, with sparkles
+  spiralling around it. Otherwise it works the same: it burns through blocks and hurts and ignites creatures.
+- **Flame Blaster** (new, orange barrel): hold use to fire an orange beam with flames along it. It **doesn't break
+  blocks**. Wherever it lands it **sets fire**: in front of the block it hit, on top of it, and a few random spots
+  around. Creatures in the beam take a little damage and burn for 10 s. Never you, your own pets or Morph Wand costumes.
+  Fire spreads by itself (unless `/gamerule dofiretick false`), so careful near houses!
+
+Crafting (Flame Blaster): blaze rod on top; fire charge, laser pointer, fire charge in the middle; glowstone at the bottom.
+
+1. `/give @s mymod:laser_blaster` and hold use: thick glowing cyan beam with spiralling sparkles, still burning through blocks.
+2. `/give @s mymod:flame_blaster` (orange barrel icon, name **Flame Blaster**). Hold use at grass: fire appears where it
+   lands and around it. No blocks are broken.
+3. Aim at a cow or zombie: it catches fire and keeps burning.
+4. Aim at a wooden wall: it catches fire (fire in front of or on top of it) and spreads.
+5. Aim at water: no fire, just the beam.
+6. Content Log: no errors about `laser_glow` or `fire_beam`.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| The Laser Blaster lags | Make `GLOW_STEP` and `SPARKLE_STEP` in `blaster.js` bigger (fewer particles). |
+| Fire doesn't appear on walls | Fire needs a solid block under it. Aim at the floor in front of the wall, or at the top of it. |
+| Fire goes out at once | Fire on non-flammable blocks (stone, dirt) burns out after a few seconds. That's normal. |
+
+## Water Blaster and Ice Blaster
+
+`scripts/blaster.js` handles them, like the other blasters (hold use to fire). They are the Flame Blaster's counters.
+
+- **Water Blaster** (blue barrel): a blue jet with splashes. Where it lands (3 blocks around), it **puts out fire** and
+  **cools lava**: still lava turns to obsidian, flowing lava to cobblestone. Creatures in the jet stop burning and get
+  pushed back a little.
+- **Ice Blaster** (pale icy barrel): an icy beam with snowflakes. Where it lands it **puts out fire**, **freezes water**
+  (the top layer turns to ice), cools lava like the Water Blaster, and **lays snow** on the ground. Creatures in the beam
+  stop burning, slow right down for 3 s, and take a small freezing hit.
+- Neither one breaks blocks, and neither affects you, your own pets or Morph Wand costumes.
+
+Crafting: like the Laser Blaster, but with a water bucket on top and 2 lapis lazuli at the sides (Water), or blue ice
+on top and 2 snowballs at the sides (Ice).
+
+1. `/give @s mymod:water_blaster` and `/give @s mymod:ice_blaster`. Check the blue and icy icons and the names.
+2. Start a fire with the Flame Blaster, then hold the Water Blaster on it: the fire goes out with a fizz.
+3. Do the same with the Ice Blaster: the fire goes out, and snow appears around the spot.
+4. Aim the Ice Blaster at a pond: the surface turns to ice.
+5. Aim either at a lava pool: still lava becomes obsidian, flowing lava becomes cobblestone.
+6. Set a cow on fire with the Flame Blaster, then spray it: it stops burning. Ice: it slows right down.
+7. Content Log: no errors about `water_beam` or `ice_beam`.
+
+## Barf Blaster
+
+`scripts/blaster.js` handles it, like the other blasters (hold use to fire).
+
+- **Barf Blaster** (slimy green barrel): a green beam with little angry puffs. It doesn't change any blocks and does
+  **no damage**. Anyone it hits (players and creatures) **throws up**: green-brown chunks fly out of their mouth and
+  splat on the ground, with slimy sounds, for about 4 s after the last hit, then a burp. Players also get **nausea**
+  (the screen wobbles, 10 s) and a little **hunger**.
+- It never affects you, your own pets or Morph Wand costumes.
+
+Crafting: like the Laser Blaster, but with a spider eye on top and 2 slime balls at the sides.
+
+1. `/give @s mymod:barf_blaster`. Check the green icon and the name **Barf Blaster**.
+2. Aim at a cow or villager: chunks come out of its mouth, in the direction it's looking, and fall to the ground.
+3. Stop firing: it keeps throwing up for about 4 s, then burps and stops.
+4. With a second player (or ask someone): hit them, their screen wobbles and their hunger bar drains a bit.
+5. Content Log: no errors about `barf_beam` or `barf_spew`.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| The chunks shoot straight up or stay still | `variable.direction` isn't reaching `barf_spew.particle.json`. Check the Content Log. |
+| The chunks fall through the floor | Particle collision is off in some graphics modes. Harmless. |
+
+
+## Mooshroom Drill
+
+A digging vehicle with a real **mooshroom** on the front as its drill bit. `scripts/drill.js` does the digging; the
+chassis model and its texture come from `tools/gen_mooshroom_drill.py`; the mooshroom is Minecraft's own model and
+texture.
+
+- **Put it down:** use the **Mooshroom Drill** item on the ground. It faces the way you're looking.
+- **Get in:** use it (right-click / tap). **Get out:** sneak. **Pick it up:** sneak and hit it.
+- **Dig:** hold forward. The mooshroom spins like a drill bit and a 5-wide, 5-tall tunnel opens in front of you,
+  every tick, so you can drive straight through stone. Where you look decides the shape:
+  - look level: a flat tunnel
+  - look up: stairs going up
+  - look down: stairs going down
+  - look straight down: a shaft straight down
+- **Ores** go straight into your inventory (coal, raw iron/copper/gold, redstone, lapis, diamonds, emeralds,
+  nether gold and quartz, ancient debris). Everything else just disappears, so the tunnel doesn't fill with items.
+- It never breaks bedrock, portals, command blocks or anything with an inventory (chests, furnaces...), and it
+  leaves water and lava alone.
+- **Nothing can hurt it**, the mooshroom included: swords, fire, lava, drowning, falling, explosions.
+- While you drive it you get **night vision**, **fire resistance** and **water breathing**.
+
+Crafting: red mushroom, diamond pickaxe, brown mushroom over iron block, minecart, iron block.
+
+### Test steps
+
+1. `/give @s mymod:mooshroom_drill`. Check the icon (a red-and-white mooshroom in front of a yellow digger) and the
+   name **Mooshroom Drill**.
+2. Use it on the ground: a yellow tracked digger appears with a mooshroom on the front, mushrooms on its back and
+   head, facing away from you. It moos.
+3. Hit it with a sword (not sneaking): no damage, no red flash. It moos and tells you how to pick it up.
+4. Get in. You should sit on the seat at the back, behind the mooshroom. If you float above it or sink into it,
+   change the seat `position` in `big_cat_bp/entities/mooshroom_drill_vehicle.json`.
+5. Without pressing anything, look around: nothing gets dug and the mooshroom only wobbles gently.
+6. Drive into a hill, looking level: the mooshroom spins fast and a 5x5 tunnel opens in front of you. You drive
+   straight through without slowing down. Stone sounds and mycelium specks at the front.
+7. Look down while driving: stairs going down. Look straight down: a shaft. Look up: stairs going up (it climbs one
+   block at a time).
+8. Dig through some ores: you hear an XP "ding" and the raw ores, diamonds, etc. land in your inventory.
+9. Dig next to a chest and into bedrock: the chest and the bedrock stay.
+10. Drive into lava and water: the drill is fine and so are you (fire resistance, water breathing).
+11. Get out (sneak): the mooshroom stops spinning. Sneak and hit it: it disappears and the item comes back (in
+    Survival; in Creative the item isn't used up in the first place).
+12. Content Log: no errors about `mooshroom_drill`.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| The drill doesn't move when you press forward | The game didn't accept `minecraft:input_ground_controlled` for this entity. Check the Content Log. |
+| It digs while you sit still and look around | `player.inputInfo` isn't available on this game version, so the script falls back to "always dig while ridden". |
+| The mooshroom spins but its mushrooms don't, or the mushrooms float next to it | The vanilla mooshroom model changed its `body` / `head` pivots. Update `BODY_PIVOT` / `HEAD_PIVOT` in `tools/gen_mooshroom_drill.py`. |
+| The mooshroom has no mushrooms at all | Our chassis model didn't load. Check the Content Log for `geometry.mymod.mooshroom_drill`. |
+| It gets stuck on the step when going up | Step height (`minecraft:variable_max_auto_step`) wasn't accepted; look down a little and back up. |
+
+## Portal Pads
+
+Flat glowing pads. Step on one and you come out on top of its partner: **pads of the same colour are linked**.
+`scripts/portal.js` does the linking and teleporting; the block and its 16 colour textures come from
+`tools/gen_portal.py`.
+
+- Every new pad is **purple**, so any two pads you put down are linked straight away.
+- **Use a dye on a pad** to change its colour: two red pads link to each other, two blue pads link to each other,
+  and so on (16 colours, one per dye; ink sac, lapis, cocoa beans and bone meal work too). In Survival it uses up
+  the dye.
+- **Use a pad with an empty hand** to see where it goes.
+- With **three or more** pads of one colour, they go round in a loop in the order you placed them.
+- Works over any distance, even into chunks nobody is in, and between the Overworld, the Nether and the End.
+- Players and creatures (mobs, animals, Big Cats) travel. Items, arrows, vehicles and bosses don't. Creatures only
+  travel to places that are loaded (near a player).
+- When you arrive you have to **step off and back on** to go back.
+- Explosions can't break pads; pick one up by breaking it.
+
+Crafting: obsidian, ender pearl, obsidian in a row. Makes 2.
+
+### Test steps
+
+1. `/give @s mymod:portal_pad 4`. Check the icon (a purple swirl pad) and the name **Portal Pad**.
+2. Put one down. It glows and swirls purple, and the action bar says to place another one.
+3. Walk about 50 blocks away and put the second one down: "linked!". Step on it: whoosh, you're on the first pad,
+   with purple sparkles at both ends.
+4. Stand still on the pad you arrived on: nothing happens. Step off and back on: you go back.
+5. Use a red dye on both pads: they turn red and still link to each other. A third, purple pad: "not linked yet".
+6. Put a third red pad down. Step on pad 1 → pad 2 → pad 3 → pad 1 (a loop).
+7. Lead a cow (or push a mob) onto a pad: it travels too. Drop an item on it: the item stays.
+8. Put one pad in the Overworld and one in the Nether (same colour): you travel between the dimensions.
+9. Walk far away from both pads (so their chunks unload), save and quit, reopen, then go back to one: it still
+   takes you to the other.
+10. Break a pad, then step on its old partner: "No other ... portal pad yet".
+11. Content Log: no errors about `portal_pad` or `portal_swirl`.
+
+**What could go wrong:**
+
+| Symptom | Likely cause |
+|---|---|
+| The pad is invisible or a purple/black checkerboard | A texture is missing from `terrain_texture.json`; rebuild. |
+| Dye does nothing | The game ignored the block's `mymod:color` state. Check the Content Log for `portal_pad`. |
+| You bounce back and forth | The "step off first" check isn't working; tell me what you were standing on. |
+| The swirl particles are white | `variable.pr/pg/pb` aren't reaching `portal_swirl.particle.json`. Harmless. |

@@ -1,0 +1,22 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "mymod:portal_pad",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": "mymod_portal_pad",
+      "minecraft:display_name": {
+        "value": "item.mymod:portal_pad.name"
+      },
+      "minecraft:max_stack_size": 16,
+      "minecraft:block_placer": {
+        "block": "mymod:portal_pad",
+        "replace_block_item": true
+      }
+    }
+  }
+}

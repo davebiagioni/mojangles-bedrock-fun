@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:flame_blaster"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " B ",
+      "FPF",
+      " G "
+    ],
+    "key": {
+      "B": {
+        "item": "minecraft:blaze_rod"
+      },
+      "F": {
+        "item": "minecraft:fire_charge"
+      },
+      "P": {
+        "item": "mymod:laser_pointer"
+      },
+      "G": {
+        "item": "minecraft:glowstone"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mymod:laser_pointer"
+      }
+    ],
+    "result": {
+      "item": "mymod:flame_blaster",
+      "count": 1
+    }
+  }
+}

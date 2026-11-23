@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:atomic_bomb"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      "TTT",
+      "TGT",
+      "TTT"
+    ],
+    "key": {
+      "T": { "item": "minecraft:tnt" },
+      "G": { "item": "minecraft:glowstone" }
+    },
+    "unlock": [
+      { "item": "minecraft:tnt" }
+    ],
+    "result": {
+      "item": "mymod:atomic_bomb",
+      "count": 1
+    }
+  }
+}

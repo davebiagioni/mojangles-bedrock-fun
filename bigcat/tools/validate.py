@@ -211,6 +211,13 @@ def validate(verbose: bool = True) -> None:
     laser_textures += validate_net_trap(paths, parsed, err)
     laser_textures += validate_morph(paths, parsed, err)
     laser_textures += validate_air_cannon(paths, parsed, err)
+    laser_textures += validate_atomic_bomb(paths, parsed, err)
+    laser_textures += validate_blaster(paths, parsed, err)
+    laser_textures += validate_mountain(paths, parsed, err)
+    laser_textures += validate_vortex(paths, parsed, err)
+    laser_textures += validate_mooshroom_drill(paths, parsed, mev, err)
+    laser_textures += validate_portal(paths, parsed, err)
+    validate_blocks(paths, parsed, err)
 
     # 4. images: all referenced, right size, right alpha ---------------------------
     referenced = {
@@ -697,7 +704,7 @@ def validate_net_trap(paths, parsed, err) -> list[str]:
 
 def validate_morph(paths, parsed, err) -> list[str]:
     """Cross-checks for the Morph Wand (scripts/morph.js + tools/gen_morph.py). Returns its textures."""
-    from gen_morph import ALL_TEXTURES, FORMS, ICON_TEXTURE, MORPH_ID, PROPERTY, RC, WAND_ID, forms_js
+    from gen_morph import ALL_TEXTURES, FORMS, ICON_TEXTURE, RC, WAND_ID, entity_id, forms_js
 
     bp, rp = paths.bp, paths.rp
     if 'import "./morph.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
@@ -713,22 +720,27 @@ def validate_morph(paths, parsed, err) -> list[str]:
     if not forms.is_file() or forms.read_text(encoding="utf-8") != forms_js():
         err(f"{rel(forms)}: missing or stale; run tools/gen_morph.py")
 
-    ent = parsed.get(bp / "entities/morph.json")
-    desc = ent["minecraft:entity"]["description"] if ent else {}
-    if desc.get("identifier") != MORPH_ID:
-        err(f"entities/morph.json: missing or identifier is not {MORPH_ID}")
-    elif desc.get("properties", {}).get(PROPERTY, {}).get("range") != [0, len(FORMS)]:
-        err(f"entities/morph.json: property {PROPERTY} should have range [0, {len(FORMS)}]")
-    ce = parsed.get(rp / "entity/morph.entity.json")
     rcs = parsed.get(rp / "render_controllers/morph.render_controllers.json", {}).get("render_controllers", {})
-    if not ce or ce["minecraft:client_entity"]["description"]["identifier"] != MORPH_ID:
-        err(f"entity/morph.entity.json: missing or identifier is not {MORPH_ID}")
-    else:
-        used = [k for e in ce["minecraft:client_entity"]["description"]["render_controllers"] for k in e]
-        for f in FORMS:
-            name = RC.format(key=f.key)
-            if name not in used or name not in rcs:
-                err(f"entity/morph.entity.json: render controller {name} missing or not defined")
+    for f in FORMS:
+        ident = entity_id(f)
+        ent = parsed.get(bp / f"entities/morph_{f.key}.json")
+        if not ent or ent["minecraft:entity"]["description"]["identifier"] != ident:
+            err(f"entities/morph_{f.key}.json: missing or identifier is not {ident}")
+        ce = parsed.get(rp / f"entity/morph_{f.key}.entity.json")
+        desc = ce["minecraft:client_entity"]["description"] if ce else {}
+        if desc.get("identifier") != ident:
+            err(f"entity/morph_{f.key}.entity.json: missing or identifier is not {ident}")
+        elif len(desc.get("geometry", {})) != 1:
+            err(f"entity/morph_{f.key}.entity.json: exactly one geometry (more log locator errors in game)")
+        name = RC.format(key=f.key)
+        if desc and (name not in desc.get("render_controllers", []) or name not in rcs):
+            err(f"entity/morph_{f.key}.entity.json: render controller {name} missing or not defined")
+    for old in ("entities/morph.json",):
+        if (bp / old).is_file():
+            err(f"{old}: the old single costume entity; delete it (one entity per form now)")
+    for js_file in sorted((bp / "scripts").glob("*.js")):
+        if '"mymod:morph"' in js_file.read_text(encoding="utf-8"):
+            err(f"{rel(js_file)}: uses the old id mymod:morph; costumes are mymod:morph_<form> (check startsWith)")
 
     atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
     item = parsed.get(bp / "items/morph_wand.json")
@@ -834,6 +846,294 @@ def validate_air_cannon(paths, parsed, err) -> list[str]:
         err(f"recipes/air_cannon.json: missing or does not make {item_id}")
     if f"item.{item_id}.name=" not in (rp / "texts/en_US.lang").read_text(encoding="utf-8"):
         err(f"texts/en_US.lang: missing item.{item_id}.name=...")
+    return list(ALL_TEXTURES)
+
+
+def validate_blocks(paths, parsed, err) -> None:
+    """Minecraft refuses a block (and every recipe for it) that has textures but no geometry."""
+    for f in sorted((paths.bp / "blocks").glob("*.json")):
+        comps = parsed.get(f, {}).get("minecraft:block", {}).get("components", {})
+        if "minecraft:material_instances" in comps and "minecraft:geometry" not in comps:
+            err(
+                f"blocks/{f.name}: has material_instances but no minecraft:geometry (use minecraft:geometry.full_block)"
+            )
+
+
+def validate_blaster(paths, parsed, err) -> list[str]:
+    """Cross-checks for the Laser, Flame, Water, Ice and Barf Blasters (scripts/blaster.js). Returns their textures."""
+    from gen_blaster import (
+        ALL_TEXTURES,
+        BARF_ID,
+        BARF_TEXTURE,
+        BLASTER_ID,
+        FLAME_ID,
+        FLAME_TEXTURE,
+        ICE_ID,
+        ICE_TEXTURE,
+        ICON_TEXTURE,
+        WATER_ID,
+        WATER_TEXTURE,
+    )
+
+    bp, rp = paths.bp, paths.rp
+    if 'import "./blaster.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./blaster.js")
+    script = bp / "scripts/blaster.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    for name in ("laser_beam", "laser_glow", "fire_beam", "water_beam", "ice_beam", "barf_beam", "barf_spew"):
+        pid = f"mymod:{name}"
+        particle = parsed.get(rp / f"particles/{name}.particle.json")
+        if not particle or particle["particle_effect"]["description"]["identifier"] != pid or f'"{pid}"' not in js:
+            err(f"particles/{name}.particle.json: missing or does not define {pid} (used by {rel(script)})")
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    lang = (rp / "texts/en_US.lang").read_text(encoding="utf-8")
+    blasters = (
+        (BLASTER_ID, ICON_TEXTURE),
+        (FLAME_ID, FLAME_TEXTURE),
+        (WATER_ID, WATER_TEXTURE),
+        (ICE_ID, ICE_TEXTURE),
+        (BARF_ID, BARF_TEXTURE),
+    )
+    for item_id, texture in blasters:
+        name = item_id.split(":")[1]
+        if f'"{item_id}"' not in js:
+            err(f"{rel(script)}: missing or does not use {item_id}")
+        item = parsed.get(bp / f"items/{name}.json")
+        if not item or item["minecraft:item"]["description"]["identifier"] != item_id:
+            err(f"items/{name}.json: missing or identifier is not {item_id}")
+        else:
+            comps = item["minecraft:item"]["components"]
+            if comps.get("minecraft:use_modifiers", {}).get("use_duration", 0) < 60:
+                err(f"items/{name}.json: needs minecraft:use_modifiers with a long use_duration (hold to fire)")
+            if atlas.get(comps.get("minecraft:icon"), {}).get("textures") != texture:
+                err(f"items/{name}.json: icon should map to {texture} in item_texture.json")
+        recipe = parsed.get(bp / f"recipes/{name}.json")
+        if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != item_id:
+            err(f"recipes/{name}.json: missing or does not make {item_id}")
+        if f"item.{item_id}.name=" not in lang:
+            err(f"texts/en_US.lang: missing item.{item_id}.name=...")
+    return list(ALL_TEXTURES)
+
+
+def validate_atomic_bomb(paths, parsed, err) -> list[str]:
+    """Cross-checks for the Atomic Bomb block and script. Returns the RP texture paths it uses."""
+    from gen_atomic_bomb import ALL_TEXTURES, BOMB_ID, TERRAIN
+
+    bp, rp = paths.bp, paths.rp
+    script = bp / "scripts/atomic_bomb.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if f'"{BOMB_ID}"' not in js:
+        err(f"{rel(script)}: missing, or does not use {BOMB_ID}")
+    if 'import "./atomic_bomb.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./atomic_bomb.js")
+    block = parsed.get(bp / "blocks/atomic_bomb.json")
+    if not block or block["minecraft:block"]["description"]["identifier"] != BOMB_ID:
+        err(f"blocks/atomic_bomb.json: missing or identifier is not {BOMB_ID}")
+    else:
+        terrain = parsed.get(rp / "textures/terrain_texture.json", {}).get("texture_data", {})
+        mats = block["minecraft:block"]["components"].get("minecraft:material_instances", {})
+        for face, m in mats.items():
+            tex = m.get("texture")
+            if tex not in TERRAIN or terrain.get(tex, {}).get("textures") != TERRAIN[tex]:
+                err(f"blocks/atomic_bomb.json: {face} texture {tex!r} is not mapped in terrain_texture.json")
+    recipe = parsed.get(bp / "recipes/atomic_bomb.json")
+    if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != BOMB_ID:
+        err(f"recipes/atomic_bomb.json: missing or does not make {BOMB_ID}")
+    if f"tile.{BOMB_ID}.name=" not in (rp / "texts/en_US.lang").read_text(encoding="utf-8"):
+        err(f"texts/en_US.lang: missing tile.{BOMB_ID}.name=...")
+    return list(ALL_TEXTURES)
+
+
+def validate_mountain(paths, parsed, err) -> list[str]:
+    """Cross-checks for the Mountain Seed. Returns the RP texture paths it uses."""
+    from gen_mountain import ALL_TEXTURES
+
+    bp, rp = paths.bp, paths.rp
+    item_id = "mymod:mountain_seed"
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    script = bp / "scripts/mountain.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if f'"{item_id}"' not in js:
+        err(f"{rel(script)}: missing, or does not use {item_id}")
+    if 'import "./mountain.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./mountain.js")
+    item = parsed.get(bp / "items/mountain_seed.json")
+    if not item or item["minecraft:item"]["description"]["identifier"] != item_id:
+        err(f"items/mountain_seed.json: missing or identifier is not {item_id}")
+    elif item["minecraft:item"]["components"].get("minecraft:icon") not in atlas:
+        err("items/mountain_seed.json: icon not in item_texture.json")
+    recipe = parsed.get(bp / "recipes/mountain_seed.json")
+    if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != item_id:
+        err(f"recipes/mountain_seed.json: missing or does not make {item_id}")
+    if f"item.{item_id}.name=" not in (rp / "texts/en_US.lang").read_text(encoding="utf-8"):
+        err(f"texts/en_US.lang: missing item.{item_id}.name=...")
+    return list(ALL_TEXTURES)
+
+
+def validate_vortex(paths, parsed, err) -> list[str]:
+    """Cross-checks for the two Vortex Guns (monsters / animals). Returns the RP texture paths they use."""
+    from gen_vortex import ALL_TEXTURES
+
+    bp, rp = paths.bp, paths.rp
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    lang = (rp / "texts/en_US.lang").read_text(encoding="utf-8")
+    script = bp / "scripts/vortex.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if 'import "./vortex.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./vortex.js")
+    for name in ("vortex_gun", "animal_vortex_gun"):
+        item_id = f"mymod:{name}"
+        if f'"{item_id}"' not in js:
+            err(f"{rel(script)}: missing, or does not use {item_id}")
+        item = parsed.get(bp / f"items/{name}.json")
+        if not item or item["minecraft:item"]["description"]["identifier"] != item_id:
+            err(f"items/{name}.json: missing or identifier is not {item_id}")
+        elif item["minecraft:item"]["components"].get("minecraft:icon") not in atlas:
+            err(f"items/{name}.json: icon not in item_texture.json")
+        recipe = parsed.get(bp / f"recipes/{name}.json")
+        if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != item_id:
+            err(f"recipes/{name}.json: missing or does not make {item_id}")
+        if f"item.{item_id}.name=" not in lang:
+            err(f"texts/en_US.lang: missing item.{item_id}.name=...")
+    return list(ALL_TEXTURES)
+
+
+def validate_mooshroom_drill(paths, parsed, mev, err) -> list[str]:
+    """Cross-checks for the Mooshroom Drill (scripts/drill.js + tools/gen_mooshroom_drill.py). Returns its textures."""
+    from gen_mooshroom_drill import (
+        ALL_TEXTURES,
+        ENTITY_TEXTURE,
+        GEO_FILE,
+        GEOMETRY_ID,
+        ICON_TEXTURE,
+        ITEM_ID,
+        VEHICLE_ID,
+    )
+
+    bp, rp = paths.bp, paths.rp
+    if 'import "./drill.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./drill.js")
+    script = bp / "scripts/drill.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    for needle in (ITEM_ID, VEHICLE_ID, "mymod:drilling"):
+        if f'"{needle}"' not in js:
+            err(f"{rel(script)}: missing, or does not use {needle}")
+
+    ent = parsed.get(bp / "entities/mooshroom_drill_vehicle.json")
+    if not ent or ent["minecraft:entity"]["description"]["identifier"] != VEHICLE_ID:
+        err(f"entities/mooshroom_drill_vehicle.json: missing or identifier is not {VEHICLE_ID}")
+    else:
+        fv = ent.get("format_version", "0")
+        if mev and tuple(int(x) for x in fv.split(".")) > tuple(mev):
+            err(f"entities/mooshroom_drill_vehicle.json: format_version {fv} is newer than min_engine_version {mev}")
+        prop = ent["minecraft:entity"]["description"].get("properties", {}).get("mymod:drilling", {})
+        if prop.get("type") != "bool" or prop.get("client_sync") is not True:
+            err("entities/mooshroom_drill_vehicle.json: mymod:drilling must be a client_sync bool (starts the spin)")
+        comps = ent["minecraft:entity"].get("components", {})
+        ds = comps.get("minecraft:damage_sensor", {}).get("triggers", {})
+        if ds.get("cause") != "all" or ds.get("deals_damage") != "no":
+            err("entities/mooshroom_drill_vehicle.json: damage_sensor must block all damage (mooshroom never hurt)")
+        # 1.26.50 split minecraft:pushable in two; the old name makes the whole entity fail to load
+        if "minecraft:pushable" in comps:
+            err("entities/mooshroom_drill_vehicle.json: minecraft:pushable no longer exists (use pushable_by_block)")
+        for must in ("minecraft:rideable", "minecraft:input_ground_controlled", "minecraft:movement"):
+            if must not in comps:
+                err(f"entities/mooshroom_drill_vehicle.json: {must} missing (it can't be driven)")
+
+    ce = parsed.get(rp / "entity/mooshroom_drill_vehicle.entity.json")
+    rcf = parsed.get(rp / "render_controllers/mooshroom_drill.render_controllers.json", {})
+    rcs = rcf.get("render_controllers", {})
+    anims = parsed.get(rp / "animations/mooshroom_drill.animation.json", {}).get("animations", {})
+    geo = parsed.get(rp / GEO_FILE)
+    if not ce or ce["minecraft:client_entity"]["description"]["identifier"] != VEHICLE_ID:
+        err(f"entity/mooshroom_drill_vehicle.entity.json: missing or identifier is not {VEHICLE_ID}")
+    else:
+        desc = ce["minecraft:client_entity"]["description"]
+        if desc.get("textures", {}).get("default") != ENTITY_TEXTURE:
+            err(f"entity/mooshroom_drill_vehicle.entity.json: default texture should be {ENTITY_TEXTURE}")
+        if desc.get("geometry", {}).get("default") != GEOMETRY_ID or not geo:
+            err(f"entity/mooshroom_drill_vehicle.entity.json: default geometry should be {GEOMETRY_ID} ({GEO_FILE})")
+        for name in desc.get("render_controllers", []):
+            if name not in rcs:
+                err(f"entity/mooshroom_drill_vehicle.entity.json: render controller {name} not defined")
+        for short, anim in desc.get("animations", {}).items():
+            if anim not in anims:
+                err(f"entity/mooshroom_drill_vehicle.entity.json: animation {short} ({anim}) not defined")
+        spin = anims.get(desc.get("animations", {}).get("spin"), {}).get("bones", {})
+        if not {"body", "head"} <= set(spin):
+            err("animations/mooshroom_drill.animation.json: spin must turn the body and head bones")
+
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    item = parsed.get(bp / "items/mooshroom_drill.json")
+    if not item or item["minecraft:item"]["description"]["identifier"] != ITEM_ID:
+        err(f"items/mooshroom_drill.json: missing or identifier is not {ITEM_ID}")
+    elif atlas.get(item["minecraft:item"]["components"].get("minecraft:icon"), {}).get("textures") != ICON_TEXTURE:
+        err(f"items/mooshroom_drill.json: icon should map to {ICON_TEXTURE} in item_texture.json")
+    recipe = parsed.get(bp / "recipes/mooshroom_drill.json")
+    if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != ITEM_ID:
+        err(f"recipes/mooshroom_drill.json: missing or does not make {ITEM_ID}")
+    lang = (rp / "texts/en_US.lang").read_text(encoding="utf-8")
+    for key in (f"item.{ITEM_ID}.name", f"entity.{VEHICLE_ID}.name"):
+        if f"{key}=" not in lang:
+            err(f"texts/en_US.lang: missing {key}=...")
+    return list(ALL_TEXTURES)
+
+
+def validate_portal(paths, parsed, err) -> list[str]:
+    """Cross-checks for the Portal Pads (scripts/portal.js + tools/gen_portal.py). Returns their textures."""
+    from gen_portal import (
+        ALL_TEXTURES,
+        COLORS,
+        GEOMETRY_ID,
+        ICON_TEXTURE,
+        PAD_ID,
+        atlas_key,
+        block,
+        colors_js,
+        texture_path,
+    )
+
+    bp, rp = paths.bp, paths.rp
+    if 'import "./portal.js"' not in (bp / "scripts/main.js").read_text(encoding="utf-8"):
+        err("scripts/main.js: must import ./portal.js")
+    script = bp / "scripts/portal.js"
+    js = script.read_text(encoding="utf-8") if script.is_file() else ""
+    if f'"{PAD_ID}"' not in js or '"./portal_colors.js"' not in js or '"mymod:portal_swirl"' not in js:
+        err(f"{rel(script)}: missing, or does not use {PAD_ID}, ./portal_colors.js and mymod:portal_swirl")
+    colors = bp / "scripts/portal_colors.js"
+    if not colors.is_file() or colors.read_text(encoding="utf-8") != colors_js():
+        err(f"{rel(colors)}: missing or stale; run tools/gen_portal.py")
+    if parsed.get(bp / "blocks/portal_pad.json") != block():
+        err("blocks/portal_pad.json: missing or stale; run tools/gen_portal.py")
+
+    terrain = parsed.get(rp / "textures/terrain_texture.json", {}).get("texture_data", {})
+    for c in COLORS:
+        if terrain.get(atlas_key(c), {}).get("textures") != texture_path(c):
+            err(f"textures/terrain_texture.json: {atlas_key(c)} should map to {texture_path(c)}")
+    geo = parsed.get(rp / "models/blocks/portal_pad.geo.json", {})
+    if GEOMETRY_ID not in [g["description"]["identifier"] for g in geo.get("minecraft:geometry", [])]:
+        err(f"models/blocks/portal_pad.geo.json: missing or does not define {GEOMETRY_ID}")
+    particle = parsed.get(rp / "particles/portal_swirl.particle.json")
+    if not particle or particle["particle_effect"]["description"]["identifier"] != "mymod:portal_swirl":
+        err("particles/portal_swirl.particle.json: missing or does not define mymod:portal_swirl")
+
+    atlas = parsed.get(rp / "textures/item_texture.json", {}).get("texture_data", {})
+    item = parsed.get(bp / "items/portal_pad.json")
+    if not item or item["minecraft:item"]["description"]["identifier"] != PAD_ID:
+        err(f"items/portal_pad.json: missing or identifier is not {PAD_ID}")
+    else:
+        comps = item["minecraft:item"]["components"]
+        if atlas.get(comps.get("minecraft:icon"), {}).get("textures") != ICON_TEXTURE:
+            err(f"items/portal_pad.json: icon should map to {ICON_TEXTURE} in item_texture.json")
+        if comps.get("minecraft:block_placer", {}).get("block") != PAD_ID:
+            err(f"items/portal_pad.json: minecraft:block_placer must place {PAD_ID}")
+    recipe = parsed.get(bp / "recipes/portal_pad.json")
+    if not recipe or recipe.get("minecraft:recipe_shaped", {}).get("result", {}).get("item") != PAD_ID:
+        err(f"recipes/portal_pad.json: missing or does not make {PAD_ID}")
+    lang = (rp / "texts/en_US.lang").read_text(encoding="utf-8")
+    for key in (f"item.{PAD_ID}.name", f"tile.{PAD_ID}.name"):
+        if f"{key}=" not in lang:
+            err(f"texts/en_US.lang: missing {key}=...")
     return list(ALL_TEXTURES)
 
 

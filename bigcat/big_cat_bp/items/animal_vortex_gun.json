@@ -1,0 +1,19 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "mymod:animal_vortex_gun",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": "mymod_animal_vortex_gun",
+      "minecraft:display_name": {
+        "value": "item.mymod:animal_vortex_gun.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true
+    }
+  }
+}

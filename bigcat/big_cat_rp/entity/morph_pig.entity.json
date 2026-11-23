@@ -1,0 +1,33 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "mymod:morph_pig",
+      "materials": {
+        "default": "pig_v3"
+      },
+      "textures": {
+        "default": "textures/entity/pig/pig_v3"
+      },
+      "geometry": {
+        "default": "geometry.pig.v3"
+      },
+      "animations": {
+        "setup": "animation.pig.setup",
+        "walk": "animation.quadruped.walk",
+        "look": "animation.common.look_at_target"
+      },
+      "scripts": {
+        "animate": [
+          "setup",
+          {
+            "walk": "query.modified_move_speed"
+          },
+          "look"
+        ],
+        "scale": "1.0"
+      },
+      "render_controllers": ["controller.render.mymod.morph.pig"]
+    }
+  }
+}

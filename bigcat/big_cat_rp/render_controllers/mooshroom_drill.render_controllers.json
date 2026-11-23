@@ -1,0 +1,27 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.mymod.mooshroom_drill": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ]
+    },
+    "controller.render.mymod.mooshroom_drill.cow": {
+      "geometry": "Geometry.cow",
+      "materials": [
+        {
+          "*": "Material.cow"
+        }
+      ],
+      "textures": [
+        "Texture.cow"
+      ]
+    }
+  }
+}

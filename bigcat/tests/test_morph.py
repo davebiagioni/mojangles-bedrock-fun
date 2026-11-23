@@ -12,45 +12,45 @@ import validate
 from common import BuildError
 
 
-def test_every_form_has_a_render_controller_and_condition():
-    ce = gen_morph.client_entity()["minecraft:client_entity"]["description"]
+def test_one_entity_per_form_with_one_model():
     rcs = gen_morph.render_controllers()["render_controllers"]
-    for n, f in enumerate(gen_morph.FORMS, start=1):
-        name = gen_morph.RC.format(key=f.key)
-        assert {name: gen_morph.form_condition(n)} in ce["render_controllers"]
-        assert rcs[name]["geometry"] == f"Geometry.{f.key}"
-        assert ce["geometry"][f.key] == f.geometry
-        assert ce["textures"][f.key] == f.texture
-        for short in f.animations:
-            assert any(
-                f"{f.key}_{short}" in e and e[f"{f.key}_{short}"].startswith(gen_morph.form_condition(n))
-                for e in ce["scripts"]["animate"]
-            )
+    for f in gen_morph.FORMS:
+        ident = gen_morph.MORPH_PREFIX + f.key
+        assert gen_morph.behavior_entity(f)["minecraft:entity"]["description"]["identifier"] == ident
+        ce = gen_morph.client_entity(f)["minecraft:client_entity"]["description"]
+        assert ce["identifier"] == ident
+        # one model per client entity, or the game logs "model already has a locator ..." errors
+        assert ce["geometry"] == {"default": f.geometry}
+        assert ce["textures"] == {"default": f.texture}
+        assert ce["render_controllers"] == [gen_morph.RC.format(key=f.key)]
+        assert rcs[gen_morph.RC.format(key=f.key)]["geometry"] == "Geometry.default"
+        assert set(ce["animations"]) == set(f.animations)
 
 
-def test_keys_unique_and_property_range():
+def test_keys_unique():
     keys = [f.key for f in gen_morph.FORMS]
     assert len(keys) == len(set(keys))
-    props = gen_morph.behavior_entity()["minecraft:entity"]["description"]["properties"]
-    assert props[gen_morph.PROPERTY]["range"] == [0, len(gen_morph.FORMS)]
 
 
-def test_scale_expression():
-    scale = gen_morph.client_entity()["minecraft:client_entity"]["description"]["scripts"]["scale"]
-    big = next(n for n, f in enumerate(gen_morph.FORMS, start=1) if f.key == "big_cat")
-    assert f"{gen_morph.form_condition(big)} ? 2.0" in scale
-    assert scale.endswith(": 1.0")
+def test_scale():
+    for f in gen_morph.FORMS:
+        scale = gen_morph.client_entity(f)["minecraft:client_entity"]["description"]["scripts"]["scale"]
+        assert scale == ("2.0" if f.key == "big_cat" else "1.0")
 
 
 def test_forms_js_lists_human_first():
     js = gen_morph.forms_js()
     rows = [json.loads(line.strip().rstrip(",")) for line in js.splitlines() if line.strip().startswith("{")]
     assert [r["key"] for r in rows] == ["human"] + [f.key for f in gen_morph.FORMS]
+    assert [r["entity"] for r in rows] == [None] + [gen_morph.MORPH_PREFIX + f.key for f in gen_morph.FORMS]
 
 
 def test_generate_writes_files(raw_project):
     gen_morph.generate_morph(verbose=False)
-    assert (raw_project.bp / "entities/morph.json").is_file()
+    for f in gen_morph.FORMS:
+        assert (raw_project.bp / f"entities/morph_{f.key}.json").is_file()
+        assert (raw_project.rp / f"entity/morph_{f.key}.entity.json").is_file()
+    assert not (raw_project.bp / "entities/morph.json").exists()
     assert (raw_project.bp / "scripts/morph_forms.js").read_text(encoding="utf-8") == gen_morph.forms_js()
     with Image.open(raw_project.rp / (gen_morph.ICON_TEXTURE + ".png")) as im:
         assert im.size == (16, 16)
@@ -76,7 +76,21 @@ def recipe_missing(p):
     (p.bp / "recipes" / "morph_wand.json").unlink()
 
 
+def old_id_in_script(p):
+    f = p.bp / "scripts" / "blaster.js"
+    f.write_text(f.read_text(encoding="utf-8") + '\nconst X = "mymod:morph";\n', encoding="utf-8")
+
+
+def two_models(p):
+    f = p.rp / "entity" / "morph_pig.entity.json"
+    d = json.loads(f.read_text(encoding="utf-8"))
+    d["minecraft:client_entity"]["description"]["geometry"]["extra"] = "geometry.cat"
+    f.write_text(json.dumps(d), encoding="utf-8")
+
+
 BREAKAGES = [
+    (old_id_in_script, "uses the old id mymod:morph"),
+    (two_models, "entity/morph_pig.entity.json: exactly one geometry"),
     (not_imported, "scripts/main.js: must import ./morph.js"),
     (stale_forms, "missing or stale; run tools/gen_morph.py"),
     (perk_missing, "need an entry for frog"),

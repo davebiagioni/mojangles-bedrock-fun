@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:ice_blaster"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " I ",
+      "SPS",
+      " G "
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:blue_ice"
+      },
+      "S": {
+        "item": "minecraft:snowball"
+      },
+      "P": {
+        "item": "mymod:laser_pointer"
+      },
+      "G": {
+        "item": "minecraft:glowstone"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mymod:laser_pointer"
+      }
+    ],
+    "result": {
+      "item": "mymod:ice_blaster",
+      "count": 1
+    }
+  }
+}

@@ -175,6 +175,23 @@ def air_cannon_not_imported(p):
     f.write_text(f.read_text(encoding="utf-8").replace('import "./air_cannon.js";', ""), encoding="utf-8")
 
 
+def bomb_texture_unmapped(p):
+    _edit_json(
+        p.rp / "textures" / "terrain_texture.json",
+        lambda d: d["texture_data"].pop("mymod_atomic_bomb_top"),
+    )
+
+
+def mountain_not_imported(p):
+    f = p.bp / "scripts" / "main.js"
+    f.write_text(f.read_text(encoding="utf-8").replace('import "./mountain.js";', ""), encoding="utf-8")
+
+
+def vortex_not_imported(p):
+    f = p.bp / "scripts" / "main.js"
+    f.write_text(f.read_text(encoding="utf-8").replace('import "./vortex.js";', ""), encoding="utf-8")
+
+
 BREAKAGES = [
     (bump_rp_only, "depends on RP version"),
     (add_bom, "UTF-8 BOM"),
@@ -199,6 +216,9 @@ BREAKAGES = [
     (drop_orb_recipe, "recipes/trap_orb.json: missing or does not make mymod:trap_orb"),
     (drowned_ignores_trap, "drowned.json: minecraft:behavior.nearest_attackable_target does not target"),
     (lure_wrong_family, "drowned_lure.json: type_family must include bigcat_drowned_trap"),
+    (vortex_not_imported, "scripts/main.js: must import ./vortex.js"),
+    (mountain_not_imported, "scripts/main.js: must import ./mountain.js"),
+    (bomb_texture_unmapped, "atomic_bomb.json: up texture 'mymod_atomic_bomb_top' is not mapped"),
     (air_cannon_not_imported, "scripts/main.js: must import ./air_cannon.js"),
     (hook_not_a_projectile, "grapple_hook.json: needs minecraft:projectile"),
     (grapple_not_imported, "scripts/main.js: must import ./grapple.js"),

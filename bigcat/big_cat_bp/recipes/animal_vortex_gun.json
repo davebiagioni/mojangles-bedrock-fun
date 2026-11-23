@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:animal_vortex_gun"
+    },
+    "tags": ["crafting_table"],
+    "pattern": [
+      "IWI",
+      "IRI"
+    ],
+    "key": {
+      "I": { "item": "minecraft:iron_ingot" },
+      "W": { "item": "minecraft:wheat" },
+      "R": { "item": "minecraft:redstone_block" }
+    },
+    "unlock": [
+      { "item": "minecraft:wheat" }
+    ],
+    "result": {
+      "item": "mymod:animal_vortex_gun",
+      "count": 1
+    }
+  }
+}

@@ -2,8 +2,65 @@
   "resource_pack_name": "big_cat",
   "texture_name": "atlas.terrain",
   "texture_data": {
+    "mymod_portal_pad_purple": {
+      "textures": "textures/blocks/portal_pad_purple"
+    },
+    "mymod_portal_pad_white": {
+      "textures": "textures/blocks/portal_pad_white"
+    },
+    "mymod_portal_pad_orange": {
+      "textures": "textures/blocks/portal_pad_orange"
+    },
+    "mymod_portal_pad_magenta": {
+      "textures": "textures/blocks/portal_pad_magenta"
+    },
+    "mymod_portal_pad_light_blue": {
+      "textures": "textures/blocks/portal_pad_light_blue"
+    },
+    "mymod_portal_pad_yellow": {
+      "textures": "textures/blocks/portal_pad_yellow"
+    },
+    "mymod_portal_pad_lime": {
+      "textures": "textures/blocks/portal_pad_lime"
+    },
+    "mymod_portal_pad_pink": {
+      "textures": "textures/blocks/portal_pad_pink"
+    },
+    "mymod_portal_pad_gray": {
+      "textures": "textures/blocks/portal_pad_gray"
+    },
+    "mymod_portal_pad_light_gray": {
+      "textures": "textures/blocks/portal_pad_light_gray"
+    },
+    "mymod_portal_pad_cyan": {
+      "textures": "textures/blocks/portal_pad_cyan"
+    },
+    "mymod_portal_pad_blue": {
+      "textures": "textures/blocks/portal_pad_blue"
+    },
+    "mymod_portal_pad_brown": {
+      "textures": "textures/blocks/portal_pad_brown"
+    },
+    "mymod_portal_pad_green": {
+      "textures": "textures/blocks/portal_pad_green"
+    },
+    "mymod_portal_pad_red": {
+      "textures": "textures/blocks/portal_pad_red"
+    },
+    "mymod_portal_pad_black": {
+      "textures": "textures/blocks/portal_pad_black"
+    },
     "mymod_net_trap": {
       "textures": "textures/blocks/net_trap"
+    },
+    "mymod_atomic_bomb_side": {
+      "textures": "textures/blocks/atomic_bomb_side"
+    },
+    "mymod_atomic_bomb_top": {
+      "textures": "textures/blocks/atomic_bomb_top"
+    },
+    "mymod_atomic_bomb_bottom": {
+      "textures": "textures/blocks/atomic_bomb_bottom"
     }
   }
 }

@@ -4,8 +4,24 @@ Two Minecraft: Bedrock Edition add-ons, built with Python scripts.
 
 | Folder | What it is |
 |---|---|
-| [`bigcat/`](bigcat/) | **Big Cat**: a giant, tameable cat with 200 generated coats, plus a **laser pointer** that cats chase, orbs, tameable monsters, and wands that make players **mini or huge** or give them **rainbow or stinky vapor**, a **grappling gun** that pulls you to blocks or pulls mobs to you, **Evolution Stones** (dropped by ores) that evolve cats through 8 stages until they grow wings and fly, a **net trap** that holds whatever walks onto it, and a **Drowned Trap** that blows up drowned for enchanted weapons, and an **Air Cannon** that blasts players and creatures super far. |
+| [`bigcat/`](bigcat/) | **Big Cat**: a giant, tameable cat with 200 generated coats, plus gadgets: blasters, wands, traps, a digging vehicle and teleport pads (list below). |
 | [`gear/`](gear/) | **Amethyst armor**: a full armor set with a set bonus, plus **geode goggles** that give night vision. |
+
+### What's in Big Cat
+
+- **Cats:** the **Big Cat** itself; a **Laser Pointer** that cats chase; **Evolution Stones** (dropped by ores) that
+  evolve a cat through 8 stages until it grows wings and flies.
+- **Catching things:** **Cat Orb**, **Creature Orb** and **Player Trap Orb**; a **Net Trap** that holds whatever walks
+  onto it; a **Drowned Trap** that blows up drowned for enchanted weapons; tameable zombies, skeletons and creepers.
+- **Wands:** **Size Wand** (mini or huge), **Vapor Wand** (rainbow or stinky clouds), **Morph Wand** (turn into
+  8 creatures, each with a perk).
+- **Blasters and guns:** **Laser Blaster** (burns through blocks), **Flame Blaster**, **Water** and **Ice Blasters**
+  (put fires out), **Barf Blaster** (makes whoever it hits throw up), **Air Cannon** (blasts things super far),
+  **Grappling Gun**, and **Monster / Animal Vortex Guns** that pull creatures to you from far away.
+- **Big stuff:** an **Atomic Bomb** with a crater and a mushroom cloud; a **Mountain Seed** that grows a fractal
+  mountain.
+- **Getting around:** the **Mooshroom Drill**, a vehicle with a spinning mooshroom as its drill bit that digs tunnels
+  super fast; **Portal Pads**: place two of the same colour and step on one to teleport to the other.
 
 Each folder has a `TESTING.md` with the full test steps.
 

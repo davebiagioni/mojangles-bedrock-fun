@@ -8,14 +8,14 @@
 // Each use turns the player into the next creature; after the last one they're themselves again.
 // Sneak + use: straight back to yourself. Drinking milk does the same.
 //
-// The costume: the player gets Invisibility and a mymod:morph entity (no AI, can't be hurt, too
+// The costume: the player gets Invisibility and a mymod:morph_<form> entity (no AI, can't be hurt, too
 // small to click) is moved onto them every tick. Invisibility doesn't hide armour, so while
 // morphed the armour is moved into the inventory (marked with ARMOR_MARK in its lore) and put back
 // on when the player is themselves again. The item in hand still shows. Each creature also has a
 // perk (PERKS below). The form is saved on the player, so it survives relogs and deaths.
 
 import { world, system, EquipmentSlot } from "@minecraft/server";
-import { FORMS, MORPH_ID, FORM_PROPERTY } from "./morph_forms.js";
+import { FORMS, MORPH_FAMILY } from "./morph_forms.js";
 
 const WAND = "mymod:morph_wand";
 const PROP_FORM = "bigcat_form"; // index into FORMS; 0 = yourself
@@ -230,17 +230,17 @@ function follow(player, n) {
     removeCostume(player.id);
     return;
   }
-  if (c && (!c.isValid || c.dimension.id !== player.dimension.id)) {
+  const type = FORMS[n].entity; // one entity type per creature (see tools/gen_morph.py)
+  if (c && (!c.isValid || c.dimension.id !== player.dimension.id || c.typeId !== type)) {
     removeCostume(player.id);
     c = undefined;
   }
   const rotation = player.getRotation();
   if (!c) {
-    c = safe(() => player.dimension.spawnEntity(MORPH_ID, player.location));
+    c = safe(() => player.dimension.spawnEntity(type, player.location));
     if (!c) return;
     costumes.set(player.id, c);
   }
-  if (safe(() => c.getProperty(FORM_PROPERTY)) !== n) safe(() => c.setProperty(FORM_PROPERTY, n));
   safe(() => c.teleport(player.location, { rotation, keepVelocity: false }));
 }
 
@@ -292,7 +292,7 @@ system.runInterval(() => {
   const owned = new Set([...costumes.values()].filter((c) => c.isValid).map((c) => c.id));
   for (const id of DIMENSIONS) {
     const dim = safe(() => world.getDimension(id));
-    for (const c of safe(() => dim.getEntities({ type: MORPH_ID })) ?? []) {
+    for (const c of safe(() => dim.getEntities({ families: [MORPH_FAMILY] })) ?? []) {
       if (!owned.has(c.id)) safe(() => c.remove());
     }
   }

@@ -1,0 +1,29 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:block": {
+    "description": {
+      "identifier": "mymod:atomic_bomb",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "mymod_atomic_bomb_side"
+        },
+        "up": {
+          "texture": "mymod_atomic_bomb_top"
+        },
+        "down": {
+          "texture": "mymod_atomic_bomb_bottom"
+        }
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0
+      },
+      "minecraft:map_color": "#e8c820"
+    }
+  }
+}

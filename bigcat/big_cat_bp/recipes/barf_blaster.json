@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:barf_blaster"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " I ",
+      "SPS",
+      " G "
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:spider_eye"
+      },
+      "S": {
+        "item": "minecraft:slime_ball"
+      },
+      "P": {
+        "item": "mymod:laser_pointer"
+      },
+      "G": {
+        "item": "minecraft:glowstone"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mymod:laser_pointer"
+      }
+    ],
+    "result": {
+      "item": "mymod:barf_blaster",
+      "count": 1
+    }
+  }
+}

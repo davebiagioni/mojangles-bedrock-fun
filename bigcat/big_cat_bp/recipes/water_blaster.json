@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mymod:water_blaster"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " W ",
+      "LPL",
+      " G "
+    ],
+    "key": {
+      "W": {
+        "item": "minecraft:water_bucket"
+      },
+      "L": {
+        "item": "minecraft:lapis_lazuli"
+      },
+      "P": {
+        "item": "mymod:laser_pointer"
+      },
+      "G": {
+        "item": "minecraft:glowstone"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mymod:laser_pointer"
+      }
+    ],
+    "result": {
+      "item": "mymod:water_blaster",
+      "count": 1
+    }
+  }
+}

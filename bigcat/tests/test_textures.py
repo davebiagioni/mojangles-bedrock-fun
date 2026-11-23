@@ -6,10 +6,13 @@ import pytest
 from PIL import Image
 
 import gen_air_cannon
+import gen_atomic_bomb
 import gen_drowned_trap
 import gen_grapple
 import gen_laser
+import gen_mountain
 import gen_orb
+import gen_vortex
 import gen_wand
 from common import BuildError
 
@@ -28,8 +31,15 @@ MAKERS = {
     "grapple_hook": gen_grapple._hook,
     "drowned_trap": gen_drowned_trap._icon,
     "air_cannon": gen_air_cannon._icon,
+    "atomic_bomb_side": gen_atomic_bomb._side,
+    "atomic_bomb_top": gen_atomic_bomb._top,
+    "atomic_bomb_bottom": gen_atomic_bomb._bottom,
+    "mountain_seed": gen_mountain._icon,
+    "vortex_gun": gen_vortex._icon,
+    "animal_vortex_gun": lambda: gen_vortex._icon(gen_vortex.ANIMAL_SWIRL),
 }
-ICONS = [k for k in MAKERS if k not in ("laser_dot", "grapple_hook")]  # item icons have transparent backgrounds
+# item icons have transparent backgrounds
+ICONS = [k for k in MAKERS if k not in ("laser_dot", "grapple_hook") and not k.startswith("atomic_bomb")]
 
 
 def pixels(im: Image.Image) -> list[tuple]:
@@ -80,8 +90,10 @@ def test_laser_dot_is_fully_opaque_red():
         (gen_wand.VAPOR_TIP, gen_wand.TIP_COLORS),
         (gen_grapple.ICON, gen_grapple.COLORS),
         (gen_air_cannon.ICON, gen_air_cannon.COLORS),
+        (gen_mountain.ICON, gen_mountain.COLORS),
+        (gen_vortex.ICON, gen_vortex.COLORS),
     ],
-    ids=["laser", "cat", "paw", "figure", "size_tip", "vapor_tip", "grapple", "air_cannon"],
+    ids=["laser", "cat", "paw", "figure", "size_tip", "vapor_tip", "grapple", "air_cannon", "mountain", "vortex"],
 )
 def test_pixel_grids_are_well_formed(grid, palette):
     assert all(len(row) == 16 for row in grid)
@@ -127,10 +139,15 @@ GENERATORS = [
     (gen_wand.generate_wand_textures, gen_wand.ALL_TEXTURES),
     (gen_grapple.generate_grapple_textures, gen_grapple.ALL_TEXTURES),
     (gen_air_cannon.generate_air_cannon_textures, gen_air_cannon.ALL_TEXTURES),
+    (gen_atomic_bomb.generate_atomic_bomb_textures, gen_atomic_bomb.ALL_TEXTURES),
+    (gen_mountain.generate_mountain_texture, gen_mountain.ALL_TEXTURES),
+    (gen_vortex.generate_vortex_texture, gen_vortex.ALL_TEXTURES),
 ]
 
+GENERATOR_IDS = ["laser", "orb", "wand", "grapple", "air_cannon", "atomic_bomb", "mountain", "vortex"]
 
-@pytest.mark.parametrize(("generate", "textures"), GENERATORS, ids=["laser", "orb", "wand", "grapple", "air_cannon"])
+
+@pytest.mark.parametrize(("generate", "textures"), GENERATORS, ids=GENERATOR_IDS)
 def test_generators_write_pngs_into_rp(bare_project, capsys, generate, textures):
     generate()
     out = capsys.readouterr().out
@@ -141,7 +158,7 @@ def test_generators_write_pngs_into_rp(bare_project, capsys, generate, textures)
         assert f"big_cat_rp/{tex}.png" in out
 
 
-@pytest.mark.parametrize(("generate", "textures"), GENERATORS, ids=["laser", "orb", "wand", "grapple", "air_cannon"])
+@pytest.mark.parametrize(("generate", "textures"), GENERATORS, ids=GENERATOR_IDS)
 def test_generators_are_byte_stable(bare_project, generate, textures):
     generate(verbose=False)
     first = [(bare_project.rp / (t + ".png")).read_bytes() for t in textures]
@@ -197,3 +214,8 @@ def test_patch_drowned_requires_target_goal(project):
     (project.root / "vanilla" / "drowned.json").write_text('{"minecraft:entity": {"components": {}}}', encoding="utf-8")
     with pytest.raises(BuildError, match=r"has no minecraft:behavior\.nearest_attackable_target"):
         gen_drowned_trap.patch_drowned()
+
+
+def test_atomic_bomb_textures_are_opaque():
+    for make in (gen_atomic_bomb._side, gen_atomic_bomb._top, gen_atomic_bomb._bottom):
+        assert {px[3] for px in pixels(make())} == {255}
